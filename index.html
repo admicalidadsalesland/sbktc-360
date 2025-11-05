@@ -159,206 +159,191 @@
     <div id="errorContainer"><div class="info">Esperando datos...</div></div>
   </div>
 
-  <script>
-    const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRp7iRBUwVpHnmf7Q0mLyARIBl-inFlZbH43i3wU1whcjE0GlPi7Z51VcmXRsWrcYCmWMS1WTL-ySJt/pub?gid=2119161122&single=true&output=csv";
+ <script>
+  const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRp7iRBUwVpHnmf7Q0mLyARIBl-inFlZbH43i3wU1whcjE0GlPi7Z51VcmXRsWrcYCmWMS1WTL-ySJt/pub?gid=2119161122&single=true&output=csv";
 
-    const COLUMNS = [
-      { key: '1_COMUNICACIÓN', label: 'Comunicación' },
-      { key: '2_INFORMACIÓN', label: 'Información' },
-      { key: '3_GESTION DE VENTA (PRE VENTA)', label: 'Gestión de Venta (Preventa)' },
-      { key: '4_REGULATORIO', label: 'Regulatorio' },
-      { key: 'NOTA', label: 'Nota General' }
-    ];
+  const COLUMNS = [
+    { key: '1_COMUNICACIÓN', label: 'Comunicación' },
+    { key: '2_INFORMACIÓN', label: 'Información' },
+    { key: '3_GESTION DE VENTA (PRE VENTA)', label: 'Gestión de Venta (Preventa)' },
+    { key: '4_REGULATORIO', label: 'Regulatorio' },
+    { key: 'NOTA', label: 'Nota General' }
+  ];
 
-    const DETAIL_COLUMNS = [
-      { key: '1.1 PROTOCOLO DE BIENVENIDA Y DESPEDIDA', label: 'Protocolo de bienvenida y despedida' },
-      { key: '1.2 CAPACIDAD DE FLUIDEZ Y VOCALIZACIÓN', label: 'Fluidez y vocalización' },
-      { key: '1.3 PRESENTA SONRISA TELEFONICA', label: 'Sonrisa telefónica' },
-      { key: '1.4 NO UTILIZA TECNISISMOS', label: 'No usa tecnicismos' },
-      { key: '1.5 NO UTILIZA MULETILLAS', label: 'No usa muletillas' },
-      { key: '1.6 ESCUCHA ACTIVA', label: 'Escucha activa' },
-      { key: '1.7 NO REALIZA TUTEO (PERSONALIZACION)', label: 'No tuteo (personalización)' },
-      { key: '2.1 BRINDA CARACTERISTICAS CORRECTAS DEL PRODUCTO', label: 'Características correctas del producto' },
-      { key: '2.2 BRINDA CARACTERISTICAS COMPLETAS DEL PRODUCTO', label: 'Características completas del producto' },
-      { key: '2.3 PRESENTA BENEFICIOS DE MANERA CORRECTA', label: 'Beneficios correctos' },
-      { key: '2.4 PRESENTA BENEFICIOS DE MANERA COMPLETA', label: 'Beneficios completos' },
-      { key: '2.5 ACLARA DUDAS DEL CLIENTE', label: 'Aclara dudas del cliente' },
-      { key: '3.1 SONDEA LA NECESIDAD DE CLIENTE', label: 'Sondea necesidad del cliente' },
-      { key: '3.2 REBATE LA NEGATIVA DEL CLIENTE', label: 'Rebate la negativa' },
-      { key: '3.3 REBATE DE ACUERDO A LA NEGATIVA DEL CLIENTE', label: 'Rebate según negativa' },
-      { key: '3.4 APLICA CIERRE DE VENTA', label: 'Cierre de venta' },
-      { key: '3.5 OFRECE CORRECTAMENTE CUENTA DIGITAL', label: 'Ofrece cuenta digital' },
-      { key: '3.6 TIPIFICACIÓN', label: 'Tipificación' },
-      { key: '4.1 LPDP (FLAG 0 & 2)', label: 'LPDP (Flag 0 & 2)' }
-    ];
+  const DETAIL_COLUMNS = [
+    { key: '1.1 PROTOCOLO DE BIENVENIDA Y DESPEDIDA', label: 'Protocolo de bienvenida y despedida' },
+    { key: '1.2 CAPACIDAD DE FLUIDEZ Y VOCALIZACIÓN', label: 'Fluidez y vocalización' },
+    { key: '1.3 PRESENTA SONRISA TELEFONICA', label: 'Sonrisa telefónica' },
+    { key: '1.4 NO UTILIZA TECNISISMOS', label: 'No usa tecnicismos' },
+    { key: '1.5 NO UTILIZA MULETILLAS', label: 'No usa muletillas' },
+    { key: '1.6 ESCUCHA ACTIVA', label: 'Escucha activa' },
+    { key: '1.7 NO REALIZA TUTEO (PERSONALIZACION)', label: 'No tuteo (personalización)' },
+    { key: '2.1 BRINDA CARACTERISTICAS CORRECTAS DEL PRODUCTO', label: 'Características correctas del producto' },
+    { key: '2.2 BRINDA CARACTERISTICAS COMPLETAS DEL PRODUCTO', label: 'Características completas del producto' },
+    { key: '2.3 PRESENTA BENEFICIOS DE MANERA CORRECTA', label: 'Beneficios correctos' },
+    { key: '2.4 PRESENTA BENEFICIOS DE MANERA COMPLETA', label: 'Beneficios completos' },
+    { key: '2.5 ACLARA DUDAS DEL CLIENTE', label: 'Aclara dudas del cliente' },
+    { key: '3.1 SONDEA LA NECESIDAD DE CLIENTE', label: 'Sondea necesidad del cliente' },
+    { key: '3.2 REBATE LA NEGATIVA DEL CLIENTE', label: 'Rebate la negativa' },
+    { key: '3.3 REBATE DE ACUERDO A LA NEGATIVA DEL CLIENTE', label: 'Rebate según negativa' },
+    { key: '3.4 APLICA CIERRE DE VENTA', label: 'Cierre de venta' },
+    { key: '3.5 OFRECE CORRECTAMENTE CUENTA DIGITAL', label: 'Ofrece cuenta digital' },
+    { key: '3.6 TIPIFICACIÓN', label: 'Tipificación' },
+    { key: '4.1 LPDP (FLAG 0 & 2)', label: 'LPDP (Flag 0 & 2)' }
+  ];
 
-    let allData = [];
+  let allData = [];
 
-    // convierte un valor textual a número porcentual 0-100
-    function parseToPercent(raw) {
-      if (raw === undefined || raw === null || raw === "") return null;
-      let s = String(raw).trim().replace('%','').replace(',','.');
-      if (s === "") return null;
-      const n = parseFloat(s);
-      if (isNaN(n)) return null;
-      // si viene en formato 0.85 -> multiplicar por 100, si ya 85 -> mantener
-      let v = n;
-      if (Math.abs(v) <= 1) v = v * 100;
-      // clamp 0..100
-      if (v < 0) v = 0;
-      if (v > 100) v = 100;
-      return v;
+  function parseToPercent(raw) {
+    if (raw === undefined || raw === null || raw === "") return null;
+    let s = String(raw).trim().replace('%','').replace(',','.');
+    if (s === "") return null;
+    const n = parseFloat(s);
+    if (isNaN(n)) return null;
+    let v = n;
+    if (Math.abs(v) <= 1) v = v * 100;
+    if (v < 0) v = 0;
+    if (v > 100) v = 100;
+    return v;
+  }
+
+  // ✅ NUEVA LÓGICA DE COLORES
+  function getColorClass(value) {
+    if (value <= 65) return 'c-bad';
+    if (value >= 85) return 'c-good';
+    return 'c-warn'; // 66% a 84% → amarillo
+  }
+
+  async function loadData() {
+    const res = await fetch(CSV_URL);
+    const text = await res.text();
+    const lines = text.split('\n').filter(Boolean);
+    const headers = lines[0].split(',').map(h=>h.trim());
+    allData = lines.slice(1).map(l=>{
+      const v = l.split(',').map(x => x.trim().replace(/^"(.+)"$/,'$1'));
+      const o = {};
+      headers.forEach((h,i)=> o[h] = v[i] === undefined ? "" : v[i]);
+      return o;
+    });
+  }
+
+  async function searchByDNI() {
+    const dni = document.getElementById("dniInput").value.trim();
+    if (!dni) return alert("Ingresa un DNI");
+    if (!allData.length) await loadData();
+
+    const filtered = allData.filter(r => r.DNI && r.DNI.toString().includes(dni));
+    if (!filtered.length) {
+      document.getElementById('resultContainer').innerHTML = `<div class="error">No se encontró el DNI ${dni}</div>`;
+      document.getElementById('errorContainer').innerHTML = "";
+      return;
     }
 
-    // Función para determinar la clase de color según el porcentaje
-    function getColorClass(value) {
-      if (value <= 65) return 'c-bad';
-      if (value <= 75) return 'c-warn';
-      if (value >= 85) return 'c-good';
-      return ''; // 76-84: sin clase especial
-    }
+    const weeks = [...new Set(filtered.map(r=>r.SEMANA || 'Sin semana'))].sort();
 
-    async function loadData() {
-      const res = await fetch(CSV_URL);
-      const text = await res.text();
-      const lines = text.split('\n').filter(Boolean);
-      const headers = lines[0].split(',').map(h=>h.trim());
-      allData = lines.slice(1).map(l=>{
-        const v = l.split(',').map(x => x.trim().replace(/^"(.+)"$/,'$1'));
-        const o = {};
-        headers.forEach((h,i)=> o[h] = v[i] === undefined ? "" : v[i]);
-        return o;
+    let table = `<h3>Resultados para DNI: ${dni}</h3>
+    <table><thead><tr><th>Indicador</th>${weeks.map(w=>`<th>${w}</th>`).join('')}</tr></thead><tbody>`;
+
+    COLUMNS.forEach(col => {
+      table += `<tr><td>${col.label}</td>`;
+      weeks.forEach(w => {
+        const vals = filtered
+          .filter(r => (r.SEMANA||'Sin semana') === w)
+          .map(r => parseToPercent(r[col.key]))
+          .filter(x => x !== null);
+        const avgWeek = vals.length ? (vals.reduce((a,b)=>a+b,0) / vals.length) : 0;
+        const cls = getColorClass(avgWeek);
+        table += `<td class="${cls}">${avgWeek.toFixed(1)}%</td>`;
       });
-    }
+      table += `</tr>`;
+    });
 
-    async function searchByDNI() {
-      const dni = document.getElementById("dniInput").value.trim();
-      if (!dni) return alert("Ingresa un DNI");
-      if (!allData.length) await loadData();
+    table += `</tbody></table><div class="divider"></div>`;
 
-      const filtered = allData.filter(r => r.DNI && r.DNI.toString().includes(dni));
-      if (!filtered.length) {
-        document.getElementById('resultContainer').innerHTML = `<div class="error">No se encontró el DNI ${dni}</div>`;
-        document.getElementById('errorContainer').innerHTML = "";
-        return;
+    const totalAverages = {};
+    COLUMNS.forEach(col => {
+      const vals = filtered.map(r => parseToPercent(r[col.key])).filter(x => x !== null);
+      totalAverages[col.key] = vals.length ? (vals.reduce((a,b)=>a+b,0) / vals.length) : 0;
+    });
+
+    const notaGlobal = totalAverages['NOTA'] || 0;
+
+    table += `
+      <div class="chart-container">
+        <svg viewBox="0 0 200 200">
+          <circle class="circle-bg" cx="100" cy="100" r="90"></circle>
+          <circle class="circle-progress" cx="100" cy="100" r="90"></circle>
+        </svg>
+        <div class="percentage" id="percentValue">0%</div>
+      </div>
+      <div class="subtitle">Total General (filas: ${filtered.length})</div>
+    `;
+
+    document.getElementById("resultContainer").innerHTML = table;
+    animateDonut(notaGlobal);
+
+    let detail = `<table><thead><tr><th>Indicador</th>${weeks.map(w=>`<th>${w}</th>`).join('')}</tr></thead><tbody>`;
+    DETAIL_COLUMNS.forEach(col=>{
+      detail += `<tr><td>${col.label}</td>`;
+      weeks.forEach(w=>{
+        const sums = filtered
+          .filter(r => (r.SEMANA||'Sin semana') === w)
+          .map(r => {
+            const v = r[col.key];
+            const n = parseInt(String(v).replace(/\D/g,''),10);
+            return isNaN(n) ? 0 : n;
+          });
+        const sum = sums.reduce((a,b)=>a+b,0);
+        detail += `<td>${sum}</td>`;
+      });
+      detail += `</tr>`;
+    });
+    detail += `</tbody></table>`;
+    document.getElementById('errorContainer').innerHTML = detail;
+  }
+
+  function animateDonut(targetPercent) {
+    const circle = document.querySelector('.circle-progress');
+    const text = document.getElementById('percentValue');
+    const radius = 90;
+    const circumference = 2 * Math.PI * radius;
+    circle.style.strokeDasharray = circumference;
+    circle.style.strokeDashoffset = circumference;
+
+    if (targetPercent < 0) targetPercent = 0;
+    if (targetPercent > 100) targetPercent = 100;
+
+    let current = 0;
+    const duration = 1500;
+    const fps = 60;
+    const steps = Math.round(duration / (1000 / fps));
+    const increment = targetPercent / steps;
+
+    const interval = setInterval(() => {
+      current += increment;
+      if (current >= targetPercent) {
+        current = targetPercent;
+        clearInterval(interval);
       }
 
-      const weeks = [...new Set(filtered.map(r=>r.SEMANA || 'Sin semana'))].sort();
+      const offset = circumference - (current / 100) * circumference;
+      circle.style.strokeDashoffset = offset;
 
-      // ---- construir tabla izquierda (por semana) ----
-      let table = `<h3>Resultados para DNI: ${dni}</h3>
-      <table><thead><tr><th>Indicador</th>${weeks.map(w=>`<th>${w}</th>`).join('')}</tr></thead><tbody>`;
+      // ✅ NUEVA LÓGICA DE COLOR EN DONUT
+      let color = "#facc15"; // amarillo por defecto (66–84)
+      if (current <= 65) {
+        color = "#f43f5e";
+      } else if (current >= 85) {
+        color = "#2AC793";
+      }
 
-      // Para cada columna calculamos promedio por semana (para la tabla)
-      COLUMNS.forEach(col => {
-        table += `<tr><td>${col.label}</td>`;
-        weeks.forEach(w => {
-          const vals = filtered
-            .filter(r => (r.SEMANA||'Sin semana') === w)
-            .map(r => parseToPercent(r[col.key]))
-            .filter(x => x !== null);
-          const avgWeek = vals.length ? (vals.reduce((a,b)=>a+b,0) / vals.length) : 0;
-          const cls = getColorClass(avgWeek);
-          table += `<td class="${cls}">${avgWeek.toFixed(1)}%</td>`;
-        });
-        table += `</tr>`;
-      });
+      circle.style.stroke = color;
+      text.style.color = color;
+      text.textContent = current.toFixed(1) + "%";
+    }, 1000 / fps);
+  }
 
-      table += `</tbody></table><div class="divider"></div>`;
-
-      // ---- TOTAL GENERAL: POR COLUMNA (promedio sobre TODAS las filas filtradas) ----
-      const totalAverages = {};
-      COLUMNS.forEach(col => {
-        const vals = filtered.map(r => parseToPercent(r[col.key])).filter(x => x !== null);
-        totalAverages[col.key] = vals.length ? (vals.reduce((a,b)=>a+b,0) / vals.length) : 0;
-      });
-
-      const notaGlobal = totalAverages['NOTA'] || 0;
-
-      table += `
-        <div class="chart-container">
-          <svg viewBox="0 0 200 200">
-            <circle class="circle-bg" cx="100" cy="100" r="90"></circle>
-            <circle class="circle-progress" cx="100" cy="100" r="90"></circle>
-          </svg>
-          <div class="percentage" id="percentValue">0%</div>
-        </div>
-        <div class="subtitle">Total General (filas: ${filtered.length})</div>
-      `;
-
-      document.getElementById("resultContainer").innerHTML = table;
-
-      // ANIMA DONUT con el valor POR COLUMNA (NOTA global)
-      animateDonut(notaGlobal);
-
-      // ---- TABLA DERECHA: detalle de errores (enteros) ----
-      let detail = `<table><thead><tr><th>Indicador</th>${weeks.map(w=>`<th>${w}</th>`).join('')}</tr></thead><tbody>`;
-      DETAIL_COLUMNS.forEach(col=>{
-        detail += `<tr><td>${col.label}</td>`;
-        weeks.forEach(w=>{
-          const sums = filtered
-            .filter(r => (r.SEMANA||'Sin semana') === w)
-            .map(r => {
-              const v = r[col.key];
-              const n = parseInt(String(v).replace(/\D/g,''),10);
-              return isNaN(n) ? 0 : n;
-            });
-          const sum = sums.reduce((a,b)=>a+b,0);
-          detail += `<td>${sum}</td>`;
-        });
-        detail += `</tr>`;
-      });
-      detail += `</tbody></table>`;
-      document.getElementById('errorContainer').innerHTML = detail;
-    }
-
-    // animación del donut (con color dinámico según target)
-    function animateDonut(targetPercent) {
-      const circle = document.querySelector('.circle-progress');
-      const text = document.getElementById('percentValue');
-      const radius = 90;
-      const circumference = 2 * Math.PI * radius;
-      circle.style.strokeDasharray = circumference;
-      circle.style.strokeDashoffset = circumference;
-
-      // clamp
-      if (targetPercent < 0) targetPercent = 0;
-      if (targetPercent > 100) targetPercent = 100;
-
-      let current = 0;
-      const duration = 1500;
-      const fps = 60;
-      const steps = Math.round(duration / (1000 / fps));
-      const increment = targetPercent / steps;
-
-      const interval = setInterval(() => {
-        current += increment;
-        if (current >= targetPercent) {
-          current = targetPercent;
-          clearInterval(interval);
-        }
-
-        const offset = circumference - (current / 100) * circumference;
-        circle.style.strokeDashoffset = offset;
-
-        // Determinar color según el valor actual
-        let color = "#111827"; // neutro por defecto
-        if (current <= 65) {
-          color = "#f43f5e";
-        } else if (current <= 75) {
-          color = "#facc15";
-        } else if (current >= 85) {
-          color = "#2AC793";
-        }
-
-        circle.style.stroke = color;
-        text.style.color = color;
-        text.textContent = current.toFixed(1) + "%";
-      }, 1000 / fps);
-    }
-
-    // cargar inicialmente
-    loadData();
-  </script>
+  loadData();
+</script>
 </body>
 </html>
