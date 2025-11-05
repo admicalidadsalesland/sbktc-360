@@ -3,50 +3,40 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Evaluaciones - Panel Completo</title>
+  <title>Promedios por DNI - Evaluaciones</title>
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background-color: #f5f7fa;
       margin: 0;
-      padding: 0;
+      padding: 20px;
       color: #333;
-      display: flex;
-      height: 100vh;
-      overflow: hidden;
     }
-
-    .left-container, .right-container {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
       background: white;
-      margin: 10px;
-      padding: 25px;
+      padding: 30px;
       border-radius: 12px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      overflow-y: auto;
     }
-
-    .left-container h1, .right-container h1 {
+    h1 {
       text-align: center;
       color: #2c3e50;
       margin-bottom: 20px;
     }
-
     .search-box {
       display: flex;
       gap: 10px;
       margin-bottom: 25px;
       align-items: center;
-      justify-content: center;
     }
     .search-box input {
       padding: 10px;
       font-size: 16px;
       border: 1px solid #ccc;
       border-radius: 6px;
-      flex: 0.7;
+      flex: 1;
     }
     .search-box button {
       padding: 10px 20px;
@@ -57,37 +47,42 @@
       cursor: pointer;
       font-size: 16px;
     }
-    .search-box button:hover { background: #2980b9; }
-
+    .search-box button:hover {
+      background: #2980b9;
+    }
     table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 25px;
-      font-size: 14px;
     }
     th, td {
       border: 1px solid #eee;
-      padding: 8px;
+      padding: 10px;
       text-align: center;
     }
     th {
       background: #f0f4f8;
       color: #2c3e50;
-      font-weight: 600;
     }
-    td { font-weight: 500; }
-
+    td {
+      font-weight: 500;
+    }
     .metric-name {
       font-weight: 600;
       color: #2980b9;
       text-align: left;
     }
-
+    .total-general {
+      margin-top: 40px;
+      padding-top: 30px;
+      border-top: 3px solid #3498db;
+      text-align: center;
+    }
     .chart-container {
       position: relative;
       width: 160px;
       height: 160px;
-      margin: 20px auto;
+      margin: 0 auto;
     }
     .circle-bg {
       fill: none;
@@ -113,36 +108,37 @@
       font-weight: 600;
       color: #2c3e50;
     }
-
-    .error { color: #e74c3c; text-align: center; font-weight: bold; margin: 20px 0; }
-    .info { text-align: center; font-style: italic; color: #7f8c8d; margin: 10px 0; }
-
-    /* Compact table for errors */
-    .right-container table td, .right-container table th {
-      padding: 6px 5px;
-      font-size: 13px;
-    }
-    .right-container h2 {
+    .loading {
       text-align: center;
+      font-size: 1.2em;
+      color: #7f8c8d;
+    }
+    .error {
       color: #e74c3c;
-      font-size: 1.1em;
-      margin-bottom: 10px;
+      text-align: center;
+      font-weight: bold;
+      margin: 20px 0;
+    }
+    .info {
+      text-align: center;
+      font-style: italic;
+      color: #7f8c8d;
+      margin: 10px 0;
     }
   </style>
 </head>
 <body>
-  <div class="left-container">
+  <div class="container">
     <h1>📊 Evaluaciones por DNI</h1>
+
     <div class="search-box">
       <input type="text" id="dniInput" placeholder="Buscar por DNI (ej: 40753375)" />
       <button onclick="searchByDNI()">Buscar</button>
     </div>
-    <div id="resultContainer"><div class="info">Cargando datos...</div></div>
-  </div>
 
-  <div class="right-container">
-    <h1>❌ Detalle de Errores</h1>
-    <div id="errorContainer"><div class="info">Esperando búsqueda...</div></div>
+    <div id="resultContainer">
+      <div class="loading">Cargando datos...</div>
+    </div>
   </div>
 
   <script>
@@ -156,61 +152,78 @@
       { key: 'NOTA', label: 'Nota General' }
     ];
 
-    const ERROR_COLUMNS = [
-      { key: 'ERROR_COMUNICACIÓN', label: 'Error Comunicación' },
-      { key: 'ERROR_INFORMACIÓN', label: 'Error Información' },
-      { key: 'ERROR_VENTA', label: 'Error Venta' },
-      { key: 'ERROR_REGULATORIO', label: 'Error Regulatorio' },
-      { key: 'TOTAL_ERRORES', label: 'Total Errores' }
-    ];
-
     let allData = [];
 
     async function loadAndProcessData() {
-      const response = await fetch(CSV_URL);
-      const csvText = await response.text();
-      const lines = csvText.trim().split('\n');
-      const headers = lines[0].split(',').map(h => h.trim());
-      allData = [];
+      try {
+        const response = await fetch(CSV_URL);
+        if (!response.ok) throw new Error('No se pudo cargar el CSV');
+        const csvText = await response.text();
+        const lines = csvText.trim().split('\n');
 
-      for (let i = 1; i < lines.length; i++) {
-        const values = lines[i].split(',').map(v => v.trim().replace(/^"(.*)"$/, '$1'));
-        const row = {};
-        headers.forEach((header, idx) => { row[header] = values[idx]; });
+        if (lines.length < 2) {
+          showError('El archivo está vacío.');
+          return;
+        }
 
-        // Convertir porcentajes
-        COLUMNS.forEach(col => {
-          let val = row[col.key];
-          if (!val) { row[col.key] = null; return; }
-          val = val.replace('%', '').replace(',', '.');
-          let num = parseFloat(val);
-          if (num <= 1) num *= 100;
-          row[col.key] = Math.min(Math.max(num, 0), 130);
-        });
+        const headers = lines[0].split(',').map(h => h.trim());
+        allData = [];
 
-        // Simulación de errores enteros por columna (solo ejemplo)
-        ERROR_COLUMNS.forEach((err, idx) => {
-          row[err.key] = Math.floor(Math.random() * 3); // Ejemplo: 0–2 errores
-        });
-        row['TOTAL_ERRORES'] = ERROR_COLUMNS.slice(0,4).reduce((a,b)=>a+(row[b.key]||0),0);
+        for (let i = 1; i < lines.length; i++) {
+          const values = lines[i].split(',').map(v => v.trim().replace(/^"(.*)"$/, '$1'));
+          if (values.length !== headers.length) continue;
 
-        allData.push(row);
+          const row = {};
+          headers.forEach((header, idx) => {
+            row[header] = values[idx];
+          });
+
+          // Conversión de porcentaje 0–100
+          COLUMNS.forEach(col => {
+            let val = row[col.key];
+            if (val === '' || val === null) {
+              row[col.key] = null;
+              return;
+            }
+            val = val.replace('%', '').trim().replace(',', '.');
+            if (isNaN(val)) {
+              row[col.key] = null;
+              return;
+            }
+            let num = parseFloat(val);
+            if (num <= 1) num *= 100;
+            row[col.key] = Math.min(Math.max(num, 0), 100);
+          });
+
+          allData.push(row);
+        }
+
+        document.getElementById('resultContainer').innerHTML = `
+          <div class="info">✅ Datos cargados. Ingresa un DNI para buscar.</div>
+        `;
+      } catch (error) {
+        showError('❌ Error: ' + error.message);
       }
-
-      document.getElementById('resultContainer').innerHTML = `<div class="info">✅ Datos cargados. Ingresa un DNI para buscar.</div>`;
     }
 
     function searchByDNI() {
       const dniQuery = document.getElementById('dniInput').value.trim();
-      if (!dniQuery) return alert('Por favor, ingresa un DNI.');
-
-      const filtered = allData.filter(r => r.DNI && r.DNI.includes(dniQuery));
-      if (filtered.length === 0) {
-        document.getElementById('resultContainer').innerHTML = `<div class="error">No se encontró DNI: ${dniQuery}</div>`;
-        document.getElementById('errorContainer').innerHTML = `<div class="error">Sin datos de error</div>`;
+      if (!dniQuery) {
+        alert('Por favor, ingresa un DNI.');
         return;
       }
 
+      const filtered = allData.filter(row =>
+        row.DNI && row.DNI.toString().includes(dniQuery)
+      );
+
+      if (filtered.length === 0) {
+        document.getElementById('resultContainer').innerHTML =
+          `<div class="error">❌ No se encontró ningún registro con DNI: ${dniQuery}</div>`;
+        return;
+      }
+
+      // Agrupar por semana
       const byWeek = {};
       filtered.forEach(row => {
         const week = row.SEMANA || "Sin semana";
@@ -218,77 +231,118 @@
         byWeek[week].push(row);
       });
 
-      const weeks = Object.keys(byWeek).sort();
+      const weeks = Object.keys(byWeek).sort((a, b) => {
+        const numA = parseInt(a.replace(/\D/g, '')) || 0;
+        const numB = parseInt(b.replace(/\D/g, '')) || 0;
+        return numA - numB;
+      });
 
-      // Promedios
+      // Calcular promedios por semana y columna
       const averagesByWeek = {};
       weeks.forEach(week => {
         averagesByWeek[week] = {};
         COLUMNS.forEach(col => {
-          const vals = byWeek[week].map(r => r[col.key]).filter(v => v !== null);
-          averagesByWeek[week][col.key] = vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : null;
+          const values = byWeek[week]
+            .map(r => r[col.key])
+            .filter(v => v !== null);
+          const avg =
+            values.length > 0
+              ? values.reduce((a, b) => a + b, 0) / values.length
+              : null;
+          averagesByWeek[week][col.key] = avg;
         });
       });
 
-      const notaGeneral = averagesByWeek[weeks[weeks.length-1]]['NOTA'] || 0;
+      // Calcular promedios globales
+      const totalSums = {};
+      const totalCounts = {};
+      COLUMNS.forEach(col => {
+        totalSums[col.key] = 0;
+        totalCounts[col.key] = 0;
+      });
+      Object.values(byWeek).flat().forEach(row => {
+        COLUMNS.forEach(col => {
+          if (row[col.key] !== null) {
+            totalSums[col.key] += row[col.key];
+            totalCounts[col.key]++;
+          }
+        });
+      });
 
-      // Tabla principal
-      let html = `<h2 style="text-align:center;">Resultados para DNI: ${dniQuery}</h2>`;
+      const totalAverages = {};
+      COLUMNS.forEach(col => {
+        totalAverages[col.key] =
+          totalCounts[col.key] > 0
+            ? (totalSums[col.key] / totalCounts[col.key]).toFixed(1)
+            : 'N/A';
+      });
+
+      const notaGeneral = totalAverages['NOTA'];
+
+      // Generar tabla
+      let html = `<h2 style="text-align:center; color:#2c3e50;">Resultados para DNI: ${dniQuery}</h2>`;
       html += `<table><thead><tr><th>Indicador</th>`;
-      weeks.forEach(w => html += `<th>${w}</th>`);
+      weeks.forEach(week => {
+        html += `<th>${week}</th>`;
+      });
       html += `</tr></thead><tbody>`;
+
       COLUMNS.forEach(col => {
         html += `<tr><td class="metric-name">${col.label}</td>`;
-        weeks.forEach(w => html += `<td>${averagesByWeek[w][col.key] ? averagesByWeek[w][col.key].toFixed(1)+'%' : '-'}</td>`);
+        weeks.forEach(week => {
+          const val = averagesByWeek[week][col.key];
+          html += `<td>${val ? val.toFixed(1) + '%' : 'N/A'}</td>`;
+        });
         html += `</tr>`;
       });
+
       html += `</tbody></table>`;
 
+      // Total general
       html += `
-        <div class="chart-container">
-          <svg viewBox="0 0 160 160">
-            <circle class="circle-bg" cx="80" cy="80" r="70"></circle>
-            <circle class="circle" cx="80" cy="80" r="70"></circle>
-          </svg>
-          <div class="percentage" id="percent-text">${notaGeneral.toFixed(1)}%</div>
+        <div class="total-general">
+          <div style="font-size:1.2em; color:#2c3e50; margin-bottom:15px;">Total General</div>
+          <div class="chart-container">
+            <svg viewBox="0 0 160 160">
+              <circle class="circle-bg" cx="80" cy="80" r="70"></circle>
+              <circle class="circle" cx="80" cy="80" r="70"></circle>
+            </svg>
+            <div class="percentage" id="percent-text">${notaGeneral}%</div>
+          </div>
         </div>
+        <div class="info">Filas procesadas: ${filtered.length}</div>
       `;
 
       document.getElementById('resultContainer').innerHTML = html;
       animateChart(notaGeneral);
-
-      // Tabla de errores con formato por semana
-      let errHtml = `<h2>Errores por Indicador</h2><table><thead><tr><th>Indicador</th>`;
-      weeks.forEach(w => errHtml += `<th>${w}</th>`);
-      errHtml += `</tr></thead><tbody>`;
-
-      ERROR_COLUMNS.forEach(err => {
-        errHtml += `<tr><td class="metric-name">${err.label}</td>`;
-        weeks.forEach(w => {
-          const vals = byWeek[w].map(r => r[err.key] || 0);
-          const total = vals.length ? vals.reduce((a,b)=>a+b,0) : 0;
-          errHtml += `<td>${total}</td>`;
-        });
-        errHtml += `</tr>`;
-      });
-
-      errHtml += `</tbody></table>`;
-      document.getElementById('errorContainer').innerHTML = errHtml;
     }
 
     function animateChart(porcentaje) {
       const circle = document.querySelector('.circle');
       const percentText = document.getElementById('percent-text');
       const radius = 70;
-      const circ = 2 * Math.PI * radius;
-      const offset = circ - (porcentaje / 130) * circ;
-      circle.style.strokeDasharray = circ;
-      circle.style.strokeDashoffset = circ;
+      const circumference = 2 * Math.PI * radius;
+      const offset = circumference - (porcentaje / 100) * circumference;
 
-      circle.animate([{ strokeDashoffset: circ }, { strokeDashoffset: offset }],
-        { duration: 1500, fill: "forwards", easing: "ease-out" });
+      circle.style.strokeDasharray = circumference;
+      circle.style.strokeDashoffset = circumference;
 
-      percentText.textContent = porcentaje.toFixed(1) + "%";
+      circle.animate(
+        [{ strokeDashoffset: circumference }, { strokeDashoffset: offset }],
+        { duration: 1500, fill: "forwards", easing: "ease-out" }
+      );
+
+      let current = 0;
+      const target = Math.round(porcentaje);
+      const interval = setInterval(() => {
+        current++;
+        percentText.textContent = current + "%";
+        if (current >= target) clearInterval(interval);
+      }, 1500 / target);
+    }
+
+    function showError(message) {
+      document.getElementById('resultContainer').innerHTML = `<div class="error">${message}</div>`;
     }
 
     loadAndProcessData();
