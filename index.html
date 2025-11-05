@@ -94,7 +94,7 @@
       border-bottom: 1px solid #f1f5f9;
       text-align: center;
       color: #0f172a;
-      transition: color .15s ease;
+      transition: color .15s ease, background-color .15s ease;
     }
 
     /* Izquierda (más compacta) */
@@ -142,6 +142,19 @@
     .c-bad { color: #f43f5e !important; font-weight: 600; }
     .c-warn { color: #facc15 !important; font-weight: 600; }
     .c-good { color: #2AC793 !important; font-weight: 600; }
+
+    /* celdas error visual */
+    .cell-error {
+      background: #fee2e2;
+      color: #f43f5e;
+      font-weight: 600;
+      border-radius: 4px;
+    }
+
+    .cell-ok {
+      background: #f8fafc;
+      color: #cbd5e1;
+    }
   </style>
 </head>
 <body>
@@ -207,11 +220,10 @@
     return v;
   }
 
-  // ✅ NUEVA LÓGICA DE COLORES
   function getColorClass(value) {
     if (value <= 65) return 'c-bad';
     if (value >= 85) return 'c-good';
-    return 'c-warn'; // 66% a 84% → amarillo
+    return 'c-warn';
   }
 
   async function loadData() {
@@ -241,6 +253,7 @@
 
     const weeks = [...new Set(filtered.map(r=>r.SEMANA || 'Sin semana'))].sort();
 
+    // === TABLA IZQUIERDA ===
     let table = `<h3>Resultados para DNI: ${dni}</h3>
     <table><thead><tr><th>Indicador</th>${weeks.map(w=>`<th>${w}</th>`).join('')}</tr></thead><tbody>`;
 
@@ -260,6 +273,7 @@
 
     table += `</tbody></table><div class="divider"></div>`;
 
+    // TOTAL GENERAL (por columna)
     const totalAverages = {};
     COLUMNS.forEach(col => {
       const vals = filtered.map(r => parseToPercent(r[col.key])).filter(x => x !== null);
@@ -282,6 +296,7 @@
     document.getElementById("resultContainer").innerHTML = table;
     animateDonut(notaGlobal);
 
+    // === TABLA DERECHA ===
     let detail = `<table><thead><tr><th>Indicador</th>${weeks.map(w=>`<th>${w}</th>`).join('')}</tr></thead><tbody>`;
     DETAIL_COLUMNS.forEach(col=>{
       detail += `<tr><td>${col.label}</td>`;
@@ -294,7 +309,12 @@
             return isNaN(n) ? 0 : n;
           });
         const sum = sums.reduce((a,b)=>a+b,0);
-        detail += `<td>${sum}</td>`;
+
+        if (sum >= 1) {
+          detail += `<td class="cell-error">❌</td>`;
+        } else {
+          detail += `<td class="cell-ok">–</td>`;
+        }
       });
       detail += `</tr>`;
     });
@@ -329,13 +349,9 @@
       const offset = circumference - (current / 100) * circumference;
       circle.style.strokeDashoffset = offset;
 
-      // ✅ NUEVA LÓGICA DE COLOR EN DONUT
-      let color = "#facc15"; // amarillo por defecto (66–84)
-      if (current <= 65) {
-        color = "#f43f5e";
-      } else if (current >= 85) {
-        color = "#2AC793";
-      }
+      let color = "#facc15"; // amarillo (66–84)
+      if (current <= 65) color = "#f43f5e";
+      else if (current >= 85) color = "#2AC793";
 
       circle.style.stroke = color;
       text.style.color = color;
