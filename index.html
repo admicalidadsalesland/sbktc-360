@@ -126,10 +126,11 @@
       margin: 20px 0;
     }
 
+    /* === GRAFICO DE ANILLO === */
     .chart-container {
       position: relative;
-      width: 130px;
-      height: 130px;
+      width: 140px;
+      height: 140px;
       margin: 0 auto;
     }
 
@@ -148,7 +149,6 @@
       transform-origin: 50% 50%;
       stroke-dasharray: 440;
       stroke-dashoffset: 440;
-      transition: stroke-dashoffset 1.3s ease;
     }
 
     .percentage {
@@ -156,8 +156,9 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      font-size: 22px;
-      font-weight: 600;
+      font-size: 26px;
+      font-weight: 700;
+      color: #0f172a;
     }
 
     .subtitle {
@@ -174,7 +175,6 @@
     }
     .info { color: #64748b; font-style: italic; }
     .error { color: #dc2626; }
-
   </style>
 </head>
 <body>
@@ -254,7 +254,7 @@
 
       const weeks = [...new Set(filtered.map(r=>r.SEMANA))].sort();
 
-      // TABLA IZQUIERDA (compacta, porcentajes)
+      // TABLA IZQUIERDA
       let table = `<h3>Resultados para DNI: ${dni}</h3>
       <table><thead><tr><th>Indicador</th>${weeks.map(w=>`<th>${w}</th>`).join('')}</tr></thead><tbody>`;
       let total=0, count=0;
@@ -270,19 +270,20 @@
       });
       table += `</tbody></table><div class="divider"></div>
       <div class="chart-container">
-        <svg width="130" height="130"><circle class="circle-bg" cx="65" cy="65" r="50"></circle><circle class="circle" cx="65" cy="65" r="50"></circle></svg>
+        <svg width="140" height="140">
+          <circle class="circle-bg" cx="70" cy="70" r="60"></circle>
+          <circle class="circle" cx="70" cy="70" r="60"></circle>
+        </svg>
         <div class="percentage" id="percentageValue">0%</div>
       </div>
       <div class="subtitle">Total General (filas: ${filtered.length})</div>`;
       document.getElementById("resultContainer").innerHTML = table;
 
+      // ANIMACIÓN UX
       const percent = total/count;
-      const circle = document.querySelector(".circle");
-      const dashoffset = 440 - (440*percent)/100;
-      circle.style.strokeDashoffset = dashoffset;
-      document.getElementById("percentageValue").textContent = `${percent.toFixed(1)}%`;
+      animateDonut(percent);
 
-      // TABLA DERECHA (ultra compacta)
+      // TABLA DERECHA
       let detail = `<table><thead><tr><th>Indicador</th>${weeks.map(w=>`<th>${w}</th>`).join('')}</tr></thead><tbody>`;
       DETAIL_COLUMNS.forEach(col=>{
         detail += `<tr><td>${col.label}</td>`;
@@ -295,6 +296,28 @@
       });
       detail += `</tbody></table>`;
       document.getElementById('errorContainer').innerHTML = detail;
+    }
+
+    function animateDonut(finalPercent) {
+      const circle = document.querySelector(".circle");
+      const text = document.getElementById("percentageValue");
+      const radius = 60;
+      const circumference = 2 * Math.PI * radius;
+      let current = 0;
+      const duration = 1500;
+      const frameRate = 1000 / 60;
+      const totalFrames = duration / frameRate;
+      const increment = finalPercent / totalFrames;
+
+      const animate = () => {
+        current += increment;
+        if (current > finalPercent) current = finalPercent;
+        const offset = circumference - (circumference * current) / 100;
+        circle.style.strokeDashoffset = offset;
+        text.textContent = `${current.toFixed(0)}%`;
+        if (current < finalPercent) requestAnimationFrame(animate);
+      };
+      animate();
     }
 
     loadData();
