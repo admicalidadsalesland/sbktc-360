@@ -224,16 +224,24 @@
             row[header] = values[idx];
           });
 
-          // Convertir columnas numéricas que ya están en %
+          // Convertir columnas numéricas
           const numericFields = ['1_COMUNICACIÓN', '2_INFORMACIÓN', '3_GESTION DE VENTA (PRE VENTA)', '4_REGULATORIO', 'NOTA'];
           numericFields.forEach(field => {
             let val = row[field];
             if (val === '' || val === null) {
               row[field] = null;
             } else {
+              // Eliminar símbolo % si existe
               val = val.replace('%', '').trim();
               if (!isNaN(val)) {
-                row[field] = parseFloat(val);
+                const num = parseFloat(val);
+                // Si el número es mayor a 5, asumimos que ya es porcentaje
+                // Si es menor o igual a 5, lo convertimos a porcentaje (escala 0-5)
+                if (num <= 5) {
+                  row[field] = (num / 5) * 100; // Convertir a %
+                } else {
+                  row[field] = num; // Ya es porcentaje
+                }
               } else {
                 row[field] = null;
               }
@@ -267,7 +275,7 @@
         return;
       }
 
-      // Tomar el primer agente encontrado (o puedes tomar el más reciente)
+      // Tomar el primer agente encontrado
       const firstRow = agentRows[0];
       const agentName = firstRow.AGENTE || 'Agente Desconocido';
       const initials = agentName.split(' ').map(n => n[0]).join('').toUpperCase();
@@ -280,7 +288,7 @@
         byWeek[week].push(row);
       });
 
-      // Calcular promedio por semana
+      // Calcular promedio por semana (usando NOTA)
       const weekAverages = {};
       for (const week in byWeek) {
         let sum = 0;
