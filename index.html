@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Reporte de Agentes</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: #f9f9f9;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    .filters {
+      background: #fff;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .filters label {
+      display: inline-block;
+      margin-right: 10px;
+      font-weight: bold;
+    }
+    .filters input, .filters select {
+      margin-right: 15px;
+      padding: 5px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    th, td {
+      padding: 10px;
+      text-align: center;
+      border: 1px solid #ddd;
+    }
+    th {
+      background-color: #4CAF50;
+      color: white;
+    }
+    tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+    .loading {
+      text-align: center;
+      font-size: 18px;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <h1>📊 Reporte de Evaluación de Agentes</h1>
+
+  <div class="filters">
+    <label for="dniFilter">Buscar por DNI:</label>
+    <input type="text" id="dniFilter" placeholder="Ej: 12345678" />
+
+    <label for="dateFrom">Desde:</label>
+    <input type="date" id="dateFrom" />
+
+    <label for="dateTo">Hasta:</label>
+    <input type="date" id="dateTo" />
+
+    <label for="monthFilter">Mes:</label>
+    <select id="monthFilter">
+      <option value="">Todos los meses</option>
+      <option value="0">Enero</option>
+      <option value="1">Febrero</option>
+      <option value="2">Marzo</option>
+      <option value="3">Abril</option>
+      <option value="4">Mayo</option>
+      <option value="5">Junio</option>
+      <option value="6">Julio</option>
+      <option value="7">Agosto</option>
+      <option value="8">Septiembre</option>
+      <option value="9">Octubre</option>
+      <option value="10">Noviembre</option>
+      <option value="11">Diciembre</option>
+    </select>
+
+    <button onclick="applyFilters()">Aplicar Filtros</button>
+  </div>
+
+  <div id="loading" class="loading">Cargando datos...</div>
+  <div id="tableContainer" style="display:none;">
+    <table id="reportTable">
+      <thead>
+        <tr>
+          <th>DNI</th>
+          <th>Agente</th>
+          <th>Semana</th>
+          <th>Comunicación</th>
+          <th>Información</th>
+          <th>Gestión de Venta</th>
+          <th>Regulatorio</th>
+          <th>Nota Promedio</th>
+          <th>Fecha</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+
+  <script>
+    const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRp7iRBUwVpHnmf7Q0mLyARIBl-inFlZbH43i3wU1whcjE0GlPi7Z51VcmXRsWrcYCmWMS1WTL-ySJt/pub?gid=2119161122&single=true&output=csv';
+
+    let originalData = [];
+    let displayedData = [];
+
+    // Parsea CSV a array de objetos
+    function parseCSV(csvText) {
+      const lines = csvText.trim().split('\n');
+      const headers = lines[0].split(',').map(h => h.trim());
+      const result = [];
+
+      for (let i = 1; i < lines.length; i++) {
+        const values = lines[i].split(',').map(v => v.trim().replace(/^"(.*)"$/, '$1'));
+        if (values.length !== headers.length) continue;
+
+        const row = {};
+        headers.forEach((header, index) => {
+          row[header] = values[index];
+        });
+
+        // Convertir campos numéricos
+        const numericFields = ['1_COMUNICACIÓN', '2_INFORMACIÓN', '3_GESTION DE VENTA (PRE VENTA)', '4_REGULATORIO', 'NOTA'];
+        numericFields.forEach(field => {
+          if (row[field] !== '' && !isNaN(row[field])) {
+            row[field] = parseFloat(row[field]);
+          } else {
+            row[field] = null;
+          }
+        });
+
+        // Parsear fecha
+        if (row.FECHA) {
+          const [day, month, year] = row.FECHA.split('/');
+          if (year && month && day) {
+            row.dateObj = new Date(`${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`);
+          }
+        }
+
+        result.push(row);
+      }
+      return result;
+    }
+
+    // Agrupa por DNI + SEMANA y calcula promedios
+    function aggregateData(data) {
+      const grouped = {};
+      data.forEach(row => {
+        const key = `${row.DNI}-${row.SEMANA}`;
+        if (!grouped[key]) {
+          grouped[key] = {
+            DNI: row.DNI,
+            AGENTE: row.AGENTE,
+            SEMANA: row.SEMANA,
+            FECHA: row.FECHA,
+            dateObj: row.dateObj,
+            sum1: 0, sum2: 0, sum3: 0, sum4: 0, sumN: 0,
+            count: 0
+          };
+        }
+        if (row['1_COMUNICACIÓN'] !== null) grouped[key].sum1 += row['1_COMUNICACIÓN'];
+        if (row['2_INFORMACIÓN'] !== null) grouped[key].sum2 += row['2_INFORMACIÓN'];
+        if (row['3_GESTION DE VENTA (PRE VENTA)'] !== null) grouped[key].sum3 += row['3_GESTION DE VENTA (PRE VENTA)'];
+        if (row['4_REGULATORIO'] !== null) grouped[key].sum4 += row['4_REGULATORIO'];
+        if (row.NOTA !== null) grouped[key].sumN += row.NOTA;
+        grouped[key].count++;
+      });
+
+      return Object.values(grouped).map(g => ({
+        DNI: g.DNI,
+        AGENTE: g.AGENTE,
+        SEMANA: g.SEMANA,
+        FECHA: g.FECHA,
+        dateObj: g.dateObj,
+        '1_COMUNICACIÓN': (g.sum1 / g.count).toFixed(2),
+        '2_INFORMACIÓN': (g.sum2 / g.count).toFixed(2),
+        '3_GESTION DE VENTA (PRE VENTA)': (g.sum3 / g.count).toFixed(2),
+        '4_REGULATORIO': (g.sum4 / g.count).toFixed(2),
+        NOTA: (g.sumN / g.count).toFixed(2)
+      }));
+    }
+
+    // Renderiza tabla
+    function renderTable(data) {
+      const tbody = document.getElementById('tableBody');
+      tbody.innerHTML = '';
+      data.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${row.DNI}</td>
+          <td>${row.AGENTE}</td>
+          <td>${row.SEMANA}</td>
+          <td>${row['1_COMUNICACIÓN']}</td>
+          <td>${row['2_INFORMACIÓN']}</td>
+          <td>${row['3_GESTION DE VENTA (PRE VENTA)']}</td>
+          <td>${row['4_REGULATORIO']}</td>
+          <td>${row.NOTA}</td>
+          <td>${row.FECHA}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // Aplica filtros
+    function applyFilters() {
+      const dni = document.getElementById('dniFilter').value.trim().toLowerCase();
+      const from = document.getElementById('dateFrom').value;
+      const to = document.getElementById('dateTo').value;
+      const month = document.getElementById('monthFilter').value;
+
+      let filtered = originalData;
+
+      if (dni) {
+        filtered = filtered.filter(r => r.DNI.toLowerCase().includes(dni));
+      }
+
+      if (from) {
+        const fromDate = new Date(from);
+        filtered = filtered.filter(r => r.dateObj && r.dateObj >= fromDate);
+      }
+
+      if (to) {
+        const toDate = new Date(to);
+        toDate.setHours(23, 59, 59, 999);
+        filtered = filtered.filter(r => r.dateObj && r.dateObj <= toDate);
+      }
+
+      if (month !== '') {
+        const m = parseInt(month);
+        filtered = filtered.filter(r => r.dateObj && r.dateObj.getMonth() === m);
+      }
+
+      displayedData = filtered;
+      renderTable(displayedData);
+    }
+
+    // Cargar datos al iniciar
+    async function loadData() {
+      try {
+        const response = await fetch(CSV_URL);
+        const csvText = await response.text();
+        const rawData = parseCSV(csvText);
+        originalData = aggregateData(rawData);
+        displayedData = [...originalData];
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('tableContainer').style.display = 'block';
+        renderTable(displayedData);
+      } catch (error) {
+        document.getElementById('loading').textContent = '❌ Error al cargar los datos: ' + error.message;
+      }
+    }
+
+    // Inicializar
+    loadData();
+  </script>
+</body>
+</html>
