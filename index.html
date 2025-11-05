@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Promedio General - Evaluación Agentes</title>
+  <title>Promedio por Agente - Evaluaciones</title>
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -23,7 +23,32 @@
     h1 {
       text-align: center;
       color: #2c3e50;
-      margin-bottom: 30px;
+      margin-bottom: 20px;
+    }
+    .search-box {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      align-items: center;
+    }
+    .search-box input {
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      flex: 1;
+    }
+    .search-box button {
+      padding: 10px 20px;
+      background: #3498db;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    .search-box button:hover {
+      background: #2980b9;
     }
     .metric {
       display: flex;
@@ -53,12 +78,25 @@
       color: #e74c3c;
       text-align: center;
       font-weight: bold;
+      margin: 20px 0;
+    }
+    .info {
+      text-align: center;
+      font-style: italic;
+      color: #7f8c8d;
+      margin: 10px 0;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>📊 Promedio General de Evaluaciones</h1>
+    <h1>📊 Promedio por Agente - Evaluaciones</h1>
+
+    <div class="search-box">
+      <input type="text" id="dniInput" placeholder="Buscar por DNI (ej: 12345678)" />
+      <button onclick="searchByDNI()">Buscar</button>
+    </div>
+
     <div id="resultContainer">
       <div class="loading">Cargando datos...</div>
     </div>
@@ -67,8 +105,10 @@
   <script>
     const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRp7iRBUwVpHnmf7Q0mLyARIBl-inFlZbH43i3wU1whcjE0GlPi7Z51VcmXRsWrcYCmWMS1WTL-ySJt/pub?gid=2119161122&single=true&output=csv';
 
-    // Suponemos que la escala máxima es 5. Cambia a 10 o 100 si es necesario.
+    // Suponemos que la escala máxima es 5. Cambia si es necesario.
     const MAX_SCORE = 5;
+
+    let allData = [];
 
     async function loadAndProcessData() {
       try {
@@ -83,7 +123,7 @@
         }
 
         const headers = lines[0].split(',').map(h => h.trim());
-        const data = [];
+        allData = [];
 
         for (let i = 1; i < lines.length; i++) {
           const values = lines[i].split(',').map(v => v.trim().replace(/^"(.*)"$/, '$1'));
@@ -96,7 +136,6 @@
 
           // Convertir campos numéricos
           const numericFields = ['1_COMUNICACIÓN', '2_INFORMACIÓN', '3_GESTION DE VENTA (PRE VENTA)', '4_REGULATORIO', 'NOTA'];
-          let validRow = true;
           numericFields.forEach(field => {
             const val = row[field];
             if (val === '' || isNaN(val)) {
@@ -104,69 +143,139 @@
             } else {
               const num = parseFloat(val);
               if (num < 0 || num > MAX_SCORE) {
-                // Opcional: ignorar valores fuera de rango
-                row[field] = null;
+                row[field] = null; // Ignorar valores fuera de rango
               } else {
                 row[field] = num;
               }
             }
           });
 
-          data.push(row);
+          allData.push(row);
         }
 
-        // Calcular promedios
-        const sums = { '1_COMUNICACIÓN': 0, '2_INFORMACIÓN': 0, '3_GESTION DE VENTA (PRE VENTA)': 0, '4_REGULATORIO': 0, 'NOTA': 0 };
-        const counts = { '1_COMUNICACIÓN': 0, '2_INFORMACIÓN': 0, '3_GESTION DE VENTA (PRE VENTA)': 0, '4_REGULATORIO': 0, 'NOTA': 0 };
-
-        data.forEach(row => {
-          for (const field in sums) {
-            if (row[field] !== null) {
-              sums[field] += row[field];
-              counts[field]++;
-            }
-          }
-        });
-
-        const averages = {};
-        for (const field in sums) {
-          if (counts[field] > 0) {
-            const avg = sums[field] / counts[field];
-            const percentage = ((avg / MAX_SCORE) * 100).toFixed(1);
-            averages[field] = percentage;
-          } else {
-            averages[field] = 'N/A';
-          }
-        }
-
-        // Mostrar resultados
-        const container = document.getElementById('resultContainer');
-        container.innerHTML = `
-          <div class="metric">
-            <span class="label">Comunicación:</span>
-            <span class="value">${averages['1_COMUNICACIÓN']}%</span>
-          </div>
-          <div class="metric">
-            <span class="label">Información:</span>
-            <span class="value">${averages['2_INFORMACIÓN']}%</span>
-          </div>
-          <div class="metric">
-            <span class="label">Gestión de Venta (Preventa):</span>
-            <span class="value">${averages['3_GESTION DE VENTA (PRE VENTA)']}%</span>
-          </div>
-          <div class="metric">
-            <span class="label">Regulatorio:</span>
-            <span class="value">${averages['4_REGULATORIO']}%</span>
-          </div>
-          <div class="metric">
-            <span class="label">Nota General:</span>
-            <span class="value">${averages['NOTA']}%</span>
-          </div>
-        `;
+        // Mostrar promedio general al cargar
+        calculateOverallAverages();
 
       } catch (error) {
         showError('❌ Error al procesar los datos: ' + error.message);
       }
+    }
+
+    function calculateOverallAverages() {
+      const sums = { '1_COMUNICACIÓN': 0, '2_INFORMACIÓN': 0, '3_GESTION DE VENTA (PRE VENTA)': 0, '4_REGULATORIO': 0, 'NOTA': 0 };
+      const counts = { '1_COMUNICACIÓN': 0, '2_INFORMACIÓN': 0, '3_GESTION DE VENTA (PRE VENTA)': 0, '4_REGULATORIO': 0, 'NOTA': 0 };
+
+      allData.forEach(row => {
+        for (const field in sums) {
+          if (row[field] !== null) {
+            sums[field] += row[field];
+            counts[field]++;
+          }
+        }
+      });
+
+      const averages = {};
+      for (const field in sums) {
+        if (counts[field] > 0) {
+          const avg = sums[field] / counts[field];
+          const percentage = ((avg / MAX_SCORE) * 100).toFixed(1);
+          averages[field] = percentage;
+        } else {
+          averages[field] = 'N/A';
+        }
+      }
+
+      const container = document.getElementById('resultContainer');
+      container.innerHTML = `
+        <div class="metric">
+          <span class="label">Comunicación:</span>
+          <span class="value">${averages['1_COMUNICACIÓN']}%</span>
+        </div>
+        <div class="metric">
+          <span class="label">Información:</span>
+          <span class="value">${averages['2_INFORMACIÓN']}%</span>
+        </div>
+        <div class="metric">
+          <span class="label">Gestión de Venta (Preventa):</span>
+          <span class="value">${averages['3_GESTION DE VENTA (PRE VENTA)']}%</span>
+        </div>
+        <div class="metric">
+          <span class="label">Regulatorio:</span>
+          <span class="value">${averages['4_REGULATORIO']}%</span>
+        </div>
+        <div class="metric">
+          <span class="label">Nota General:</span>
+          <span class="value">${averages['NOTA']}%</span>
+        </div>
+        <div class="info">Total de evaluaciones: ${allData.length}</div>
+      `;
+    }
+
+    function searchByDNI() {
+      const dni = document.getElementById('dniInput').value.trim().toUpperCase();
+      if (!dni) {
+        alert('Por favor, ingresa un DNI.');
+        return;
+      }
+
+      const agentData = allData.filter(row => row.DNI && row.DNI.toUpperCase().includes(dni));
+
+      if (agentData.length === 0) {
+        document.getElementById('resultContainer').innerHTML = `
+          <div class="error">❌ No se encontró ningún agente con DNI: ${dni}</div>
+        `;
+        return;
+      }
+
+      // Calcular promedios del agente
+      const sums = { '1_COMUNICACIÓN': 0, '2_INFORMACIÓN': 0, '3_GESTION DE VENTA (PRE VENTA)': 0, '4_REGULATORIO': 0, 'NOTA': 0 };
+      const counts = { '1_COMUNICACIÓN': 0, '2_INFORMACIÓN': 0, '3_GESTION DE VENTA (PRE VENTA)': 0, '4_REGULATORIO': 0, 'NOTA': 0 };
+
+      agentData.forEach(row => {
+        for (const field in sums) {
+          if (row[field] !== null) {
+            sums[field] += row[field];
+            counts[field]++;
+          }
+        }
+      });
+
+      const averages = {};
+      for (const field in sums) {
+        if (counts[field] > 0) {
+          const avg = sums[field] / counts[field];
+          const percentage = ((avg / MAX_SCORE) * 100).toFixed(1);
+          averages[field] = percentage;
+        } else {
+          averages[field] = 'N/A';
+        }
+      }
+
+      const container = document.getElementById('resultContainer');
+      container.innerHTML = `
+        <h2 style="text-align:center; color:#2c3e50;">🔍 Resultado para DNI: ${dni}</h2>
+        <div class="metric">
+          <span class="label">Comunicación:</span>
+          <span class="value">${averages['1_COMUNICACIÓN']}%</span>
+        </div>
+        <div class="metric">
+          <span class="label">Información:</span>
+          <span class="value">${averages['2_INFORMACIÓN']}%</span>
+        </div>
+        <div class="metric">
+          <span class="label">Gestión de Venta (Preventa):</span>
+          <span class="value">${averages['3_GESTION DE VENTA (PRE VENTA)']}%</span>
+        </div>
+        <div class="metric">
+          <span class="label">Regulatorio:</span>
+          <span class="value">${averages['4_REGULATORIO']}%</span>
+        </div>
+        <div class="metric">
+          <span class="label">Nota General:</span>
+          <span class="value">${averages['NOTA']}%</span>
+        </div>
+        <div class="info">Evaluaciones encontradas: ${agentData.length}</div>
+      `;
     }
 
     function showError(message) {
