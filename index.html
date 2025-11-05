@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Promedios por DNI - Evaluaciones</title>
+  <title>Suma de Indicadores - Evaluaciones</title>
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -72,47 +72,6 @@
       color: #2980b9;
       text-align: left;
     }
-    .total-general {
-      margin-top: 40px;
-      padding-top: 30px;
-      border-top: 3px solid #3498db;
-      text-align: center;
-    }
-    .chart-container {
-      position: relative;
-      width: 160px;
-      height: 160px;
-      margin: 0 auto;
-    }
-    .circle-bg {
-      fill: none;
-      stroke: #e2e8f0;
-      stroke-width: 12;
-    }
-    .circle {
-      fill: none;
-      stroke-width: 12;
-      stroke-linecap: round;
-      stroke: #3498db;
-      transform: rotate(-90deg);
-      transform-origin: 50% 50%;
-      stroke-dasharray: 440;
-      stroke-dashoffset: 440;
-    }
-    .percentage {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 32px;
-      font-weight: 600;
-      color: #2c3e50;
-    }
-    .loading {
-      text-align: center;
-      font-size: 1.2em;
-      color: #7f8c8d;
-    }
     .error {
       color: #e74c3c;
       text-align: center;
@@ -129,7 +88,7 @@
 </head>
 <body>
   <div class="container">
-    <h1>📊 Evaluaciones por DNI</h1>
+    <h1>📋 Suma de Indicadores por DNI</h1>
 
     <div class="search-box">
       <input type="text" id="dniInput" placeholder="Buscar por DNI (ej: 40753375)" />
@@ -137,215 +96,94 @@
     </div>
 
     <div id="resultContainer">
-      <div class="loading">Cargando datos...</div>
+      <div class="info">Cargando datos...</div>
     </div>
   </div>
 
   <script>
     const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRp7iRBUwVpHnmf7Q0mLyARIBl-inFlZbH43i3wU1whcjE0GlPi7Z51VcmXRsWrcYCmWMS1WTL-ySJt/pub?gid=2119161122&single=true&output=csv';
 
-    const COLUMNS = [
-      { key: '1_COMUNICACIÓN', label: 'Comunicación' },
-      { key: '2_INFORMACIÓN', label: 'Información' },
-      { key: '3_GESTION DE VENTA (PRE VENTA)', label: 'Gestión de Venta (Preventa)' },
-      { key: '4_REGULATORIO', label: 'Regulatorio' },
-      { key: 'NOTA', label: 'Nota General' }
+    const NEW_COLUMNS = [
+      "1.1 PROTOCOLO DE BIENVENIDA Y DESPEDIDA",
+      "1.2 CAPACIDAD DE FLUIDEZ Y VOCALIZACIÓN",
+      "1.3 PRESENTA SONRISA TELEFONICA",
+      "1.4 NO UTILIZA TECNISISMOS",
+      "1.5 NO UTILIZA MULETILLAS",
+      "1.6 ESCUCHA ACTIVA",
+      "1.7 NO REALIZA TUTEO (PERSONALIZACION)",
+      "2.1 BRINDA CARACTERISTICAS CORRECTAS DEL PRODUCTO",
+      "2.2 BRINDA CARACTERISTICAS COMPLETAS DEL PRODUCTO",
+      "2.3 PRESENTA BENEFICIOS DE MANERA CORRECTA",
+      "2.4 PRESENTA BENEFICIOS DE MANERA COMPLETA",
+      "2.5 ACLARA DUDAS DEL CLIENTE",
+      "3.1 SONDEA LA NECESIDAD DE CLIENTE",
+      "3.2 REBATE LA NEGATIVA DEL CLIENTE",
+      "3.3 REBATE DE ACUERDO A LA NEGATIVA DEL CLIENTE",
+      "3.4 APLICA CIERRE DE VENTA",
+      "3.5 OFRECE CORRECTAMENTE CUENTA DIGITAL",
+      "3.6 TIPIFICACIÓN",
+      "4.1 LPDP (FLAG 0 & 2)"
     ];
 
     let allData = [];
 
-    async function loadAndProcessData() {
+    async function loadData() {
       try {
         const response = await fetch(CSV_URL);
-        if (!response.ok) throw new Error('No se pudo cargar el CSV');
         const csvText = await response.text();
-        const lines = csvText.trim().split('\n');
-
-        if (lines.length < 2) {
-          showError('El archivo está vacío.');
-          return;
-        }
-
-        const headers = lines[0].split(',').map(h => h.trim());
+        const lines = csvText.trim().split("\n");
+        const headers = lines[0].split(",").map(h => h.trim());
         allData = [];
 
         for (let i = 1; i < lines.length; i++) {
-          const values = lines[i].split(',').map(v => v.trim().replace(/^"(.*)"$/, '$1'));
-          if (values.length !== headers.length) continue;
-
+          const values = lines[i].split(",").map(v => v.trim().replace(/^"(.*)"$/, '$1'));
           const row = {};
-          headers.forEach((header, idx) => {
-            row[header] = values[idx];
-          });
-
-          // Conversión de porcentaje 0–100
-          COLUMNS.forEach(col => {
-            let val = row[col.key];
-            if (val === '' || val === null) {
-              row[col.key] = null;
-              return;
-            }
-            val = val.replace('%', '').trim().replace(',', '.');
-            if (isNaN(val)) {
-              row[col.key] = null;
-              return;
-            }
-            let num = parseFloat(val);
-            if (num <= 1) num *= 100;
-            row[col.key] = Math.min(Math.max(num, 0), 100);
-          });
-
+          headers.forEach((h, idx) => (row[h] = values[idx]));
           allData.push(row);
         }
 
-        document.getElementById('resultContainer').innerHTML = `
-          <div class="info">✅ Datos cargados. Ingresa un DNI para buscar.</div>
-        `;
+        document.getElementById("resultContainer").innerHTML =
+          `<div class="info">✅ Datos cargados. Ingresa un DNI para buscar.</div>`;
       } catch (error) {
-        showError('❌ Error: ' + error.message);
+        showError("❌ Error al cargar CSV: " + error.message);
       }
     }
 
     function searchByDNI() {
-      const dniQuery = document.getElementById('dniInput').value.trim();
-      if (!dniQuery) {
-        alert('Por favor, ingresa un DNI.');
+      const dni = document.getElementById("dniInput").value.trim();
+      if (!dni) {
+        alert("Por favor ingresa un DNI.");
         return;
       }
 
-      const filtered = allData.filter(row =>
-        row.DNI && row.DNI.toString().includes(dniQuery)
-      );
-
+      const filtered = allData.filter(r => r.DNI && r.DNI.includes(dni));
       if (filtered.length === 0) {
-        document.getElementById('resultContainer').innerHTML =
-          `<div class="error">❌ No se encontró ningún registro con DNI: ${dniQuery}</div>`;
+        showError(`❌ No se encontraron registros con DNI ${dni}`);
         return;
       }
 
-      // Agrupar por semana
-      const byWeek = {};
-      filtered.forEach(row => {
-        const week = row.SEMANA || "Sin semana";
-        if (!byWeek[week]) byWeek[week] = [];
-        byWeek[week].push(row);
-      });
+      let resultHTML = `<h2 style="text-align:center; color:#2c3e50;">Resultados para DNI: ${dni}</h2>`;
+      resultHTML += `<table><thead><tr><th>Indicador</th><th>Suma Total</th></tr></thead><tbody>`;
 
-      const weeks = Object.keys(byWeek).sort((a, b) => {
-        const numA = parseInt(a.replace(/\D/g, '')) || 0;
-        const numB = parseInt(b.replace(/\D/g, '')) || 0;
-        return numA - numB;
-      });
-
-      // Calcular promedios por semana y columna
-      const averagesByWeek = {};
-      weeks.forEach(week => {
-        averagesByWeek[week] = {};
-        COLUMNS.forEach(col => {
-          const values = byWeek[week]
-            .map(r => r[col.key])
-            .filter(v => v !== null);
-          const avg =
-            values.length > 0
-              ? values.reduce((a, b) => a + b, 0) / values.length
-              : null;
-          averagesByWeek[week][col.key] = avg;
+      NEW_COLUMNS.forEach(col => {
+        let total = 0;
+        filtered.forEach(row => {
+          let val = row[col];
+          if (val && !isNaN(val)) total += parseFloat(val);
         });
+        resultHTML += `<tr><td class="metric-name">${col}</td><td>${total.toFixed(1)}</td></tr>`;
       });
 
-      // Calcular promedios globales
-      const totalSums = {};
-      const totalCounts = {};
-      COLUMNS.forEach(col => {
-        totalSums[col.key] = 0;
-        totalCounts[col.key] = 0;
-      });
-      Object.values(byWeek).flat().forEach(row => {
-        COLUMNS.forEach(col => {
-          if (row[col.key] !== null) {
-            totalSums[col.key] += row[col.key];
-            totalCounts[col.key]++;
-          }
-        });
-      });
-
-      const totalAverages = {};
-      COLUMNS.forEach(col => {
-        totalAverages[col.key] =
-          totalCounts[col.key] > 0
-            ? (totalSums[col.key] / totalCounts[col.key]).toFixed(1)
-            : 'N/A';
-      });
-
-      const notaGeneral = totalAverages['NOTA'];
-
-      // Generar tabla
-      let html = `<h2 style="text-align:center; color:#2c3e50;">Resultados para DNI: ${dniQuery}</h2>`;
-      html += `<table><thead><tr><th>Indicador</th>`;
-      weeks.forEach(week => {
-        html += `<th>${week}</th>`;
-      });
-      html += `</tr></thead><tbody>`;
-
-      COLUMNS.forEach(col => {
-        html += `<tr><td class="metric-name">${col.label}</td>`;
-        weeks.forEach(week => {
-          const val = averagesByWeek[week][col.key];
-          html += `<td>${val ? val.toFixed(1) + '%' : 'N/A'}</td>`;
-        });
-        html += `</tr>`;
-      });
-
-      html += `</tbody></table>`;
-
-      // Total general
-      html += `
-        <div class="total-general">
-          <div style="font-size:1.2em; color:#2c3e50; margin-bottom:15px;">Total General</div>
-          <div class="chart-container">
-            <svg viewBox="0 0 160 160">
-              <circle class="circle-bg" cx="80" cy="80" r="70"></circle>
-              <circle class="circle" cx="80" cy="80" r="70"></circle>
-            </svg>
-            <div class="percentage" id="percent-text">${notaGeneral}%</div>
-          </div>
-        </div>
-        <div class="info">Filas procesadas: ${filtered.length}</div>
-      `;
-
-      document.getElementById('resultContainer').innerHTML = html;
-      animateChart(notaGeneral);
+      resultHTML += `</tbody></table>`;
+      document.getElementById("resultContainer").innerHTML = resultHTML;
     }
 
-    function animateChart(porcentaje) {
-      const circle = document.querySelector('.circle');
-      const percentText = document.getElementById('percent-text');
-      const radius = 70;
-      const circumference = 2 * Math.PI * radius;
-      const offset = circumference - (porcentaje / 100) * circumference;
-
-      circle.style.strokeDasharray = circumference;
-      circle.style.strokeDashoffset = circumference;
-
-      circle.animate(
-        [{ strokeDashoffset: circumference }, { strokeDashoffset: offset }],
-        { duration: 1500, fill: "forwards", easing: "ease-out" }
-      );
-
-      let current = 0;
-      const target = Math.round(porcentaje);
-      const interval = setInterval(() => {
-        current++;
-        percentText.textContent = current + "%";
-        if (current >= target) clearInterval(interval);
-      }, 1500 / target);
+    function showError(msg) {
+      document.getElementById("resultContainer").innerHTML =
+        `<div class="error">${msg}</div>`;
     }
 
-    function showError(message) {
-      document.getElementById('resultContainer').innerHTML = `<div class="error">${message}</div>`;
-    }
-
-    loadAndProcessData();
+    loadData();
   </script>
 </body>
 </html>
