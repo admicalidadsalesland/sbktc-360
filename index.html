@@ -129,9 +129,9 @@
     /* === GRAFICO DE ANILLO UX === */
     .chart-container {
       position: relative;
-      width: 160px;
-      height: 160px;
-      margin: 0 auto;
+      width: 180px;
+      height: 180px;
+      margin: 10px auto;
     }
 
     svg {
@@ -148,12 +148,13 @@
 
     .circle-progress {
       fill: none;
-      stroke: url(#gradient);
+      stroke: #2AC793;
       stroke-width: 12;
       stroke-linecap: round;
       stroke-dasharray: 565.48;
       stroke-dashoffset: 565.48;
-      transition: stroke-dashoffset 1.8s ease-out;
+      transition: stroke-dashoffset 0.4s ease-out, stroke 0.3s;
+      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
     }
 
     .percentage {
@@ -161,9 +162,10 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      font-size: 2rem;
+      font-size: 2.2rem;
       font-weight: 700;
       color: #111827;
+      transition: color 0.4s ease;
     }
 
     .subtitle {
@@ -276,12 +278,6 @@
       table += `</tbody></table><div class="divider"></div>
       <div class="chart-container">
         <svg viewBox="0 0 200 200">
-          <defs>
-            <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#10b981" />
-              <stop offset="100%" stop-color="#3b82f6" />
-            </linearGradient>
-          </defs>
           <circle class="circle-bg" cx="100" cy="100" r="90"></circle>
           <circle class="circle-progress" cx="100" cy="100" r="90"></circle>
         </svg>
@@ -290,7 +286,6 @@
       <div class="subtitle">Total General (filas: ${filtered.length})</div>`;
       document.getElementById("resultContainer").innerHTML = table;
 
-      // ANIMACIÓN UX
       const percent = total/count;
       animateDonut(percent);
 
@@ -309,6 +304,7 @@
       document.getElementById('errorContainer').innerHTML = detail;
     }
 
+    // === NUEVA ANIMACIÓN UX ===
     function animateDonut(targetPercent) {
       const circle = document.querySelector('.circle-progress');
       const text = document.getElementById('percentValue');
@@ -318,7 +314,7 @@
       circle.style.strokeDashoffset = circumference;
 
       let current = 0;
-      const duration = 1800;
+      const duration = 1500;
       const fps = 60;
       const steps = Math.round(duration / (1000 / fps));
       const increment = targetPercent / steps;
@@ -332,6 +328,14 @@
 
         const offset = circumference - (current / 100) * circumference;
         circle.style.strokeDashoffset = offset;
+
+        // color dinámico
+        let color = "#2AC793";
+        if (current <= 65) color = "#f43f5e";
+        else if (current <= 75) color = "#facc15";
+        circle.style.stroke = color;
+        text.style.color = color;
+
         text.textContent = current.toFixed(1) + "%";
       }, 1000 / fps);
     }
