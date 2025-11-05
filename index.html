@@ -224,7 +224,7 @@
             row[header] = values[idx];
           });
 
-          // Convertir columnas numéricas
+          // Solo limpiar el % de las columnas numéricas, sin convertir
           const numericFields = ['1_COMUNICACIÓN', '2_INFORMACIÓN', '3_GESTION DE VENTA (PRE VENTA)', '4_REGULATORIO', 'NOTA'];
           numericFields.forEach(field => {
             let val = row[field];
@@ -234,14 +234,7 @@
               // Eliminar símbolo % si existe
               val = val.replace('%', '').trim();
               if (!isNaN(val)) {
-                const num = parseFloat(val);
-                // Si el número es mayor a 5, asumimos que ya es porcentaje
-                // Si es menor o igual a 5, lo convertimos a porcentaje (escala 0-5)
-                if (num <= 5) {
-                  row[field] = (num / 5) * 100; // Convertir a %
-                } else {
-                  row[field] = num; // Ya es porcentaje
-                }
+                row[field] = parseFloat(val); // Ya está en %
               } else {
                 row[field] = null;
               }
