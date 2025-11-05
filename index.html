@@ -13,7 +13,7 @@
       color: #333;
     }
     .container {
-      max-width: 900px;
+      max-width: 1000px;
       margin: 0 auto;
       background: white;
       padding: 30px;
@@ -50,33 +50,27 @@
     .search-box button:hover {
       background: #2980b9;
     }
-    .week-section {
+    table {
+      width: 100%;
+      border-collapse: collapse;
       margin-top: 25px;
-      padding-top: 15px;
-      border-top: 2px solid #eee;
     }
-    .week-title {
-      font-size: 1.4em;
-      color: #2980b9;
-      margin-bottom: 15px;
+    th, td {
+      border: 1px solid #eee;
+      padding: 10px;
       text-align: center;
     }
-    .metric {
-      display: flex;
-      justify-content: space-between;
-      padding: 10px 0;
-      border-bottom: 1px solid #f5f5f5;
-    }
-    .metric:last-child {
-      border-bottom: none;
-    }
-    .label {
-      font-weight: bold;
+    th {
+      background: #f0f4f8;
       color: #2c3e50;
     }
-    .value {
-      font-weight: bold;
-      color: #27ae60;
+    td {
+      font-weight: 500;
+    }
+    .metric-name {
+      font-weight: 600;
+      color: #2980b9;
+      text-align: left;
     }
     .total-general {
       margin-top: 40px;
@@ -184,24 +178,21 @@
             row[header] = values[idx];
           });
 
-          // 🔧 Conversión correcta de porcentajes (0–100)
+          // Conversión de porcentaje 0–100
           COLUMNS.forEach(col => {
             let val = row[col.key];
             if (val === '' || val === null) {
               row[col.key] = null;
               return;
             }
-
             val = val.replace('%', '').trim().replace(',', '.');
             if (isNaN(val)) {
               row[col.key] = null;
               return;
             }
-
             let num = parseFloat(val);
-            if (num <= 1) num = num * 100; // Si viene como 0.85 → 85
-            num = Math.min(Math.max(num, 0), 100); // Limitar entre 0 y 100
-            row[col.key] = num;
+            if (num <= 1) num *= 100;
+            row[col.key] = Math.min(Math.max(num, 0), 100);
           });
 
           allData.push(row);
@@ -210,7 +201,6 @@
         document.getElementById('resultContainer').innerHTML = `
           <div class="info">✅ Datos cargados. Ingresa un DNI para buscar.</div>
         `;
-
       } catch (error) {
         showError('❌ Error: ' + error.message);
       }
@@ -228,13 +218,12 @@
       );
 
       if (filtered.length === 0) {
-        document.getElementById('resultContainer').innerHTML = `
-          <div class="error">❌ No se encontró ningún registro con DNI: ${dniQuery}</div>
-        `;
+        document.getElementById('resultContainer').innerHTML =
+          `<div class="error">❌ No se encontró ningún registro con DNI: ${dniQuery}</div>`;
         return;
       }
 
-      // Agrupar por SEMANA
+      // Agrupar por semana
       const byWeek = {};
       filtered.forEach(row => {
         const week = row.SEMANA || "Sin semana";
@@ -242,67 +231,74 @@
         byWeek[week].push(row);
       });
 
-      let html = `<h2 style="text-align:center; color:#2c3e50;">Resultados para DNI: ${dniQuery}</h2>`;
-
-      const sortedWeeks = Object.keys(byWeek).sort((a, b) => {
+      const weeks = Object.keys(byWeek).sort((a, b) => {
         const numA = parseInt(a.replace(/\D/g, '')) || 0;
         const numB = parseInt(b.replace(/\D/g, '')) || 0;
         return numA - numB;
       });
 
+      // Calcular promedios por semana y columna
+      const averagesByWeek = {};
+      weeks.forEach(week => {
+        averagesByWeek[week] = {};
+        COLUMNS.forEach(col => {
+          const values = byWeek[week]
+            .map(r => r[col.key])
+            .filter(v => v !== null);
+          const avg =
+            values.length > 0
+              ? values.reduce((a, b) => a + b, 0) / values.length
+              : null;
+          averagesByWeek[week][col.key] = avg;
+        });
+      });
+
+      // Calcular promedios globales
       const totalSums = {};
       const totalCounts = {};
       COLUMNS.forEach(col => {
         totalSums[col.key] = 0;
         totalCounts[col.key] = 0;
       });
-
-      sortedWeeks.forEach(weekName => {
-        const weekData = byWeek[weekName];
-        const weekAverages = {};
-
+      Object.values(byWeek).flat().forEach(row => {
         COLUMNS.forEach(col => {
-          let sum = 0;
-          let count = 0;
-          weekData.forEach(row => {
-            if (row[col.key] !== null) {
-              sum += row[col.key];
-              count++;
-              totalSums[col.key] += row[col.key];
-              totalCounts[col.key]++;
-            }
-          });
-          weekAverages[col.key] = count > 0 ? (sum / count).toFixed(1) : 'N/A';
+          if (row[col.key] !== null) {
+            totalSums[col.key] += row[col.key];
+            totalCounts[col.key]++;
+          }
         });
-
-        html += `<div class="week-section">`;
-        html += `<div class="week-title">${weekName}</div>`;
-
-        COLUMNS.forEach(col => {
-          const value = weekAverages[col.key];
-          html += `
-            <div class="metric">
-              <span class="label">${col.label}:</span>
-              <span class="value">${value}%</span>
-            </div>
-          `;
-        });
-
-        html += `</div>`;
       });
 
       const totalAverages = {};
       COLUMNS.forEach(col => {
-        if (totalCounts[col.key] > 0) {
-          totalAverages[col.key] = (totalSums[col.key] / totalCounts[col.key]).toFixed(1);
-        } else {
-          totalAverages[col.key] = 'N/A';
-        }
+        totalAverages[col.key] =
+          totalCounts[col.key] > 0
+            ? (totalSums[col.key] / totalCounts[col.key]).toFixed(1)
+            : 'N/A';
       });
 
       const notaGeneral = totalAverages['NOTA'];
 
-      // 🎯 Gráfico circular animado en Total General
+      // Generar tabla
+      let html = `<h2 style="text-align:center; color:#2c3e50;">Resultados para DNI: ${dniQuery}</h2>`;
+      html += `<table><thead><tr><th>Indicador</th>`;
+      weeks.forEach(week => {
+        html += `<th>${week}</th>`;
+      });
+      html += `</tr></thead><tbody>`;
+
+      COLUMNS.forEach(col => {
+        html += `<tr><td class="metric-name">${col.label}</td>`;
+        weeks.forEach(week => {
+          const val = averagesByWeek[week][col.key];
+          html += `<td>${val ? val.toFixed(1) + '%' : 'N/A'}</td>`;
+        });
+        html += `</tr>`;
+      });
+
+      html += `</tbody></table>`;
+
+      // Total general
       html += `
         <div class="total-general">
           <div style="font-size:1.2em; color:#2c3e50; margin-bottom:15px;">Total General</div>
@@ -318,8 +314,6 @@
       `;
 
       document.getElementById('resultContainer').innerHTML = html;
-
-      // Animación del gráfico
       animateChart(notaGeneral);
     }
 
