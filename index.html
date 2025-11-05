@@ -4,153 +4,128 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Evaluaciones por DNI</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --primary: #3b82f6;
-      --primary-hover: #2563eb;
-      --bg-gradient: linear-gradient(135deg, #e0f2fe 0%, #f8fafc 100%);
-      --card-bg: #ffffff;
-      --text-main: #1e293b;
-      --text-muted: #64748b;
-      --shadow-soft: 0 6px 20px rgba(0,0,0,0.06);
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
-
-    * { box-sizing: border-box; }
 
     body {
-      margin: 0;
-      font-family: 'Inter', sans-serif;
-      background: var(--bg-gradient);
-      color: var(--text-main);
+      font-family: 'Inter', 'Segoe UI', Tahoma, sans-serif;
+      background-color: #f9fafb; /* Fondo neutro y suave */
+      color: #1e293b;
+      padding-top: 56px; /* Altura del header */
+      padding: 0 20px 20px;
+      min-height: 100vh;
     }
 
-    /* === HEADER SUPERIOR === */
-    header {
+    /* === HEADER SUPERIOR MÍNIMO === */
+    .app-header {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
-      height: 60px;
-      background: var(--card-bg);
+      height: 56px;
+      background: white;
+      border-bottom: 1px solid #e2e8f0;
       display: flex;
       align-items: center;
-      justify-content: space-between;
       padding: 0 24px;
-      box-shadow: var(--shadow-soft);
-      z-index: 1000;
+      z-index: 100;
     }
 
-    header .logo {
-      font-weight: 700;
-      font-size: 1.2rem;
-      color: var(--primary);
-    }
-
-    header nav a {
-      margin-left: 20px;
-      text-decoration: none;
-      color: var(--text-main);
-      font-weight: 500;
-      transition: color 0.2s ease;
-    }
-
-    header nav a:hover { color: var(--primary); }
-
-    /* === CONTENEDOR PRINCIPAL === */
-    main {
-      display: flex;
-      justify-content: space-between;
-      gap: 20px;
-      padding: 100px 40px 40px 40px; /* deja espacio para header */
-      min-height: 100vh;
-    }
-
-    .left-panel, .right-panel {
-      background: var(--card-bg);
-      border-radius: 16px;
-      box-shadow: var(--shadow-soft);
-      padding: 20px;
-      height: calc(100vh - 160px);
-      overflow-y: auto;
-    }
-
-    .left-panel { width: 55%; }
-    .right-panel { width: 40%; }
-
-    /* === TITULOS === */
-    h1 {
-      font-size: 1.5rem;
-      margin-bottom: 16px;
-      color: #334155;
+    .app-header h1 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #1e293b;
       display: flex;
       align-items: center;
       gap: 8px;
     }
-    h1::before { content: "📊"; }
 
-    h3 {
-      font-size: 1.1rem;
-      color: #475569;
-      margin-bottom: 12px;
+    .app-header h1::before {
+      content: "📊";
+      font-size: 1.2rem;
     }
 
-    /* === BUSCADOR === */
+    /* === CONTENEDOR PRINCIPAL === */
+    .main-layout {
+      display: flex;
+      gap: 20px;
+      max-width: 1600px;
+      margin: 0 auto;
+      height: calc(100vh - 76px); /* Ajustado al header + padding */
+    }
+
+    .left-panel, .right-panel {
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      padding: 16px 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .left-panel { width: 50%; }
+    .right-panel { width: 50%; }
+
+    /* === Estilos originales preservados === */
+    h3 {
+      font-size: 1rem;
+      color: #475569;
+      margin: 16px 0 8px;
+      font-weight: 600;
+    }
+
     .search-box {
       display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
+      gap: 8px;
+      margin-bottom: 16px;
     }
 
     .search-box input {
       flex: 1;
-      padding: 10px 14px;
-      border-radius: 10px;
+      padding: 6px 10px;
+      border-radius: 8px;
       border: 1px solid #cbd5e1;
       font-size: 14px;
-      transition: border 0.2s ease;
-    }
-
-    .search-box input:focus {
-      border-color: var(--primary);
-      outline: none;
-      box-shadow: 0 0 0 2px rgba(59,130,246,0.2);
+      font-family: inherit;
     }
 
     .search-box button {
-      background: var(--primary);
+      background: #3b82f6;
       color: white;
       border: none;
-      border-radius: 10px;
-      padding: 10px 16px;
+      border-radius: 8px;
+      padding: 6px 12px;
       font-size: 14px;
-      font-weight: 500;
       cursor: pointer;
-      transition: all 0.2s ease;
+      font-weight: 500;
+      transition: background 0.2s ease;
     }
 
     .search-box button:hover {
-      background: var(--primary-hover);
-      transform: translateY(-1px);
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      background: #2563eb;
     }
 
-    /* === TABLAS === */
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 8px;
+      margin-top: 6px;
+      font-size: 12px; /* Igual que antes */
     }
 
     th {
-      background: #f1f5f9;
-      color: var(--text-main);
+      background: #f8fafc;
+      color: #1e293b;
       font-weight: 600;
       border-bottom: 1px solid #e2e8f0;
       text-align: center;
       font-size: 13px;
-      padding: 6px 8px;
+      padding: 4px 6px;
     }
 
     td {
@@ -158,27 +133,52 @@
       text-align: center;
       color: #0f172a;
       font-size: 12px;
-      padding: 4px 6px;
-      transition: color .15s ease, background-color .15s ease;
+      padding: 2px 4px;
     }
 
-    td:first-child { text-align: left; font-weight: 500; }
-    tbody tr:nth-child(even) { background: #f9fafb; }
+    td:first-child {
+      text-align: left;
+      font-weight: 500;
+    }
 
-    .divider { border-top: 2px solid #e2e8f0; margin: 24px 0; }
+    tbody tr:nth-child(even) {
+      background: #fafcff;
+    }
 
-    /* === GRAFICO DE ANILLO === */
-    .chart-container { position: relative; width: 180px; height: 180px; margin: 16px auto; }
-    svg { transform: rotate(-90deg); width: 100%; height: 100%; }
-    .circle-bg { fill: none; stroke: #e5e7eb; stroke-width: 12; }
+    .divider {
+      border-top: 2px solid #e2e8f0;
+      margin: 20px 0;
+    }
+
+    /* === GRÁFICO DE ANILLO (sin cambios) === */
+    .chart-container {
+      position: relative;
+      width: 180px;
+      height: 180px;
+      margin: 10px auto;
+    }
+
+    svg {
+      transform: rotate(-90deg);
+      width: 100%;
+      height: 100%;
+    }
+
+    .circle-bg {
+      fill: none;
+      stroke: #e5e7eb;
+      stroke-width: 12;
+    }
+
     .circle-progress {
       fill: none;
+      stroke: #2AC793;
       stroke-width: 12;
       stroke-linecap: round;
       stroke-dasharray: 565.48;
       stroke-dashoffset: 565.48;
-      transition: stroke-dashoffset .4s ease-out, stroke .25s ease;
-      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.08));
+      transition: stroke-dashoffset 0.4s ease-out, stroke 0.25s ease;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.06));
     }
 
     .percentage {
@@ -189,60 +189,85 @@
       font-size: 2rem;
       font-weight: 700;
       color: #111827;
-      transition: color .25s ease;
     }
 
-    .subtitle { text-align: center; color: #64748b; font-size: 0.85rem; margin-top: 8px; }
+    .subtitle {
+      text-align: center;
+      color: #64748b;
+      font-size: 0.85rem;
+      margin-top: 8px;
+    }
 
-    /* colores indicadores por rango */
+    /* Clases de color */
     .c-bad { color: #f43f5e !important; font-weight: 600; }
     .c-warn { color: #facc15 !important; font-weight: 600; }
     .c-good { color: #2AC793 !important; font-weight: 600; }
 
-    /* celdas error visual */
-    .cell-error { background: #fee2e2; color: #b91c1c; font-weight: 600; border-radius: 6px; }
-    .cell-ok { background: #dcfce7; color: #16a34a; font-weight: 600; border-radius: 6px; }
-
-    .info { text-align: center; color: #64748b; font-size: 0.85rem; margin-top: 20px; }
-    .error { text-align: center; color: #b91c1c; font-weight: 600; margin-top: 20px; }
-
-    /* Scroll moderno */
-    .left-panel::-webkit-scrollbar, .right-panel::-webkit-scrollbar { width: 8px; }
-    .left-panel::-webkit-scrollbar-thumb, .right-panel::-webkit-scrollbar-thumb {
-      background: rgba(59,130,246,0.3);
+    .cell-error {
+      background: #fee2e2;
+      color: #b91c1c;
+      font-weight: 600;
       border-radius: 4px;
+    }
+
+    .cell-ok {
+      background: #dcfce7;
+      color: #16a34a;
+      font-weight: 600;
+      border-radius: 4px;
+    }
+
+    .info {
+      text-align: center;
+      color: #64748b;
+      font-size: 0.85rem;
+      margin-top: 20px;
+    }
+
+    .error {
+      text-align: center;
+      color: #b91c1c;
+      font-weight: 600;
+      margin-top: 20px;
+    }
+
+    /* Responsive para pantallas pequeñas */
+    @media (max-width: 1100px) {
+      .main-layout {
+        flex-direction: column;
+        height: auto;
+      }
+      .left-panel, .right-panel {
+        width: 100%;
+        min-height: 400px;
+      }
     }
   </style>
 </head>
-
 <body>
-  <!-- HEADER SUPERIOR -->
-  <header>
-    <div class="logo">CAPL Analytics</div>
-    <nav>
-      <a href="#">Inicio</a>
-      <a href="#">Evaluaciones</a>
-      <a href="#">Reportes</a>
-      <a href="#">Configuración</a>
-    </nav>
+  <!-- Header minimalista -->
+  <header class="app-header">
+    <h1>Evaluaciones por DNI</h1>
   </header>
 
-  <!-- CONTENEDOR PRINCIPAL -->
-  <main>
+  <div class="main-layout">
     <div class="left-panel">
-      <h1>Evaluaciones por DNI</h1>
       <div class="search-box">
-        <input type="text" id="dniInput" placeholder="Buscar DNI (ej: 42882142)" />
+        <input type="text" id="dniInput" placeholder="Buscar DNI (ej: 42882142)" autocomplete="off" />
         <button onclick="searchByDNI()">Buscar</button>
       </div>
-      <div id="resultContainer"><div class="info">🔍 Ingresa un DNI para ver los resultados</div></div>
+      <div id="resultContainer">
+        <div class="info">🔍 Ingresa un DNI para ver los resultados</div>
+      </div>
     </div>
 
     <div class="right-panel">
       <h3>⚠️ Detalle de Errores / Incumplimientos</h3>
-      <div id="errorContainer"><div class="info">Esperando datos...</div></div>
+      <div id="errorContainer">
+        <div class="info">Esperando datos...</div>
+      </div>
     </div>
-  </main>
+  </div>
 
 <script>
   const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRp7iRBUwVpHnmf7Q0mLyARIBl-inFlZbH43i3wU1whcjE0GlPi7Z51VcmXRsWrcYCmWMS1WTL-ySJt/pub?gid=2119161122&single=true&output=csv";
@@ -280,9 +305,9 @@
   let allData = [];
 
   function parseToPercent(raw) {
-    if (!raw) return null;
+    if (raw === undefined || raw === null || raw === "") return null;
     let s = String(raw).trim().replace('%','').replace(',','.');
-    if (!s) return null;
+    if (s === "") return null;
     const n = parseFloat(s);
     if (isNaN(n)) return null;
     let v = n;
@@ -306,7 +331,7 @@
     allData = lines.slice(1).map(l=>{
       const v = l.split(',').map(x => x.trim().replace(/^"(.+)"$/,'$1'));
       const o = {};
-      headers.forEach((h,i)=> o[h] = v[i] || "");
+      headers.forEach((h,i)=> o[h] = v[i] === undefined ? "" : v[i]);
       return o;
     });
   }
@@ -325,17 +350,17 @@
 
     const weeks = [...new Set(filtered.map(r=>r.SEMANA || 'Sin semana'))].sort();
 
-    // TABLA IZQUIERDA
     let table = `<h3>Resultados para DNI: ${dni}</h3>
     <table><thead><tr><th>Indicador</th>${weeks.map(w=>`<th>${w}</th>`).join('')}</tr></thead><tbody>`;
 
     COLUMNS.forEach(col => {
       table += `<tr><td>${col.label}</td>`;
       weeks.forEach(w => {
-        const vals = filtered.filter(r => (r.SEMANA||'Sin semana') === w)
-                             .map(r => parseToPercent(r[col.key]))
-                             .filter(x => x !== null);
-        const avgWeek = vals.length ? (vals.reduce((a,b)=>a+b,0)/vals.length) : 0;
+        const vals = filtered
+          .filter(r => (r.SEMANA||'Sin semana') === w)
+          .map(r => parseToPercent(r[col.key]))
+          .filter(x => x !== null);
+        const avgWeek = vals.length ? (vals.reduce((a,b)=>a+b,0) / vals.length) : 0;
         const cls = getColorClass(avgWeek);
         table += `<td class="${cls}">${avgWeek.toFixed(1)}%</td>`;
       });
@@ -347,31 +372,43 @@
     const totalAverages = {};
     COLUMNS.forEach(col => {
       const vals = filtered.map(r => parseToPercent(r[col.key])).filter(x => x !== null);
-      totalAverages[col.key] = vals.length ? (vals.reduce((a,b)=>a+b,0)/vals.length) : 0;
+      totalAverages[col.key] = vals.length ? (vals.reduce((a,b)=>a+b,0) / vals.length) : 0;
     });
+
     const notaGlobal = totalAverages['NOTA'] || 0;
 
-    table += `<div class="chart-container">
-                <svg viewBox="0 0 200 200">
-                  <circle class="circle-bg" cx="100" cy="100" r="90"></circle>
-                  <circle class="circle-progress" cx="100" cy="100" r="90"></circle>
-                </svg>
-                <div class="percentage" id="percentValue">0%</div>
-              </div>
-              <div class="subtitle">Total General (filas: ${filtered.length})</div>`;
+    table += `
+      <div class="chart-container">
+        <svg viewBox="0 0 200 200">
+          <circle class="circle-bg" cx="100" cy="100" r="90"></circle>
+          <circle class="circle-progress" cx="100" cy="100" r="90"></circle>
+        </svg>
+        <div class="percentage" id="percentValue">0%</div>
+      </div>
+      <div class="subtitle">Total General (filas: ${filtered.length})</div>
+    `;
 
     document.getElementById("resultContainer").innerHTML = table;
     animateDonut(notaGlobal);
 
-    // TABLA DERECHA DETALLE
     let detail = `<table><thead><tr><th>Indicador</th>${weeks.map(w=>`<th>${w}</th>`).join('')}</tr></thead><tbody>`;
     DETAIL_COLUMNS.forEach(col=>{
       detail += `<tr><td>${col.label}</td>`;
       weeks.forEach(w=>{
-        const sums = filtered.filter(r => (r.SEMANA||'Sin semana') === w)
-                             .map(r => { const n = parseInt(String(r[col.key]).replace(/\D/g,''),10); return isNaN(n)?0:n; });
+        const sums = filtered
+          .filter(r => (r.SEMANA||'Sin semana') === w)
+          .map(r => {
+            const v = r[col.key];
+            const n = parseInt(String(v).replace(/\D/g,''),10);
+            return isNaN(n) ? 0 : n;
+          });
         const sum = sums.reduce((a,b)=>a+b,0);
-        detail += `<td class="${sum>=1 ? 'cell-error':'cell-ok'}">${sum>=1?'❌':'✅'}</td>`;
+
+        if (sum >= 1) {
+          detail += `<td class="cell-error">❌</td>`;
+        } else {
+          detail += `<td class="cell-ok">✅</td>`;
+        }
       });
       detail += `</tr>`;
     });
@@ -402,6 +439,7 @@
         current = targetPercent;
         clearInterval(interval);
       }
+
       const offset = circumference - (current / 100) * circumference;
       circle.style.strokeDashoffset = offset;
 
