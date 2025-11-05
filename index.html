@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Promedios por DNI - Evaluaciones</title>
+  <title>📊 Evaluaciones por DNI - Gráficos</title>
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -52,11 +52,11 @@
       background: #2980b9;
     }
 
-    /* Gráfico de línea */
-    .line-chart {
-      height: 150px;
+    /* Gráfico de barras */
+    .bar-chart {
+      height: 120px;
       position: relative;
-      margin: 20px 0 30px;
+      margin: 15px 0;
       background: #f9f9f9;
       border-radius: 8px;
       display: flex;
@@ -65,8 +65,8 @@
       padding: 10px 0;
       border: 1px solid #eee;
     }
-    .line-point {
-      width: 30px;
+    .bar {
+      width: 20px;
       background: #3498db;
       border-radius: 4px 4px 0 0;
       position: relative;
@@ -76,16 +76,13 @@
       font-size: 10px;
       font-weight: bold;
     }
-    .line-point::before {
-      content: '';
+    .bar-label {
       position: absolute;
       top: -20px;
       left: 50%;
       transform: translateX(-50%);
-      width: 6px;
-      height: 6px;
-      background: #3498db;
-      border-radius: 50%;
+      font-size: 10px;
+      color: #555;
     }
 
     /* Gráfico de anillo */
@@ -228,7 +225,7 @@
             row[header] = values[idx];
           });
 
-          // Limpiar %
+          // Convertir a % en escala 0-100
           [...COLUMNS, {key: 'NOTA'}].forEach(col => {
             let val = row[col.key];
             if (val === '' || val === null) {
@@ -236,7 +233,13 @@
             } else {
               val = val.replace('%', '').trim();
               if (!isNaN(val)) {
-                row[col.key] = parseFloat(val);
+                const num = parseFloat(val);
+                // Si es <= 5, asumimos escala 0-5 → convertimos a %
+                if (num <= 5) {
+                  row[col.key] = (num / 5) * 100;
+                } else {
+                  row[col.key] = num; // Ya es %
+                }
               } else {
                 row[col.key] = null;
               }
@@ -255,19 +258,21 @@
       }
     }
 
-    function createLineChart(values, maxValue = 100) {
+    function createBarChart(values) {
       if (values.length === 0) return '<div style="text-align:center;color:#999;">Sin datos</div>';
       
-      let pointsHtml = '';
-      values.forEach(val => {
+      let barsHtml = '';
+      values.forEach((val, index) => {
         if (val === null || val === 'N/A') {
-          pointsHtml += '<div class="line-point" style="background:#ddd;height:10px;"><span>-</span></div>';
+          barsHtml += '<div class="bar" style="background:#ddd;height:10px;"><span>-</span></div>';
         } else {
-          const height = Math.max(10, (val / maxValue) * 100); // mínimo 10px
-          pointsHtml += `<div class="line-point" style="height:${height}%; background:#3498db;"><span>${val}%</span></div>`;
+          const height = Math.max(10, (val / 100) * 100); // Escala 0-100%
+          barsHtml += `<div class="bar" style="height:${height}%; background:#3498db;">
+                         <span>${val.toFixed(1)}%</span>
+                       </div>`;
         }
       });
-      return `<div class="line-chart">${pointsHtml}</div>`;
+      return `<div class="bar-chart">${barsHtml}</div>`;
     }
 
     function createDonut(percent) {
@@ -316,59 +321,70 @@
         return numA - numB;
       });
 
-      // Acumular datos por columna para gráficos de línea
-      const lineData = {};
-      COLUMNS.forEach(col => lineData[col.key] = []);
-      const notaValues = [];
-
+      // Calcular promedio por semana y por columna
+      const weekData = {};
       sortedWeeks.forEach(weekName => {
-        const weekData = byWeek[weekName];
+        const weekRows = byWeek[weekName];
+        weekData[weekName] = {};
 
         COLUMNS.forEach(col => {
           let sum = 0, count = 0;
-          weekData.forEach(row => {
+          weekRows.forEach(row => {
             if (row[col.key] !== null) {
               sum += row[col.key];
               count++;
             }
           });
-          const avg = count > 0 ? (sum / count).toFixed(1) : null;
-          lineData[col.key].push(avg);
+          weekData[weekName][col.key] = count > 0 ? (sum / count).toFixed(1) : null;
         });
 
         // Nota general por semana
         let sumN = 0, countN = 0;
-        weekData.forEach(row => {
+        weekRows.forEach(row => {
           if (row.NOTA !== null) {
             sumN += row.NOTA;
             countN++;
           }
         });
-        const avgN = countN > 0 ? (sumN / countN).toFixed(1) : null;
-        notaValues.push(avgN);
+        weekData[weekName]['NOTA'] = countN > 0 ? (sumN / countN).toFixed(1) : null;
       });
 
-      // Total general (promedio de todas las semanas en NOTA)
-      const totalSum = notaValues.reduce((sum, val) => sum + (parseFloat(val) || 0), 0);
-      const totalCount = notaValues.filter(v => v !== null).length;
+      // Total General (promedio de todas las semanas en NOTA)
+      const notaValues = sortedWeeks.map(w => parseFloat(weekData[w]['NOTA']) || 0);
+      const totalSum = notaValues.reduce((sum, val) => sum + val, 0);
+      const totalCount = notaValues.length;
       const totalGeneral = totalCount > 0 ? (totalSum / totalCount).toFixed(1) : 0;
 
       // Generar HTML
       let html = `<h2 style="text-align:center; color:#2c3e50;">Resultados para DNI: ${dniQuery}</h2>`;
 
-      // Gráficos por columna
-      html += `<div class="charts-container">`;
-      COLUMNS.forEach(col => {
-        html += `
-          <div class="chart-card">
-            <div class="chart-title">${col.label}</div>
-            ${createLineChart(lineData[col.key])}
-          </div>
-        `;
-      });
-      html += `</div>`;
+      // Mostrar gráficos de barras por semana
+      sortedWeeks.forEach(weekName => {
+        html += `<div class="week-section">`;
+        html += `<div class="week-title">${weekName}</div>`;
 
-      // Gráfico de anillo - Nota General
+        html += `<div class="charts-container">`;
+        COLUMNS.forEach(col => {
+          const value = weekData[weekName][col.key];
+          html += `
+            <div class="chart-card">
+              <div class="chart-title">${col.label}</div>
+              ${createBarChart([value])}
+            </div>
+          `;
+        });
+        html += `</div>`;
+
+        // Mostrar Nota General de la semana (opcional)
+        const notaSemana = weekData[weekName]['NOTA'];
+        html += `<div style="text-align:center; margin-top:10px; font-size:14px; color:#666;">
+                   Nota Semanal: ${notaSemana !== null ? notaSemana + '%' : 'N/A'}
+                 </div>`;
+
+        html += `</div>`;
+      });
+
+      // Gráfico de anillo - Total General
       html += createDonut(parseFloat(totalGeneral));
 
       html += `<div class="info">Semanas evaluadas: ${sortedWeeks.length} | Filas: ${filtered.length}</div>`;
