@@ -3,138 +3,199 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Promedios por DNI - Evaluaciones</title>
+  <title>Evaluaciones por DNI</title>
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f5f7fa;
+      background: #f8fafc;
       margin: 0;
-      padding: 20px;
-      color: #333;
+      padding: 40px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 20px;
+      color: #1e293b;
     }
-    .container {
-      max-width: 1100px;
-      margin: 0 auto;
-      background: white;
-      padding: 30px;
+
+    /* CONTENEDORES */
+    .left-panel, .right-panel {
+      background: #ffffff;
       border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+      padding: 24px;
     }
-    h1, h2 {
-      text-align: center;
-      color: #2c3e50;
+
+    .left-panel {
+      width: 760px;
     }
+
+    .right-panel {
+      width: 440px;
+      max-height: 85vh;
+      overflow-y: auto;
+    }
+
+    /* TITULOS */
+    h1 {
+      font-size: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+      color: #334155;
+    }
+
+    h1::before {
+      content: "📊";
+      font-size: 1.5rem;
+    }
+
+    h3 {
+      font-size: 1.1rem;
+      color: #475569;
+      margin: 20px 0 10px;
+    }
+
+    /* BUSCADOR */
     .search-box {
       display: flex;
       gap: 10px;
-      margin-bottom: 25px;
-      align-items: center;
+      margin-bottom: 24px;
     }
+
     .search-box input {
-      padding: 10px;
-      font-size: 16px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
       flex: 1;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+      font-size: 15px;
     }
+
     .search-box button {
-      padding: 10px 20px;
-      background: #3498db;
+      background: #3b82f6;
       color: white;
       border: none;
-      border-radius: 6px;
+      border-radius: 8px;
+      padding: 10px 18px;
       cursor: pointer;
-      font-size: 16px;
+      font-size: 15px;
+      font-weight: 500;
     }
+
     .search-box button:hover {
-      background: #2980b9;
+      background: #2563eb;
     }
-    .section {
-      margin-top: 40px;
-    }
+
+    /* TABLAS */
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 15px;
+      margin-top: 10px;
+      font-size: 14.5px;
     }
-    th, td {
-      border: 1px solid #eee;
-      padding: 10px;
-      text-align: center;
-    }
+
     th {
-      background: #f0f4f8;
-      color: #2c3e50;
-    }
-    td {
-      font-weight: 500;
-    }
-    .metric-name {
+      background: #f1f5f9;
+      color: #1e293b;
+      text-align: center;
       font-weight: 600;
-      color: #2980b9;
-      text-align: left;
+      padding: 10px;
+      border-bottom: 1px solid #e2e8f0;
     }
-    .total-general {
-      margin-top: 40px;
-      padding-top: 30px;
-      border-top: 3px solid #3498db;
+
+    td {
+      padding: 10px;
+      border-bottom: 1px solid #f1f5f9;
       text-align: center;
     }
+
+    td:first-child {
+      text-align: left;
+      font-weight: 500;
+      color: #0f172a;
+    }
+
+    /* LINEA SEPARADORA */
+    .divider {
+      border-top: 2px solid #e2e8f0;
+      margin: 25px 0;
+    }
+
+    /* GRAFICO CIRCULAR */
     .chart-container {
       position: relative;
       width: 160px;
       height: 160px;
       margin: 0 auto;
     }
+
     .circle-bg {
       fill: none;
       stroke: #e2e8f0;
       stroke-width: 12;
     }
+
     .circle {
       fill: none;
       stroke-width: 12;
       stroke-linecap: round;
-      stroke: #3498db;
+      stroke: #3b82f6;
       transform: rotate(-90deg);
       transform-origin: 50% 50%;
       stroke-dasharray: 440;
       stroke-dashoffset: 440;
+      transition: stroke-dashoffset 1.3s ease;
     }
+
     .percentage {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      font-size: 32px;
+      font-size: 30px;
       font-weight: 600;
-      color: #2c3e50;
+      color: #1e293b;
     }
-    .loading, .error, .info {
+
+    .subtitle {
       text-align: center;
-      font-size: 1.1em;
-      margin: 10px 0;
+      color: #64748b;
+      margin-top: 10px;
+      font-size: 0.9rem;
     }
-    .error { color: #e74c3c; font-weight: bold; }
-    .info { color: #7f8c8d; font-style: italic; }
+
+    .error, .info {
+      text-align: center;
+      margin-top: 10px;
+      font-size: 1rem;
+    }
+
+    .error { color: #dc2626; }
+    .info { color: #64748b; font-style: italic; }
+
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>📊 Evaluaciones por DNI</h1>
-
+  <div class="left-panel">
+    <h1>Evaluaciones por DNI</h1>
     <div class="search-box">
-      <input type="text" id="dniInput" placeholder="Buscar por DNI (ej: 40753375)" />
+      <input type="text" id="dniInput" placeholder="Buscar DNI (ej: 42882142)" />
       <button onclick="searchByDNI()">Buscar</button>
     </div>
-
     <div id="resultContainer">
-      <div class="loading">Cargando datos...</div>
+      <div class="info">🔍 Ingresa un DNI para ver los resultados</div>
+    </div>
+  </div>
+
+  <div class="right-panel">
+    <h3>⚠️ Detalle de Errores / Incumplimientos</h3>
+    <div id="errorContainer">
+      <div class="info">Esperando datos...</div>
     </div>
   </div>
 
   <script>
-    const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRp7iRBUwVpHnmf7Q0mLyARIBl-inFlZbH43i3wU1whcjE0GlPi7Z51VcmXRsWrcYCmWMS1WTL-ySJt/pub?gid=2119161122&single=true&output=csv';
+    const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRp7iRBUwVpHnmf7Q0mLyARIBl-inFlZbH43i3wU1whcjE0GlPi7Z51VcmXRsWrcYCmWMS1WTL-ySJt/pub?gid=2119161122&single=true&output=csv";
 
     const COLUMNS = [
       { key: '1_COMUNICACIÓN', label: 'Comunicación' },
@@ -168,102 +229,77 @@
 
     let allData = [];
 
-    async function loadAndProcessData() {
-      try {
-        const response = await fetch(CSV_URL);
-        if (!response.ok) throw new Error('No se pudo cargar el CSV');
-        const csvText = await response.text();
-        const lines = csvText.trim().split('\n');
-        const headers = lines[0].split(',').map(h => h.trim());
-        allData = [];
-
-        for (let i = 1; i < lines.length; i++) {
-          const values = lines[i].split(',').map(v => v.trim().replace(/^"(.*)"$/, '$1'));
-          if (values.length !== headers.length) continue;
-          const row = {};
-          headers.forEach((header, idx) => row[header] = values[idx]);
-          allData.push(row);
-        }
-
-        document.getElementById('resultContainer').innerHTML = `<div class="info">✅ Datos cargados. Ingresa un DNI para buscar.</div>`;
-      } catch (error) {
-        showError('❌ Error: ' + error.message);
-      }
+    async function loadData() {
+      const res = await fetch(CSV_URL);
+      const text = await res.text();
+      const lines = text.split('\n');
+      const headers = lines[0].split(',').map(h=>h.trim());
+      allData = lines.slice(1).map(l=>{
+        const v = l.split(',').map(x=>x.trim());
+        const o={};
+        headers.forEach((h,i)=>o[h]=v[i]);
+        return o;
+      });
     }
 
-    function searchByDNI() {
-      const dniQuery = document.getElementById('dniInput').value.trim();
-      if (!dniQuery) return alert('Por favor, ingresa un DNI.');
+    async function searchByDNI() {
+      const dni = document.getElementById("dniInput").value.trim();
+      if (!dni) return alert("Ingresa un DNI");
+      if (!allData.length) await loadData();
 
-      const filtered = allData.filter(row => row.DNI && row.DNI.toString().includes(dniQuery));
-      if (filtered.length === 0) {
-        document.getElementById('resultContainer').innerHTML = `<div class="error">❌ No se encontró ningún registro con DNI: ${dniQuery}</div>`;
+      const filtered = allData.filter(r => r.DNI === dni);
+      if (!filtered.length) {
+        document.getElementById('resultContainer').innerHTML = `<div class="error">No se encontró el DNI ${dni}</div>`;
+        document.getElementById('errorContainer').innerHTML = "";
         return;
       }
 
-      // Agrupar por semana
-      const byWeek = {};
-      filtered.forEach(row => {
-        const week = row.SEMANA || "Sin semana";
-        if (!byWeek[week]) byWeek[week] = [];
-        byWeek[week].push(row);
-      });
-      const weeks = Object.keys(byWeek).sort();
+      const weeks = [...new Set(filtered.map(r=>r.SEMANA))].sort();
 
-      // Promedios porcentuales
-      const averagesByWeek = {};
-      weeks.forEach(week => {
-        averagesByWeek[week] = {};
-        COLUMNS.forEach(col => {
-          const vals = byWeek[week].map(r => parseFloat(r[col.key]?.replace('%','')) || 0);
-          averagesByWeek[week][col.key] = vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : 0;
-        });
-      });
+      let table = `<h3>Resultados para DNI: ${dni}</h3>
+      <table><thead><tr><th>Indicador</th>${weeks.map(w=>`<th>${w}</th>`).join('')}</tr></thead><tbody>`;
 
-      // Suma de errores (enteros)
-      const detailsByWeek = {};
-      weeks.forEach(week => {
-        detailsByWeek[week] = {};
-        DETAIL_COLUMNS.forEach(col => {
-          const vals = byWeek[week].map(r => parseInt(r[col.key]) || 0);
-          detailsByWeek[week][col.key] = vals.reduce((a,b)=>a+b,0);
-        });
-      });
-
-      // Construir HTML
-      let html = `<h2>Resultados para DNI: ${dniQuery}</h2>`;
-      html += `<div class="section"><h3>📈 Promedios por Semana</h3><table><thead><tr><th>Indicador</th>`;
-      weeks.forEach(w => html += `<th>${w}</th>`);
-      html += `</tr></thead><tbody>`;
+      let total=0, count=0;
       COLUMNS.forEach(col=>{
-        html += `<tr><td class="metric-name">${col.label}</td>`;
+        table += `<tr><td>${col.label}</td>`;
         weeks.forEach(w=>{
-          html += `<td>${averagesByWeek[w][col.key].toFixed(1)}%</td>`;
+          const values = filtered.filter(r=>r.SEMANA===w).map(r=>parseFloat(r[col.key])||0);
+          const avg = values.length?values.reduce((a,b)=>a+b,0)/values.length:0;
+          table += `<td>${avg.toFixed(1)}%</td>`;
+          if(col.key==="NOTA"){ total+=avg; count++; }
         });
-        html += `</tr>`;
+        table += `</tr>`;
       });
-      html += `</tbody></table></div>`;
+      table += `</tbody></table><div class="divider"></div>
+      <h3 style="text-align:center;">Total General</h3>
+      <div class="chart-container">
+        <svg width="160" height="160"><circle class="circle-bg" cx="80" cy="80" r="60"></circle><circle class="circle" cx="80" cy="80" r="60"></circle></svg>
+        <div class="percentage" id="percentageValue">0%</div>
+      </div>
+      <div class="subtitle">Filas procesadas: ${filtered.length}</div>`;
+      document.getElementById("resultContainer").innerHTML = table;
 
-      html += `<div class="section"><h3>⚠️ Detalle de Errores / Incumplimientos</h3><table><thead><tr><th>Indicador</th>`;
-      weeks.forEach(w => html += `<th>${w}</th>`);
-      html += `</tr></thead><tbody>`;
+      const percent = total/count;
+      const circle = document.querySelector(".circle");
+      const dashoffset = 440 - (440*percent)/130;
+      circle.style.strokeDashoffset = dashoffset;
+      document.getElementById("percentageValue").textContent = `${percent.toFixed(1)}%`;
+
+      // tabla detalle
+      let detail = `<table><thead><tr><th>Indicador</th>${weeks.map(w=>`<th>${w}</th>`).join('')}</tr></thead><tbody>`;
       DETAIL_COLUMNS.forEach(col=>{
-        html += `<tr><td class="metric-name">${col.label}</td>`;
+        detail += `<tr><td>${col.label}</td>`;
         weeks.forEach(w=>{
-          html += `<td>${detailsByWeek[w][col.key]}</td>`;
+          const vals = filtered.filter(r=>r.SEMANA===w).map(r=>parseInt(r[col.key])||0);
+          detail += `<td>${vals.reduce((a,b)=>a+b,0)}</td>`;
         });
-        html += `</tr>`;
+        detail += `</tr>`;
       });
-      html += `</tbody></table></div>`;
-
-      document.getElementById('resultContainer').innerHTML = html;
+      detail += `</tbody></table>`;
+      document.getElementById('errorContainer').innerHTML = detail;
     }
 
-    function showError(msg){
-      document.getElementById('resultContainer').innerHTML = `<div class="error">${msg}</div>`;
-    }
-
-    loadAndProcessData();
+    loadData();
   </script>
 </body>
 </html>
