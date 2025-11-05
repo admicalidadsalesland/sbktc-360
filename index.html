@@ -79,15 +79,40 @@
       color: #27ae60;
     }
     .total-general {
-      margin-top: 25px;
-      padding-top: 20px;
+      margin-top: 40px;
+      padding-top: 30px;
       border-top: 3px solid #3498db;
       text-align: center;
     }
-    .total-value {
-      font-size: 1.8em;
-      color: #3498db;
-      font-weight: bold;
+    .chart-container {
+      position: relative;
+      width: 160px;
+      height: 160px;
+      margin: 0 auto;
+    }
+    .circle-bg {
+      fill: none;
+      stroke: #e2e8f0;
+      stroke-width: 12;
+    }
+    .circle {
+      fill: none;
+      stroke-width: 12;
+      stroke-linecap: round;
+      stroke: #3498db;
+      transform: rotate(-90deg);
+      transform-origin: 50% 50%;
+      stroke-dasharray: 440;
+      stroke-dashoffset: 440;
+    }
+    .percentage {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 32px;
+      font-weight: 600;
+      color: #2c3e50;
     }
     .loading {
       text-align: center;
@@ -159,19 +184,24 @@
             row[header] = values[idx];
           });
 
-          // Limpiar y convertir columnas numéricas que ya están en %
+          // 🔧 Conversión correcta de porcentajes (0–100)
           COLUMNS.forEach(col => {
             let val = row[col.key];
             if (val === '' || val === null) {
               row[col.key] = null;
-            } else {
-              val = val.replace('%', '').trim();
-              if (!isNaN(val)) {
-                row[col.key] = parseFloat(val);
-              } else {
-                row[col.key] = null;
-              }
+              return;
             }
+
+            val = val.replace('%', '').trim().replace(',', '.');
+            if (isNaN(val)) {
+              row[col.key] = null;
+              return;
+            }
+
+            let num = parseFloat(val);
+            if (num <= 1) num = num * 100; // Si viene como 0.85 → 85
+            num = Math.min(Math.max(num, 0), 100); // Limitar entre 0 y 100
+            row[col.key] = num;
           });
 
           allData.push(row);
@@ -207,22 +237,19 @@
       // Agrupar por SEMANA
       const byWeek = {};
       filtered.forEach(row => {
-        const week = row.SEMANA;
+        const week = row.SEMANA || "Sin semana";
         if (!byWeek[week]) byWeek[week] = [];
         byWeek[week].push(row);
       });
 
-      // Generar HTML por semana
       let html = `<h2 style="text-align:center; color:#2c3e50;">Resultados para DNI: ${dniQuery}</h2>`;
 
-      // Ordenar semanas: Semana1, Semana2, ..., Semana10, etc.
       const sortedWeeks = Object.keys(byWeek).sort((a, b) => {
         const numA = parseInt(a.replace(/\D/g, '')) || 0;
         const numB = parseInt(b.replace(/\D/g, '')) || 0;
         return numA - numB;
       });
 
-      // Calcular total general acumulando todos los valores
       const totalSums = {};
       const totalCounts = {};
       COLUMNS.forEach(col => {
@@ -232,9 +259,8 @@
 
       sortedWeeks.forEach(weekName => {
         const weekData = byWeek[weekName];
-
-        // Promedios por columna en esta semana
         const weekAverages = {};
+
         COLUMNS.forEach(col => {
           let sum = 0;
           let count = 0;
@@ -265,7 +291,6 @@
         html += `</div>`;
       });
 
-      // Calcular Total General (promedio global de cada columna)
       const totalAverages = {};
       COLUMNS.forEach(col => {
         if (totalCounts[col.key] > 0) {
@@ -275,26 +300,57 @@
         }
       });
 
-      // Mostrar Total General (usamos NOTA como resumen, o puedes mostrar todas)
       const notaGeneral = totalAverages['NOTA'];
 
+      // 🎯 Gráfico circular animado en Total General
       html += `
         <div class="total-general">
-          <div style="font-size:1.2em; color:#2c3e50;">Total General</div>
-          <div class="total-value">${notaGeneral}%</div>
+          <div style="font-size:1.2em; color:#2c3e50; margin-bottom:15px;">Total General</div>
+          <div class="chart-container">
+            <svg viewBox="0 0 160 160">
+              <circle class="circle-bg" cx="80" cy="80" r="70"></circle>
+              <circle class="circle" cx="80" cy="80" r="70"></circle>
+            </svg>
+            <div class="percentage" id="percent-text">${notaGeneral}%</div>
+          </div>
         </div>
+        <div class="info">Filas procesadas: ${filtered.length}</div>
       `;
 
-      html += `<div class="info">Filas procesadas: ${filtered.length}</div>`;
-
       document.getElementById('resultContainer').innerHTML = html;
+
+      // Animación del gráfico
+      animateChart(notaGeneral);
+    }
+
+    function animateChart(porcentaje) {
+      const circle = document.querySelector('.circle');
+      const percentText = document.getElementById('percent-text');
+      const radius = 70;
+      const circumference = 2 * Math.PI * radius;
+      const offset = circumference - (porcentaje / 100) * circumference;
+
+      circle.style.strokeDasharray = circumference;
+      circle.style.strokeDashoffset = circumference;
+
+      circle.animate(
+        [{ strokeDashoffset: circumference }, { strokeDashoffset: offset }],
+        { duration: 1500, fill: "forwards", easing: "ease-out" }
+      );
+
+      let current = 0;
+      const target = Math.round(porcentaje);
+      const interval = setInterval(() => {
+        current++;
+        percentText.textContent = current + "%";
+        if (current >= target) clearInterval(interval);
+      }, 1500 / target);
     }
 
     function showError(message) {
       document.getElementById('resultContainer').innerHTML = `<div class="error">${message}</div>`;
     }
 
-    // Iniciar carga
     loadAndProcessData();
   </script>
 </body>
