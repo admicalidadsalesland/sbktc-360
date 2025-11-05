@@ -126,30 +126,34 @@
       margin: 20px 0;
     }
 
-    /* === GRAFICO DE ANILLO === */
+    /* === GRAFICO DE ANILLO UX === */
     .chart-container {
       position: relative;
-      width: 140px;
-      height: 140px;
+      width: 160px;
+      height: 160px;
       margin: 0 auto;
+    }
+
+    svg {
+      transform: rotate(-90deg);
+      width: 100%;
+      height: 100%;
     }
 
     .circle-bg {
       fill: none;
-      stroke: #e2e8f0;
-      stroke-width: 10;
+      stroke: #e5e7eb;
+      stroke-width: 12;
     }
 
-    .circle {
+    .circle-progress {
       fill: none;
-      stroke-width: 10;
+      stroke: url(#gradient);
+      stroke-width: 12;
       stroke-linecap: round;
-      stroke: #3b82f6; /* Color inicial */
-      transform: rotate(-90deg);
-      transform-origin: 50% 50%;
-      stroke-dasharray: 440;
-      stroke-dashoffset: 440;
-      transition: stroke 0.5s ease;
+      stroke-dasharray: 565.48;
+      stroke-dashoffset: 565.48;
+      transition: stroke-dashoffset 1.8s ease-out;
     }
 
     .percentage {
@@ -157,10 +161,9 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      font-size: 26px;
+      font-size: 2rem;
       font-weight: 700;
-      color: #0f172a;
-      transition: color 0.5s ease;
+      color: #111827;
     }
 
     .subtitle {
@@ -233,11 +236,11 @@
       const res = await fetch(CSV_URL);
       const text = await res.text();
       const lines = text.split('\n');
-      const headers = lines[0].split(',').map(h => h.trim());
-      allData = lines.slice(1).map(l => {
-        const v = l.split(',').map(x => x.trim());
-        const o = {};
-        headers.forEach((h, i) => o[h] = v[i]);
+      const headers = lines[0].split(',').map(h=>h.trim());
+      allData = lines.slice(1).map(l=>{
+        const v = l.split(',').map(x=>x.trim());
+        const o={};
+        headers.forEach((h,i)=>o[h]=v[i]);
         return o;
       });
     }
@@ -254,69 +257,50 @@
         return;
       }
 
-      const weeks = [...new Set(filtered.map(r => r.SEMANA))].sort();
-
-      // === FUNCIÓN PARA CONVERTIR VALOR A NÚMERO EN % ===
-      function parsePercent(val) {
-        if (!val) return null;
-        let clean = val.toString().replace('%', '').replace(',', '.').trim();
-        let num = parseFloat(clean);
-        return isNaN(num) ? null : num;
-      }
+      const weeks = [...new Set(filtered.map(r=>r.SEMANA))].sort();
 
       // TABLA IZQUIERDA
       let table = `<h3>Resultados para DNI: ${dni}</h3>
-      <table><thead><tr><th>Indicador</th>${weeks.map(w => `<th>${w}</th>`).join('')}</tr></thead><tbody>`;
-      
-      let totalNotaValues = []; // Para calcular Total General correctamente
-
-      COLUMNS.forEach(col => {
+      <table><thead><tr><th>Indicador</th>${weeks.map(w=>`<th>${w}</th>`).join('')}</tr></thead><tbody>`;
+      let total=0, count=0;
+      COLUMNS.forEach(col=>{
         table += `<tr><td>${col.label}</td>`;
-        weeks.forEach(w => {
-          const values = filtered
-            .filter(r => r.SEMANA === w)
-            .map(r => parsePercent(r[col.key]))
-            .filter(v => v !== null);
-
-          const avg = values.length ? values.reduce((a, b) => a + b, 0) / values.length : 0;
-          
-          // Solo acumular NOTA para Total General
-          if (col.key === 'NOTA') {
-            totalNotaValues.push(...values);
-          }
-
+        weeks.forEach(w=>{
+          const values = filtered.filter(r=>r.SEMANA===w).map(r=>parseFloat(r[col.key])||0);
+          const avg = values.length ? (values.reduce((a,b)=>a+b,0)/values.length)*100 : 0;
           table += `<td>${avg.toFixed(1)}%</td>`;
+          if(col.key==="NOTA"){ total+=avg; count++; }
         });
         table += `</tr>`;
       });
       table += `</tbody></table><div class="divider"></div>
       <div class="chart-container">
-        <svg width="140" height="140">
-          <circle class="circle-bg" cx="70" cy="70" r="60"></circle>
-          <circle class="circle" cx="70" cy="70" r="60"></circle>
+        <svg viewBox="0 0 200 200">
+          <defs>
+            <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#10b981" />
+              <stop offset="100%" stop-color="#3b82f6" />
+            </linearGradient>
+          </defs>
+          <circle class="circle-bg" cx="100" cy="100" r="90"></circle>
+          <circle class="circle-progress" cx="100" cy="100" r="90"></circle>
         </svg>
-        <div class="percentage" id="percentageValue">0%</div>
+        <div class="percentage" id="percentValue">0%</div>
       </div>
       <div class="subtitle">Total General (filas: ${filtered.length})</div>`;
       document.getElementById("resultContainer").innerHTML = table;
 
-      // === CALCULAR TOTAL GENERAL CORRECTO ===
-      const totalGeneral = totalNotaValues.length 
-        ? totalNotaValues.reduce((a, b) => a + b, 0) / totalNotaValues.length 
-        : 0;
+      // ANIMACIÓN UX
+      const percent = total/count;
+      animateDonut(percent);
 
-      // ANIMAR CON EL VALOR CORRECTO (0–100) Y CAMBIAR COLOR
-      animateDonut(Math.min(100, Math.max(0, totalGeneral)));
-
-      // TABLA DERECHA (sin cambios)
-      let detail = `<table><thead><tr><th>Indicador</th>${weeks.map(w => `<th>${w}</th>`).join('')}</tr></thead><tbody>`;
-      DETAIL_COLUMNS.forEach(col => {
+      // TABLA DERECHA
+      let detail = `<table><thead><tr><th>Indicador</th>${weeks.map(w=>`<th>${w}</th>`).join('')}</tr></thead><tbody>`;
+      DETAIL_COLUMNS.forEach(col=>{
         detail += `<tr><td>${col.label}</td>`;
-        weeks.forEach(w => {
-          const vals = filtered
-            .filter(r => r.SEMANA === w)
-            .map(r => parseInt(r[col.key]) || 0);
-          const sum = vals.reduce((a, b) => a + b, 0);
+        weeks.forEach(w=>{
+          const vals = filtered.filter(r=>r.SEMANA===w).map(r=>parseInt(r[col.key])||0);
+          const sum = vals.reduce((a,b)=>a+b,0);
           detail += `<td>${sum}</td>`;
         });
         detail += `</tr>`;
@@ -325,50 +309,31 @@
       document.getElementById('errorContainer').innerHTML = detail;
     }
 
-    function animateDonut(finalPercent) {
-      const circle = document.querySelector(".circle");
-      const text = document.getElementById("percentageValue");
-      const radius = 60;
+    function animateDonut(targetPercent) {
+      const circle = document.querySelector('.circle-progress');
+      const text = document.getElementById('percentValue');
+      const radius = 90;
       const circumference = 2 * Math.PI * radius;
-      
-      // Asegurar que finalPercent esté entre 0 y 100
-      finalPercent = Math.min(100, Math.max(0, finalPercent));
-      
-      // Determinar color según rango
-      let color = '#ef4444'; // Rojo por defecto
-      if (finalPercent >= 75) {
-        color = '#10b981'; // Verde
-      } else if (finalPercent >= 65) {
-        color = '#f59e0b'; // Amarillo
-      }
-
-      // Aplicar color al círculo
-      circle.style.stroke = color;
-      text.style.color = color;
+      circle.style.strokeDasharray = circumference;
+      circle.style.strokeDashoffset = circumference;
 
       let current = 0;
-      const duration = 1200;
-      const startTime = performance.now();
+      const duration = 1800;
+      const fps = 60;
+      const steps = Math.round(duration / (1000 / fps));
+      const increment = targetPercent / steps;
 
-      function animate(time) {
-        const elapsed = time - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-        
-        // Easing suave
-        const easeProgress = 1 - Math.pow(1 - progress, 3);
-        current = easeProgress * finalPercent;
-        
-        const offset = circumference - (circumference * current) / 100;
-        circle.style.strokeDasharray = `${circumference} ${circumference}`;
-        circle.style.strokeDashoffset = offset;
-        text.textContent = `${current.toFixed(1)}%`;
-        
-        if (progress < 1) {
-          requestAnimationFrame(animate);
+      const interval = setInterval(() => {
+        current += increment;
+        if (current >= targetPercent) {
+          current = targetPercent;
+          clearInterval(interval);
         }
-      }
-      
-      requestAnimationFrame(animate);
+
+        const offset = circumference - (current / 100) * circumference;
+        circle.style.strokeDashoffset = offset;
+        text.textContent = current.toFixed(1) + "%";
+      }, 1000 / fps);
     }
 
     loadData();
