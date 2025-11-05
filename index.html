@@ -13,7 +13,7 @@
       color: #333;
     }
     .container {
-      max-width: 800px;
+      max-width: 900px;
       margin: 0 auto;
       background: white;
       padding: 30px;
@@ -50,24 +50,44 @@
     .search-box button:hover {
       background: #2980b9;
     }
+    .week-section {
+      margin-top: 25px;
+      padding-top: 15px;
+      border-top: 2px solid #eee;
+    }
+    .week-title {
+      font-size: 1.4em;
+      color: #2980b9;
+      margin-bottom: 15px;
+      text-align: center;
+    }
     .metric {
       display: flex;
       justify-content: space-between;
-      padding: 14px 0;
-      border-bottom: 1px solid #eee;
+      padding: 10px 0;
+      border-bottom: 1px solid #f5f5f5;
     }
     .metric:last-child {
       border-bottom: none;
     }
     .label {
       font-weight: bold;
-      font-size: 1.1em;
-      color: #2980b9;
+      color: #2c3e50;
     }
     .value {
-      font-size: 1.3em;
       font-weight: bold;
       color: #27ae60;
+    }
+    .total-general {
+      margin-top: 25px;
+      padding-top: 20px;
+      border-top: 3px solid #3498db;
+      text-align: center;
+    }
+    .total-value {
+      font-size: 1.8em;
+      color: #3498db;
+      font-weight: bold;
     }
     .loading {
       text-align: center;
@@ -85,13 +105,6 @@
       font-style: italic;
       color: #7f8c8d;
       margin: 10px 0;
-    }
-    .section-title {
-      margin-top: 25px;
-      padding-top: 20px;
-      border-top: 2px solid #eee;
-      text-align: center;
-      color: #2c3e50;
     }
   </style>
 </head>
@@ -152,7 +165,6 @@
             if (val === '' || val === null) {
               row[col.key] = null;
             } else {
-              // Eliminar símbolo % y convertir a número
               val = val.replace('%', '').trim();
               if (!isNaN(val)) {
                 row[col.key] = parseFloat(val);
@@ -165,7 +177,6 @@
           allData.push(row);
         }
 
-        // Mostrar mensaje inicial
         document.getElementById('resultContainer').innerHTML = `
           <div class="info">✅ Datos cargados. Ingresa un DNI para buscar.</div>
         `;
@@ -193,37 +204,88 @@
         return;
       }
 
-      // Si hay múltiples filas, calcular promedio por columna
-      const averages = {};
+      // Agrupar por SEMANA
+      const byWeek = {};
+      filtered.forEach(row => {
+        const week = row.SEMANA;
+        if (!byWeek[week]) byWeek[week] = [];
+        byWeek[week].push(row);
+      });
+
+      // Generar HTML por semana
+      let html = `<h2 style="text-align:center; color:#2c3e50;">Resultados para DNI: ${dniQuery}</h2>`;
+
+      // Ordenar semanas: Semana1, Semana2, ..., Semana10, etc.
+      const sortedWeeks = Object.keys(byWeek).sort((a, b) => {
+        const numA = parseInt(a.replace(/\D/g, '')) || 0;
+        const numB = parseInt(b.replace(/\D/g, '')) || 0;
+        return numA - numB;
+      });
+
+      // Calcular total general acumulando todos los valores
+      const totalSums = {};
+      const totalCounts = {};
       COLUMNS.forEach(col => {
-        let sum = 0;
-        let count = 0;
-        filtered.forEach(row => {
-          if (row[col.key] !== null) {
-            sum += row[col.key];
-            count++;
-          }
+        totalSums[col.key] = 0;
+        totalCounts[col.key] = 0;
+      });
+
+      sortedWeeks.forEach(weekName => {
+        const weekData = byWeek[weekName];
+
+        // Promedios por columna en esta semana
+        const weekAverages = {};
+        COLUMNS.forEach(col => {
+          let sum = 0;
+          let count = 0;
+          weekData.forEach(row => {
+            if (row[col.key] !== null) {
+              sum += row[col.key];
+              count++;
+              totalSums[col.key] += row[col.key];
+              totalCounts[col.key]++;
+            }
+          });
+          weekAverages[col.key] = count > 0 ? (sum / count).toFixed(1) : 'N/A';
         });
-        if (count > 0) {
-          averages[col.key] = (sum / count).toFixed(1);
+
+        html += `<div class="week-section">`;
+        html += `<div class="week-title">${weekName}</div>`;
+
+        COLUMNS.forEach(col => {
+          const value = weekAverages[col.key];
+          html += `
+            <div class="metric">
+              <span class="label">${col.label}:</span>
+              <span class="value">${value}%</span>
+            </div>
+          `;
+        });
+
+        html += `</div>`;
+      });
+
+      // Calcular Total General (promedio global de cada columna)
+      const totalAverages = {};
+      COLUMNS.forEach(col => {
+        if (totalCounts[col.key] > 0) {
+          totalAverages[col.key] = (totalSums[col.key] / totalCounts[col.key]).toFixed(1);
         } else {
-          averages[col.key] = 'N/A';
+          totalAverages[col.key] = 'N/A';
         }
       });
 
-      let html = `<h2 class="section-title">Resultados para DNI: ${dniQuery}</h2>`;
+      // Mostrar Total General (usamos NOTA como resumen, o puedes mostrar todas)
+      const notaGeneral = totalAverages['NOTA'];
 
-      COLUMNS.forEach(col => {
-        const value = averages[col.key];
-        html += `
-          <div class="metric">
-            <span class="label">${col.label}:</span>
-            <span class="value">${value}%</span>
-          </div>
-        `;
-      });
+      html += `
+        <div class="total-general">
+          <div style="font-size:1.2em; color:#2c3e50;">Total General</div>
+          <div class="total-value">${notaGeneral}%</div>
+        </div>
+      `;
 
-      html += `<div class="info">Filas encontradas: ${filtered.length}</div>`;
+      html += `<div class="info">Filas procesadas: ${filtered.length}</div>`;
 
       document.getElementById('resultContainer').innerHTML = html;
     }
