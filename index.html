@@ -3,122 +3,200 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Promedios por DNI - Evaluaciones</title>
+  <title>Consulta Notas de Calidad</title>
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f5f7fa;
+      background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 50%, #fad0c4 50%, #a1c4fd 100%);
       margin: 0;
       padding: 20px;
-      color: #333;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
     .container {
       max-width: 800px;
-      margin: 0 auto;
-      background: white;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
       padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      backdrop-filter: blur(10px);
     }
     h1 {
       text-align: center;
-      color: #2c3e50;
+      color: #333;
+      margin-bottom: 5px;
+      font-size: 24px;
+    }
+    .subtitle {
+      text-align: center;
+      color: #666;
       margin-bottom: 20px;
+      font-size: 14px;
     }
     .search-box {
       display: flex;
       gap: 10px;
       margin-bottom: 25px;
       align-items: center;
+      justify-content: center;
     }
     .search-box input {
-      padding: 10px;
+      padding: 12px 15px;
       font-size: 16px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      flex: 1;
+      border: 1px solid #ddd;
+      border-radius: 30px;
+      width: 300px;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+    .search-box input:focus {
+      border-color: #3498db;
+    }
+    .search-box input::placeholder {
+      color: #999;
+    }
+    .search-box .icon {
+      margin-right: 8px;
+      color: #999;
     }
     .search-box button {
-      padding: 10px 20px;
-      background: #3498db;
+      padding: 12px 25px;
+      background: #6c5ce7;
       color: white;
       border: none;
-      border-radius: 6px;
+      border-radius: 30px;
       cursor: pointer;
+      font-weight: bold;
       font-size: 16px;
+      transition: background 0.3s;
     }
     .search-box button:hover {
-      background: #2980b9;
+      background: #5544b5;
     }
-    .metric {
+    .result-card {
+      background: white;
+      border-radius: 15px;
+      padding: 25px;
+      text-align: center;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+      margin-top: 20px;
+    }
+    .avatar {
+      width: 50px;
+      height: 50px;
+      background: #e0e0ff;
+      border-radius: 50%;
       display: flex;
-      justify-content: space-between;
-      padding: 14px 0;
-      border-bottom: 1px solid #eee;
-    }
-    .metric:last-child {
-      border-bottom: none;
-    }
-    .label {
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
       font-weight: bold;
-      font-size: 1.1em;
-      color: #2980b9;
+      color: #6c5ce7;
+      margin: 0 auto 15px;
     }
-    .value {
-      font-size: 1.3em;
+    .agent-name {
+      font-size: 20px;
       font-weight: bold;
-      color: #27ae60;
+      color: #333;
+      margin: 0 0 20px 0;
+    }
+    .weeks-container {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin: 20px 0;
+    }
+    .week-card {
+      background: #f8f9fa;
+      border-radius: 10px;
+      padding: 15px;
+      min-width: 100px;
+      text-align: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    .week-label {
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 5px;
+    }
+    .week-value {
+      font-size: 18px;
+      font-weight: bold;
+      margin: 5px 0;
+    }
+    .progress-bar {
+      height: 6px;
+      background: #eee;
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: 5px;
+    }
+    .progress-fill {
+      height: 100%;
+      border-radius: 3px;
+    }
+    .total-general {
+      margin-top: 20px;
+      font-size: 14px;
+      color: #666;
+    }
+    .total-value {
+      font-size: 28px;
+      font-weight: bold;
+      color: #6c5ce7;
+      margin: 5px 0;
     }
     .loading {
       text-align: center;
       font-size: 1.2em;
       color: #7f8c8d;
+      padding: 30px;
     }
     .error {
       color: #e74c3c;
       text-align: center;
       font-weight: bold;
-      margin: 20px 0;
+      padding: 20px;
     }
-    .info {
-      text-align: center;
-      font-style: italic;
-      color: #7f8c8d;
-      margin: 10px 0;
-    }
-    .section-title {
-      margin-top: 25px;
-      padding-top: 20px;
-      border-top: 2px solid #eee;
-      text-align: center;
-      color: #2c3e50;
+    .hidden {
+      display: none;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>📊 Evaluaciones por DNI</h1>
+    <h1>Consulta tus notas de calidad</h1>
+    <p class="subtitle">Busca al agente por su DNI y revisa su desempeño general.</p>
 
     <div class="search-box">
-      <input type="text" id="dniInput" placeholder="Buscar por DNI (ej: 40753375)" />
-      <button onclick="searchByDNI()">Buscar</button>
+      <span class="icon">👤</span>
+      <input type="text" id="dniInput" placeholder="Ingresa el DNI del agente" />
+      <button onclick="searchByDNI()">Buscar Agente</button>
     </div>
 
-    <div id="resultContainer">
-      <div class="loading">Cargando datos...</div>
+    <div id="resultContainer" class="hidden">
+      <div class="result-card">
+        <div class="avatar" id="avatar">D</div>
+        <div class="agent-name" id="agentName">DIANA ELIZABETH AYQUIPA PONTE</div>
+
+        <div class="weeks-container" id="weeksContainer">
+          <!-- Aquí se generan las semanas -->
+        </div>
+
+        <div class="total-general">Total General</div>
+        <div class="total-value" id="totalGeneral">96.17%</div>
+      </div>
     </div>
+
+    <div id="loading" class="loading">Cargando datos...</div>
+    <div id="errorMessage" class="error hidden"></div>
   </div>
 
   <script>
     const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRp7iRBUwVpHnmf7Q0mLyARIBl-inFlZbH43i3wU1whcjE0GlPi7Z51VcmXRsWrcYCmWMS1WTL-ySJt/pub?gid=2119161122&single=true&output=csv';
-
-    const COLUMNS = [
-      { key: '1_COMUNICACIÓN', label: 'Comunicación' },
-      { key: '2_INFORMACIÓN', label: 'Información' },
-      { key: '3_GESTION DE VENTA (PRE VENTA)', label: 'Gestión de Venta (Preventa)' },
-      { key: '4_REGULATORIO', label: 'Regulatorio' },
-      { key: 'NOTA', label: 'Nota General' }
-    ];
 
     let allData = [];
 
@@ -146,18 +224,18 @@
             row[header] = values[idx];
           });
 
-          // Limpiar y convertir columnas numéricas que ya están en %
-          COLUMNS.forEach(col => {
-            let val = row[col.key];
+          // Convertir columnas numéricas que ya están en %
+          const numericFields = ['1_COMUNICACIÓN', '2_INFORMACIÓN', '3_GESTION DE VENTA (PRE VENTA)', '4_REGULATORIO', 'NOTA'];
+          numericFields.forEach(field => {
+            let val = row[field];
             if (val === '' || val === null) {
-              row[col.key] = null;
+              row[field] = null;
             } else {
-              // Eliminar símbolo % y convertir a número
               val = val.replace('%', '').trim();
               if (!isNaN(val)) {
-                row[col.key] = parseFloat(val);
+                row[field] = parseFloat(val);
               } else {
-                row[col.key] = null;
+                row[field] = null;
               }
             }
           });
@@ -165,13 +243,11 @@
           allData.push(row);
         }
 
-        // Mostrar mensaje inicial
-        document.getElementById('resultContainer').innerHTML = `
-          <div class="info">✅ Datos cargados. Ingresa un DNI para buscar.</div>
-        `;
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('resultContainer').classList.remove('hidden');
 
       } catch (error) {
-        showError('❌ Error: ' + error.message);
+        showError('❌ Error al cargar los datos: ' + error.message);
       }
     }
 
@@ -182,54 +258,112 @@
         return;
       }
 
-      const filtered = allData.filter(row =>
+      const agentRows = allData.filter(row =>
         row.DNI && row.DNI.toString().includes(dniQuery)
       );
 
-      if (filtered.length === 0) {
-        document.getElementById('resultContainer').innerHTML = `
-          <div class="error">❌ No se encontró ningún registro con DNI: ${dniQuery}</div>
-        `;
+      if (agentRows.length === 0) {
+        showError(`❌ No se encontró ningún agente con DNI: ${dniQuery}`);
         return;
       }
 
-      // Si hay múltiples filas, calcular promedio por columna
-      const averages = {};
-      COLUMNS.forEach(col => {
+      // Tomar el primer agente encontrado (o puedes tomar el más reciente)
+      const firstRow = agentRows[0];
+      const agentName = firstRow.AGENTE || 'Agente Desconocido';
+      const initials = agentName.split(' ').map(n => n[0]).join('').toUpperCase();
+
+      // Agrupar por semana
+      const byWeek = {};
+      agentRows.forEach(row => {
+        const week = row.SEMANA;
+        if (!byWeek[week]) byWeek[week] = [];
+        byWeek[week].push(row);
+      });
+
+      // Calcular promedio por semana
+      const weekAverages = {};
+      for (const week in byWeek) {
         let sum = 0;
         let count = 0;
-        filtered.forEach(row => {
-          if (row[col.key] !== null) {
-            sum += row[col.key];
+        byWeek[week].forEach(row => {
+          if (row.NOTA !== null) {
+            sum += row.NOTA;
             count++;
           }
         });
         if (count > 0) {
-          averages[col.key] = (sum / count).toFixed(1);
+          weekAverages[week] = (sum / count).toFixed(1);
+        }
+      }
+
+      // Mostrar resultados
+      document.getElementById('avatar').textContent = initials.charAt(0);
+      document.getElementById('agentName').textContent = agentName;
+
+      const weeksContainer = document.getElementById('weeksContainer');
+      weeksContainer.innerHTML = '';
+
+      // Generar tarjetas de semanas 1 a 5
+      for (let i = 1; i <= 5; i++) {
+        const weekKey = `Semana${i}`;
+        const value = weekAverages[`Semana${i}`] || 'N/A';
+        const percentage = value === 'N/A' ? 0 : parseFloat(value);
+
+        const card = document.createElement('div');
+        card.className = 'week-card';
+
+        const label = document.createElement('div');
+        label.className = 'week-label';
+        label.textContent = weekKey;
+
+        const valueDiv = document.createElement('div');
+        valueDiv.className = 'week-value';
+        valueDiv.textContent = value + '%';
+
+        const progressBar = document.createElement('div');
+        progressBar.className = 'progress-bar';
+
+        const progressFill = document.createElement('div');
+        progressFill.className = 'progress-fill';
+        progressFill.style.width = `${Math.min(percentage, 100)}%`;
+
+        // Colorear la barra según el porcentaje
+        if (percentage >= 90) {
+          progressFill.style.backgroundColor = '#2ecc71'; // verde
+        } else if (percentage >= 70) {
+          progressFill.style.backgroundColor = '#f39c12'; // naranja
         } else {
-          averages[col.key] = 'N/A';
+          progressFill.style.backgroundColor = '#e74c3c'; // rojo
+        }
+
+        progressBar.appendChild(progressFill);
+        card.appendChild(label);
+        card.appendChild(valueDiv);
+        card.appendChild(progressBar);
+        weeksContainer.appendChild(card);
+      }
+
+      // Calcular total general
+      let totalSum = 0;
+      let totalCount = 0;
+      agentRows.forEach(row => {
+        if (row.NOTA !== null) {
+          totalSum += row.NOTA;
+          totalCount++;
         }
       });
+      const totalGeneral = totalCount > 0 ? (totalSum / totalCount).toFixed(2) : '0.00';
+      document.getElementById('totalGeneral').textContent = `${totalGeneral}%`;
 
-      let html = `<h2 class="section-title">Resultados para DNI: ${dniQuery}</h2>`;
+      // Ocultar errores
+      document.getElementById('errorMessage').classList.add('hidden');
 
-      COLUMNS.forEach(col => {
-        const value = averages[col.key];
-        html += `
-          <div class="metric">
-            <span class="label">${col.label}:</span>
-            <span class="value">${value}%</span>
-          </div>
-        `;
-      });
-
-      html += `<div class="info">Filas encontradas: ${filtered.length}</div>`;
-
-      document.getElementById('resultContainer').innerHTML = html;
     }
 
     function showError(message) {
-      document.getElementById('resultContainer').innerHTML = `<div class="error">${message}</div>`;
+      document.getElementById('errorMessage').textContent = message;
+      document.getElementById('errorMessage').classList.remove('hidden');
+      document.getElementById('resultContainer').classList.add('hidden');
     }
 
     // Iniciar carga
