@@ -11,10 +11,12 @@
       margin: 0;
       padding: 40px;
       display: flex;
-      justify-content: center;
+      justify-content: space-between;
       align-items: flex-start;
       gap: 20px;
       color: #1e293b;
+      height: 100vh;
+      box-sizing: border-box;
     }
 
     /* CONTENEDORES */
@@ -23,16 +25,17 @@
       border-radius: 12px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.06);
       padding: 24px;
+      height: calc(100vh - 80px);
+      overflow-y: auto;
+      box-sizing: border-box;
     }
 
     .left-panel {
-      width: 760px;
+      width: 50%;
     }
 
     .right-panel {
-      width: 440px;
-      max-height: 85vh;
-      overflow-y: auto;
+      width: 50%;
     }
 
     /* TITULOS */
@@ -256,9 +259,9 @@
 
       const weeks = [...new Set(filtered.map(r=>r.SEMANA))].sort();
 
+      // Tabla de porcentajes (0-100%)
       let table = `<h3>Resultados para DNI: ${dni}</h3>
       <table><thead><tr><th>Indicador</th>${weeks.map(w=>`<th>${w}</th>`).join('')}</tr></thead><tbody>`;
-
       let total=0, count=0;
       COLUMNS.forEach(col=>{
         table += `<tr><td>${col.label}</td>`;
@@ -281,17 +284,18 @@
 
       const percent = total/count;
       const circle = document.querySelector(".circle");
-      const dashoffset = 440 - (440*percent)/130;
+      const dashoffset = 440 - (440*percent)/100;
       circle.style.strokeDashoffset = dashoffset;
       document.getElementById("percentageValue").textContent = `${percent.toFixed(1)}%`;
 
-      // tabla detalle
+      // Tabla de errores (solo enteros)
       let detail = `<table><thead><tr><th>Indicador</th>${weeks.map(w=>`<th>${w}</th>`).join('')}</tr></thead><tbody>`;
       DETAIL_COLUMNS.forEach(col=>{
         detail += `<tr><td>${col.label}</td>`;
         weeks.forEach(w=>{
           const vals = filtered.filter(r=>r.SEMANA===w).map(r=>parseInt(r[col.key])||0);
-          detail += `<td>${vals.reduce((a,b)=>a+b,0)}</td>`;
+          const sum = vals.reduce((a,b)=>a+b,0);
+          detail += `<td>${sum}</td>`;
         });
         detail += `</tr>`;
       });
