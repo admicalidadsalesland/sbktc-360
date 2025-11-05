@@ -94,6 +94,7 @@
       border-bottom: 1px solid #f1f5f9;
       text-align: center;
       color: #0f172a;
+      transition: all 0.2s ease;
     }
 
     /* Izquierda (más compacta) */
@@ -126,34 +127,29 @@
       margin: 20px 0;
     }
 
-    /* === GRAFICO DE ANILLO UX === */
+    /* === GRAFICO DE ANILLO === */
     .chart-container {
       position: relative;
-      width: 160px;
-      height: 160px;
+      width: 140px;
+      height: 140px;
       margin: 0 auto;
-    }
-
-    svg {
-      transform: rotate(-90deg);
-      width: 100%;
-      height: 100%;
     }
 
     .circle-bg {
       fill: none;
-      stroke: #e5e7eb;
-      stroke-width: 12;
+      stroke: #e2e8f0;
+      stroke-width: 10;
     }
 
-    .circle-progress {
+    .circle {
       fill: none;
-      stroke: url(#gradient);
-      stroke-width: 12;
+      stroke-width: 10;
       stroke-linecap: round;
-      stroke-dasharray: 565.48;
-      stroke-dashoffset: 565.48;
-      transition: stroke-dashoffset 1.8s ease-out;
+      stroke: #3b82f6;
+      transform: rotate(-90deg);
+      transform-origin: 50% 50%;
+      stroke-dasharray: 440;
+      stroke-dashoffset: 440;
     }
 
     .percentage {
@@ -161,9 +157,9 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      font-size: 2rem;
+      font-size: 26px;
       font-weight: 700;
-      color: #111827;
+      color: #0f172a;
     }
 
     .subtitle {
@@ -180,6 +176,11 @@
     }
     .info { color: #64748b; font-style: italic; }
     .error { color: #dc2626; }
+
+    /* === Colores dinámicos de porcentaje === */
+    .low { color: #f43f5e; font-weight: 600; }
+    .medium { color: #facc15; font-weight: 600; }
+    .high { color: #2AC793; font-weight: 600; }
   </style>
 </head>
 <body>
@@ -268,24 +269,20 @@
         weeks.forEach(w=>{
           const values = filtered.filter(r=>r.SEMANA===w).map(r=>parseFloat(r[col.key])||0);
           const avg = values.length ? (values.reduce((a,b)=>a+b,0)/values.length)*100 : 0;
-          table += `<td>${avg.toFixed(1)}%</td>`;
+          const colorClass = avg <= 65 ? 'low' : avg <= 75 ? 'medium' : avg >= 85 ? 'high' : '';
+          table += `<td class="${colorClass}">${avg.toFixed(1)}%</td>`;
           if(col.key==="NOTA"){ total+=avg; count++; }
         });
         table += `</tr>`;
       });
-      table += `</tbody></table><div class="divider"></div>
+      table += `</tbody></table>
+      <div class="divider"></div>
       <div class="chart-container">
-        <svg viewBox="0 0 200 200">
-          <defs>
-            <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#10b981" />
-              <stop offset="100%" stop-color="#3b82f6" />
-            </linearGradient>
-          </defs>
-          <circle class="circle-bg" cx="100" cy="100" r="90"></circle>
-          <circle class="circle-progress" cx="100" cy="100" r="90"></circle>
+        <svg width="140" height="140">
+          <circle class="circle-bg" cx="70" cy="70" r="60"></circle>
+          <circle class="circle" cx="70" cy="70" r="60"></circle>
         </svg>
-        <div class="percentage" id="percentValue">0%</div>
+        <div class="percentage" id="percentageValue">0%</div>
       </div>
       <div class="subtitle">Total General (filas: ${filtered.length})</div>`;
       document.getElementById("resultContainer").innerHTML = table;
@@ -309,31 +306,26 @@
       document.getElementById('errorContainer').innerHTML = detail;
     }
 
-    function animateDonut(targetPercent) {
-      const circle = document.querySelector('.circle-progress');
-      const text = document.getElementById('percentValue');
-      const radius = 90;
+    function animateDonut(finalPercent) {
+      const circle = document.querySelector(".circle");
+      const text = document.getElementById("percentageValue");
+      const radius = 60;
       const circumference = 2 * Math.PI * radius;
-      circle.style.strokeDasharray = circumference;
-      circle.style.strokeDashoffset = circumference;
-
       let current = 0;
-      const duration = 1800;
-      const fps = 60;
-      const steps = Math.round(duration / (1000 / fps));
-      const increment = targetPercent / steps;
+      const duration = 1500;
+      const frameRate = 1000 / 60;
+      const totalFrames = duration / frameRate;
+      const increment = finalPercent / totalFrames;
 
-      const interval = setInterval(() => {
+      const animate = () => {
         current += increment;
-        if (current >= targetPercent) {
-          current = targetPercent;
-          clearInterval(interval);
-        }
-
-        const offset = circumference - (current / 100) * circumference;
+        if (current > finalPercent) current = finalPercent;
+        const offset = circumference - (circumference * current) / 100;
         circle.style.strokeDashoffset = offset;
-        text.textContent = current.toFixed(1) + "%";
-      }, 1000 / fps);
+        text.textContent = `${current.toFixed(0)}%`;
+        if (current < finalPercent) requestAnimationFrame(animate);
+      };
+      animate();
     }
 
     loadData();
