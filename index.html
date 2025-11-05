@@ -94,58 +94,26 @@
       border-bottom: 1px solid #f1f5f9;
       text-align: center;
       color: #0f172a;
+      transition: color .15s ease;
     }
 
     /* Izquierda (más compacta) */
-    .left-panel table {
-      font-size: 13px;
-    }
-
-    .left-panel th, .left-panel td {
-      padding: 4px 6px;
-      line-height: 1.2;
-    }
+    .left-panel table { font-size: 13px; }
+    .left-panel th, .left-panel td { padding: 4px 6px; line-height: 1.2; }
 
     /* Derecha (aún más compacta) */
-    .right-panel table {
-      font-size: 12px;
-    }
+    .right-panel table { font-size: 12px; }
+    .right-panel th, .right-panel td { padding: 2px 4px; line-height: 1.1; }
 
-    .right-panel th, .right-panel td {
-      padding: 2px 4px;
-      line-height: 1.1;
-    }
+    td:first-child { text-align: left; font-weight: 500; }
 
-    td:first-child {
-      text-align: left;
-      font-weight: 500;
-    }
-
-    .divider {
-      border-top: 2px solid #e2e8f0;
-      margin: 20px 0;
-    }
+    .divider { border-top: 2px solid #e2e8f0; margin: 20px 0; }
 
     /* === GRAFICO DE ANILLO UX === */
-    .chart-container {
-      position: relative;
-      width: 180px;
-      height: 180px;
-      margin: 10px auto;
-    }
+    .chart-container { position: relative; width: 180px; height: 180px; margin: 10px auto; }
+    svg { transform: rotate(-90deg); width: 100%; height: 100%; }
 
-    svg {
-      transform: rotate(-90deg);
-      width: 100%;
-      height: 100%;
-    }
-
-    .circle-bg {
-      fill: none;
-      stroke: #e5e7eb;
-      stroke-width: 12;
-    }
-
+    .circle-bg { fill: none; stroke: #e5e7eb; stroke-width: 12; }
     .circle-progress {
       fill: none;
       stroke: #2AC793;
@@ -153,8 +121,8 @@
       stroke-linecap: round;
       stroke-dasharray: 565.48;
       stroke-dashoffset: 565.48;
-      transition: stroke-dashoffset 0.4s ease-out, stroke 0.3s;
-      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+      transition: stroke-dashoffset .4s ease-out, stroke .25s ease;
+      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.08));
     }
 
     .percentage {
@@ -162,26 +130,18 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      font-size: 2.2rem;
+      font-size: 2.0rem;
       font-weight: 700;
       color: #111827;
-      transition: color 0.4s ease;
+      transition: color .25s ease;
     }
 
-    .subtitle {
-      text-align: center;
-      color: #64748b;
-      font-size: 0.85rem;
-      margin-top: 8px;
-    }
+    .subtitle { text-align: center; color: #64748b; font-size: 0.85rem; margin-top: 8px; }
 
-    .info, .error {
-      text-align: center;
-      margin-top: 10px;
-      font-size: 0.9rem;
-    }
-    .info { color: #64748b; font-style: italic; }
-    .error { color: #dc2626; }
+    /* colores indicadores por rango */
+    .c-bad { color: #f43f5e; font-weight: 600; }
+    .c-warn { color: #facc15; font-weight: 600; }
+    .c-good { color: #2AC793; font-weight: 600; }
   </style>
 </head>
 <body>
@@ -234,15 +194,31 @@
 
     let allData = [];
 
+    // convierte un valor textual a número porcentual 0-100
+    function parseToPercent(raw) {
+      if (raw === undefined || raw === null || raw === "") return null;
+      let s = String(raw).trim().replace('%','').replace(',','.');
+      if (s === "") return null;
+      const n = parseFloat(s);
+      if (isNaN(n)) return null;
+      // si viene en formato 0.85 -> multiplicar por 100, si ya 85 -> mantener
+      let v = n;
+      if (Math.abs(v) <= 1) v = v * 100;
+      // clamp 0..100
+      if (v < 0) v = 0;
+      if (v > 100) v = 100;
+      return v;
+    }
+
     async function loadData() {
       const res = await fetch(CSV_URL);
       const text = await res.text();
-      const lines = text.split('\n');
+      const lines = text.split('\n').filter(Boolean);
       const headers = lines[0].split(',').map(h=>h.trim());
       allData = lines.slice(1).map(l=>{
-        const v = l.split(',').map(x=>x.trim());
-        const o={};
-        headers.forEach((h,i)=>o[h]=v[i]);
+        const v = l.split(',').map(x => x.trim().replace(/^"(.+)"$/,'$1'));
+        const o = {};
+        headers.forEach((h,i)=> o[h] = v[i] === undefined ? "" : v[i]);
         return o;
       });
     }
@@ -252,50 +228,75 @@
       if (!dni) return alert("Ingresa un DNI");
       if (!allData.length) await loadData();
 
-      const filtered = allData.filter(r => r.DNI === dni);
+      const filtered = allData.filter(r => r.DNI && r.DNI.toString().includes(dni));
       if (!filtered.length) {
         document.getElementById('resultContainer').innerHTML = `<div class="error">No se encontró el DNI ${dni}</div>`;
         document.getElementById('errorContainer').innerHTML = "";
         return;
       }
 
-      const weeks = [...new Set(filtered.map(r=>r.SEMANA))].sort();
+      const weeks = [...new Set(filtered.map(r=>r.SEMANA || 'Sin semana'))].sort();
 
-      // TABLA IZQUIERDA
+      // ---- construir tabla izquierda (por semana) ----
       let table = `<h3>Resultados para DNI: ${dni}</h3>
       <table><thead><tr><th>Indicador</th>${weeks.map(w=>`<th>${w}</th>`).join('')}</tr></thead><tbody>`;
-      let total=0, count=0;
-      COLUMNS.forEach(col=>{
+
+      // Para cada columna calculamos promedio por semana (para la tabla)
+      COLUMNS.forEach(col => {
         table += `<tr><td>${col.label}</td>`;
-        weeks.forEach(w=>{
-          const values = filtered.filter(r=>r.SEMANA===w).map(r=>parseFloat(r[col.key])||0);
-          const avg = values.length ? (values.reduce((a,b)=>a+b,0)/values.length)*100 : 0;
-          table += `<td>${avg.toFixed(1)}%</td>`;
-          if(col.key==="NOTA"){ total+=avg; count++; }
+        weeks.forEach(w => {
+          const vals = filtered
+            .filter(r => (r.SEMANA||'Sin semana') === w)
+            .map(r => parseToPercent(r[col.key]))
+            .filter(x => x !== null);
+          const avgWeek = vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : 0;
+          const cls = avgWeek <= 65 ? 'c-bad' : avgWeek <= 75 ? 'c-warn' : avgWeek >= 85 ? 'c-good' : '';
+          table += `<td class="${cls}">${avgWeek.toFixed(1)}%</td>`;
         });
         table += `</tr>`;
       });
-      table += `</tbody></table><div class="divider"></div>
-      <div class="chart-container">
-        <svg viewBox="0 0 200 200">
-          <circle class="circle-bg" cx="100" cy="100" r="90"></circle>
-          <circle class="circle-progress" cx="100" cy="100" r="90"></circle>
-        </svg>
-        <div class="percentage" id="percentValue">0%</div>
-      </div>
-      <div class="subtitle">Total General (filas: ${filtered.length})</div>`;
+
+      table += `</tbody></table><div class="divider"></div>`;
+
+      // ---- TOTAL GENERAL: POR COLUMNA (promedio sobre TODAS las filas filtradas) ----
+      const totalAverages = {};
+      COLUMNS.forEach(col => {
+        const vals = filtered.map(r => parseToPercent(r[col.key])).filter(x => x !== null);
+        totalAverages[col.key] = vals.length ? (vals.reduce((a,b)=>a+b,0)/vals.length) : 0;
+      });
+
+      // Donut usa totalAverages['NOTA']
+      const notaGlobal = totalAverages['NOTA'] || 0;
+
+      table += `
+        <div class="chart-container">
+          <svg viewBox="0 0 200 200">
+            <circle class="circle-bg" cx="100" cy="100" r="90"></circle>
+            <circle class="circle-progress" cx="100" cy="100" r="90"></circle>
+          </svg>
+          <div class="percentage" id="percentValue">0%</div>
+        </div>
+        <div class="subtitle">Total General (filas: ${filtered.length})</div>
+      `;
+
       document.getElementById("resultContainer").innerHTML = table;
 
-      const percent = total/count;
-      animateDonut(percent);
+      // ANIMA DONUT con el valor POR COLUMNA (NOTA global)
+      animateDonut(notaGlobal);
 
-      // TABLA DERECHA
+      // ---- TABLA DERECHA: detalle de errores (enteros) ----
       let detail = `<table><thead><tr><th>Indicador</th>${weeks.map(w=>`<th>${w}</th>`).join('')}</tr></thead><tbody>`;
       DETAIL_COLUMNS.forEach(col=>{
         detail += `<tr><td>${col.label}</td>`;
         weeks.forEach(w=>{
-          const vals = filtered.filter(r=>r.SEMANA===w).map(r=>parseInt(r[col.key])||0);
-          const sum = vals.reduce((a,b)=>a+b,0);
+          const sums = filtered
+            .filter(r => (r.SEMANA||'Sin semana') === w)
+            .map(r => {
+              const v = r[col.key];
+              const n = parseInt(String(v).replace(/\D/g,''),10);
+              return isNaN(n) ? 0 : n;
+            });
+          const sum = sums.reduce((a,b)=>a+b,0);
           detail += `<td>${sum}</td>`;
         });
         detail += `</tr>`;
@@ -304,7 +305,7 @@
       document.getElementById('errorContainer').innerHTML = detail;
     }
 
-    // === NUEVA ANIMACIÓN UX ===
+    // animación del donut (con color dinámico según target)
     function animateDonut(targetPercent) {
       const circle = document.querySelector('.circle-progress');
       const text = document.getElementById('percentValue');
@@ -312,6 +313,10 @@
       const circumference = 2 * Math.PI * radius;
       circle.style.strokeDasharray = circumference;
       circle.style.strokeDashoffset = circumference;
+
+      // clamp
+      if (targetPercent < 0) targetPercent = 0;
+      if (targetPercent > 100) targetPercent = 100;
 
       let current = 0;
       const duration = 1500;
@@ -329,10 +334,13 @@
         const offset = circumference - (current / 100) * circumference;
         circle.style.strokeDashoffset = offset;
 
-        // color dinámico
-        let color = "#2AC793";
+        // color dinámico según valor actual (refleja mientras sube)
+        let color = "#2AC793"; // verde por defecto
         if (current <= 65) color = "#f43f5e";
         else if (current <= 75) color = "#facc15";
+        else if (current >= 85) color = "#2AC793";
+        else color = "#111827"; // neutro para 75 < x < 85
+
         circle.style.stroke = color;
         text.style.color = color;
 
@@ -340,6 +348,7 @@
       }, 1000 / fps);
     }
 
+    // cargar inicialmente
     loadData();
   </script>
 </body>
