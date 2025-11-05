@@ -3,146 +3,169 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Promedios por DNI - Evaluaciones</title>
+  <title>📊 Dashboard Semanal - Evaluaciones</title>
+
+  <!-- Chart.js + Datalabels -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+
   <style>
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f5f7fa;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #f0f4ff, #e6edff);
       margin: 0;
-      padding: 20px;
-      color: #333;
+      padding: 30px 20px;
+      color: #1e293b;
+      min-height: 100vh;
     }
-    .container {
-      max-width: 1000px;
-      margin: 0 auto;
-      background: white;
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
+
     h1 {
       text-align: center;
-      color: #2c3e50;
-      margin-bottom: 20px;
+      margin-bottom: 25px;
+      color: #0f172a;
+      font-weight: 700;
+      font-size: 1.8rem;
+      letter-spacing: -0.5px;
     }
+
     .search-box {
       display: flex;
-      gap: 10px;
-      margin-bottom: 25px;
-      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 35px;
+      flex-wrap: wrap;
     }
+
     .search-box input {
-      padding: 10px;
+      padding: 13px 16px;
+      border: 1px solid #cbd5e1;
+      border-radius: 12px;
       font-size: 16px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      flex: 1;
+      width: 300px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+      outline: none;
+      transition: all 0.25s ease;
     }
+
+    .search-box input:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
+    }
+
     .search-box button {
-      padding: 10px 20px;
-      background: #3498db;
+      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
       color: white;
       border: none;
-      border-radius: 6px;
+      border-radius: 12px;
+      padding: 13px 28px;
       cursor: pointer;
       font-size: 16px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 10px rgba(59,130,246,0.3);
     }
+
     .search-box button:hover {
-      background: #2980b9;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 14px rgba(59,130,246,0.4);
     }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 25px;
-    }
-    th, td {
-      border: 1px solid #eee;
+
+    .cards-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 28px;
       padding: 10px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+      padding: 24px;
       text-align: center;
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     }
-    th {
-      background: #f0f4f8;
-      color: #2c3e50;
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.12);
     }
-    td {
-      font-weight: 500;
-    }
+
     .metric-name {
-      font-weight: 600;
-      color: #2980b9;
-      text-align: left;
+      font-weight: 700;
+      margin-bottom: 14px;
+      font-size: 1.2rem;
+      color: #1e3a8a;
     }
-    .total-general {
-      margin-top: 40px;
-      padding-top: 30px;
-      border-top: 3px solid #3498db;
+
+    .average {
+      margin-top: 14px;
+      font-weight: 700;
+      font-size: 1.1rem;
+      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    canvas {
+      max-width: 100%;
+      height: 220px !important;
+      margin-top: 10px;
+    }
+
+    .info, .error {
       text-align: center;
+      margin: 30px auto;
+      padding: 20px;
+      max-width: 600px;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     }
-    .chart-container {
-      position: relative;
-      width: 160px;
-      height: 160px;
-      margin: 0 auto;
-    }
-    .circle-bg {
-      fill: none;
-      stroke: #e2e8f0;
-      stroke-width: 12;
-    }
-    .circle {
-      fill: none;
-      stroke-width: 12;
-      stroke-linecap: round;
-      stroke: #3498db;
-      transform: rotate(-90deg);
-      transform-origin: 50% 50%;
-      stroke-dasharray: 440;
-      stroke-dashoffset: 440;
-    }
-    .percentage {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 32px;
-      font-weight: 600;
-      color: #2c3e50;
-    }
-    .loading {
-      text-align: center;
-      font-size: 1.2em;
-      color: #7f8c8d;
-    }
+
     .error {
-      color: #e74c3c;
-      text-align: center;
-      font-weight: bold;
-      margin: 20px 0;
+      color: #dc2626;
+      font-weight: 600;
     }
-    .info {
-      text-align: center;
-      font-style: italic;
-      color: #7f8c8d;
-      margin: 10px 0;
+
+    @media (max-width: 768px) {
+      .cards-container {
+        grid-template-columns: 1fr;
+      }
+      h1 {
+        font-size: 1.5rem;
+      }
+      .search-box input {
+        width: 100%;
+        max-width: 300px;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>📊 Evaluaciones por DNI</h1>
+  <h1>📈 Evolución Semanal por Indicador</h1>
 
-    <div class="search-box">
-      <input type="text" id="dniInput" placeholder="Buscar por DNI (ej: 40753375)" />
-      <button onclick="searchByDNI()">Buscar</button>
-    </div>
+  <div class="search-box">
+    <input type="text" id="dniInput" placeholder="Buscar por DNI (ej: 40753375)" />
+    <button onclick="searchByDNI()">Buscar Agente</button>
+  </div>
 
-    <div id="resultContainer">
-      <div class="loading">Cargando datos...</div>
-    </div>
+  <div id="cardsContainer" class="cards-container">
+    <div class="info">Cargando datos desde Google Sheets...</div>
   </div>
 
   <script>
     const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRp7iRBUwVpHnmf7Q0mLyARIBl-inFlZbH43i3wU1whcjE0GlPi7Z51VcmXRsWrcYCmWMS1WTL-ySJt/pub?gid=2119161122&single=true&output=csv';
+
+    // Colores distintivos por métrica
+    const COLORS = {
+      '1_COMUNICACIÓN': { border: '#10b981', background: 'rgba(16,185,129,0.1)' },
+      '2_INFORMACIÓN': { border: '#f59e0b', background: 'rgba(245,158,11,0.1)' },
+      '3_GESTION DE VENTA (PRE VENTA)': { border: '#8b5cf6', background: 'rgba(139,92,246,0.1)' },
+      '4_REGULATORIO': { border: '#ef4444', background: 'rgba(239,68,68,0.1)' },
+      'NOTA': { border: '#0ea5e9', background: 'rgba(14,165,233,0.1)' }
+    };
 
     const COLUMNS = [
       { key: '1_COMUNICACIÓN', label: 'Comunicación' },
@@ -154,198 +177,210 @@
 
     let allData = [];
 
-    async function loadAndProcessData() {
+    async function loadCSV() {
       try {
         const response = await fetch(CSV_URL);
-        if (!response.ok) throw new Error('No se pudo cargar el CSV');
-        const csvText = await response.text();
-        const lines = csvText.trim().split('\n');
-
-        if (lines.length < 2) {
-          showError('El archivo está vacío.');
-          return;
-        }
-
+        const text = await response.text();
+        const lines = text.trim().split('\n');
         const headers = lines[0].split(',').map(h => h.trim());
         allData = [];
 
         for (let i = 1; i < lines.length; i++) {
           const values = lines[i].split(',').map(v => v.trim().replace(/^"(.*)"$/, '$1'));
           if (values.length !== headers.length) continue;
-
           const row = {};
-          headers.forEach((header, idx) => {
-            row[header] = values[idx];
-          });
-
-          // Conversión de porcentaje 0–100
+          headers.forEach((header, idx) => row[header] = values[idx]);
+          
           COLUMNS.forEach(col => {
             let val = row[col.key];
-            if (val === '' || val === null) {
-              row[col.key] = null;
-              return;
-            }
-            val = val.replace('%', '').trim().replace(',', '.');
-            if (isNaN(val)) {
-              row[col.key] = null;
-              return;
-            }
+            if (!val) { row[col.key] = null; return; }
+            val = val.replace('%','').replace(',','.');
             let num = parseFloat(val);
-            if (num <= 1) num *= 100;
-            row[col.key] = Math.min(Math.max(num, 0), 100);
+            if (num <= 1) num *= 100; // escala 0-1 → %
+            if (num <= 5) num *= 20;   // escala 0-5 → %
+            row[col.key] = isNaN(num) ? null : Math.min(Math.max(num,0),130);
           });
-
           allData.push(row);
         }
 
-        document.getElementById('resultContainer').innerHTML = `
-          <div class="info">✅ Datos cargados. Ingresa un DNI para buscar.</div>
-        `;
-      } catch (error) {
-        showError('❌ Error: ' + error.message);
+        document.getElementById('cardsContainer').innerHTML =
+          '<div class="info">✅ Datos cargados. Ingresa un DNI para buscar el desempeño del agente.</div>';
+      } catch (e) {
+        document.getElementById('cardsContainer').innerHTML =
+          `<div class="error">❌ Error al cargar los datos: ${e.message}</div>`;
       }
     }
 
     function searchByDNI() {
-      const dniQuery = document.getElementById('dniInput').value.trim();
-      if (!dniQuery) {
-        alert('Por favor, ingresa un DNI.');
-        return;
-      }
+      const dni = document.getElementById('dniInput').value.trim();
+      if (!dni) return alert("Por favor, ingresa un DNI");
 
-      const filtered = allData.filter(row =>
-        row.DNI && row.DNI.toString().includes(dniQuery)
-      );
-
+      const filtered = allData.filter(r => r.DNI && r.DNI.includes(dni));
       if (filtered.length === 0) {
-        document.getElementById('resultContainer').innerHTML =
-          `<div class="error">❌ No se encontró ningún registro con DNI: ${dniQuery}</div>`;
+        document.getElementById('cardsContainer').innerHTML = 
+          `<div class="error">No se encontró ningún agente con DNI: <strong>${dni}</strong></div>`;
         return;
       }
 
       // Agrupar por semana
       const byWeek = {};
       filtered.forEach(row => {
-        const week = row.SEMANA || "Sin semana";
+        const week = row.SEMANA || "Semana X";
         if (!byWeek[week]) byWeek[week] = [];
         byWeek[week].push(row);
       });
 
-      const weeks = Object.keys(byWeek).sort((a, b) => {
-        const numA = parseInt(a.replace(/\D/g, '')) || 0;
-        const numB = parseInt(b.replace(/\D/g, '')) || 0;
-        return numA - numB;
+      const weeks = Object.keys(byWeek).sort((a,b) => {
+        const na = parseInt(a.match(/\d+/)?.[0] || 0);
+        const nb = parseInt(b.match(/\d+/)?.[0] || 0);
+        return na - nb;
       });
 
-      // Calcular promedios por semana y columna
-      const averagesByWeek = {};
-      weeks.forEach(week => {
-        averagesByWeek[week] = {};
-        COLUMNS.forEach(col => {
-          const values = byWeek[week]
-            .map(r => r[col.key])
-            .filter(v => v !== null);
-          const avg =
-            values.length > 0
-              ? values.reduce((a, b) => a + b, 0) / values.length
-              : null;
-          averagesByWeek[week][col.key] = avg;
+      // Calcular promedios por semana y métrica
+      const averages = {};
+      COLUMNS.forEach(col => {
+        averages[col.key] = weeks.map(week => {
+          const vals = byWeek[week].map(r => r[col.key]).filter(v => v !== null);
+          return vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : null;
         });
       });
 
-      // Calcular promedios globales
-      const totalSums = {};
-      const totalCounts = {};
+      // Calcular Total General (promedio de NOTA)
+      const notaValues = averages['NOTA'].filter(v => v !== null);
+      const totalGeneral = notaValues.length ? notaValues.reduce((a,b)=>a+b,0)/notaValues.length : 0;
+
+      // Renderizar tarjetas
+      const container = document.getElementById('cardsContainer');
+      container.innerHTML = '';
+
+      // Tarjetas de evolución semanal
       COLUMNS.forEach(col => {
-        totalSums[col.key] = 0;
-        totalCounts[col.key] = 0;
-      });
-      Object.values(byWeek).flat().forEach(row => {
-        COLUMNS.forEach(col => {
-          if (row[col.key] !== null) {
-            totalSums[col.key] += row[col.key];
-            totalCounts[col.key]++;
-          }
+        const avgValues = averages[col.key];
+        const validValues = avgValues.filter(v => v !== null);
+        const globalAvg = validValues.length ? validValues.reduce((a,b)=>a+b,0)/validValues.length : 0;
+        const color = COLORS[col.key] || { border: '#6b7280', background: 'rgba(107,114,128,0.1)' };
+
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <div class="metric-name">${col.label}</div>
+          <canvas id="chart-${col.key.replace(/\W/g,'')}"></canvas>
+          <div class="average">${globalAvg.toFixed(1)}%</div>
+        `;
+        container.appendChild(card);
+
+        const ctx = card.querySelector('canvas').getContext('2d');
+        new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: weeks,
+            datasets: [{
+              label: col.label,
+              data: avgValues,
+              borderColor: color.border,
+              backgroundColor: color.background,
+              fill: true,
+              tension: 0.4,
+              pointRadius: 5,
+              pointHoverRadius: 7,
+              pointBackgroundColor: color.border,
+              pointBorderColor: '#fff',
+              pointBorderWidth: 2
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: { enabled: true, mode: 'index', intersect: false },
+              datalabels: {
+                display: context => context.dataset.data[context.dataIndex] !== null,
+                formatter: (v) => v !== null ? v.toFixed(1) + '%' : '',
+                color: '#1e293b',
+                font: { weight: '600', size: 11 }
+              }
+            },
+            scales: {
+              y: {
+                min: 0,
+                max: 130,
+                ticks: { 
+                  stepSize: 20, 
+                  color: '#64748b',
+                  font: { size: 10 }
+                },
+                grid: { color: 'rgba(0,0,0,0.04)' }
+              },
+              x: {
+                ticks: { 
+                  color: '#475569',
+                  font: { size: 11 },
+                  maxRotation: 0,
+                  autoSkip: false
+                },
+                grid: { color: 'rgba(0,0,0,0.03)' }
+              }
+            },
+            interaction: {
+              mode: 'nearest',
+              axis: 'x',
+              intersect: false
+            },
+            animation: {
+              duration: 1000,
+              easing: 'easeOutQuart'
+            }
+          },
+          plugins: [ChartDataLabels]
         });
       });
 
-      const totalAverages = {};
-      COLUMNS.forEach(col => {
-        totalAverages[col.key] =
-          totalCounts[col.key] > 0
-            ? (totalSums[col.key] / totalCounts[col.key]).toFixed(1)
-            : 'N/A';
-      });
-
-      const notaGeneral = totalAverages['NOTA'];
-
-      // Generar tabla
-      let html = `<h2 style="text-align:center; color:#2c3e50;">Resultados para DNI: ${dniQuery}</h2>`;
-      html += `<table><thead><tr><th>Indicador</th>`;
-      weeks.forEach(week => {
-        html += `<th>${week}</th>`;
-      });
-      html += `</tr></thead><tbody>`;
-
-      COLUMNS.forEach(col => {
-        html += `<tr><td class="metric-name">${col.label}</td>`;
-        weeks.forEach(week => {
-          const val = averagesByWeek[week][col.key];
-          html += `<td>${val ? val.toFixed(1) + '%' : 'N/A'}</td>`;
-        });
-        html += `</tr>`;
-      });
-
-      html += `</tbody></table>`;
-
-      // Total general
-      html += `
-        <div class="total-general">
-          <div style="font-size:1.2em; color:#2c3e50; margin-bottom:15px;">Total General</div>
-          <div class="chart-container">
-            <svg viewBox="0 0 160 160">
-              <circle class="circle-bg" cx="80" cy="80" r="70"></circle>
-              <circle class="circle" cx="80" cy="80" r="70"></circle>
-            </svg>
-            <div class="percentage" id="percent-text">${notaGeneral}%</div>
-          </div>
-        </div>
-        <div class="info">Filas procesadas: ${filtered.length}</div>
+      // Tarjeta de Total General (anillo)
+      const donutCard = document.createElement('div');
+      donutCard.className = 'card';
+      donutCard.innerHTML = `
+        <div class="metric-name">Total General</div>
+        <canvas id="donut-total"></canvas>
+        <div class="average">${totalGeneral.toFixed(1)}%</div>
       `;
+      container.appendChild(donutCard);
 
-      document.getElementById('resultContainer').innerHTML = html;
-      animateChart(notaGeneral);
+      const donutCtx = donutCard.querySelector('canvas').getContext('2d');
+      new Chart(donutCtx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Cumplido', 'Faltante'],
+          datasets: [{
+            data: [totalGeneral, 100 - totalGeneral],
+            backgroundColor: ['#10b981', '#e2e8f0'],
+            borderWidth: 0,
+            cutout: '70%'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: { enabled: false },
+            datalabels: {
+              display: true,
+              formatter: () => `${totalGeneral.toFixed(1)}%`,
+              color: '#0f172a',
+              font: { size: 18, weight: 'bold' }
+            }
+          },
+          animation: {
+            animateRotate: true,
+            duration: 1200
+          }
+        },
+        plugins: [ChartDataLabels]
+      });
     }
 
-    function animateChart(porcentaje) {
-      const circle = document.querySelector('.circle');
-      const percentText = document.getElementById('percent-text');
-      const radius = 70;
-      const circumference = 2 * Math.PI * radius;
-      const offset = circumference - (porcentaje / 100) * circumference;
-
-      circle.style.strokeDasharray = circumference;
-      circle.style.strokeDashoffset = circumference;
-
-      circle.animate(
-        [{ strokeDashoffset: circumference }, { strokeDashoffset: offset }],
-        { duration: 1500, fill: "forwards", easing: "ease-out" }
-      );
-
-      let current = 0;
-      const target = Math.round(porcentaje);
-      const interval = setInterval(() => {
-        current++;
-        percentText.textContent = current + "%";
-        if (current >= target) clearInterval(interval);
-      }, 1500 / target);
-    }
-
-    function showError(message) {
-      document.getElementById('resultContainer').innerHTML = `<div class="error">${message}</div>`;
-    }
-
-    loadAndProcessData();
+    loadCSV();
   </script>
 </body>
 </html>
