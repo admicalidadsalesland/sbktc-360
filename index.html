@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Promedios por Columna - Evaluaciones</title>
+  <title>Promedios por DNI - Evaluaciones</title>
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -97,10 +97,10 @@
 </head>
 <body>
   <div class="container">
-    <h1>📊 Promedios Independientes por Columna</h1>
+    <h1>📊 Evaluaciones por DNI</h1>
 
     <div class="search-box">
-      <input type="text" id="dniInput" placeholder="Buscar por DNI (ej: 12345678)" />
+      <input type="text" id="dniInput" placeholder="Buscar por DNI (ej: 40753375)" />
       <button onclick="searchByDNI()">Buscar</button>
     </div>
 
@@ -111,12 +111,6 @@
 
   <script>
     const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRp7iRBUwVpHnmf7Q0mLyARIBl-inFlZbH43i3wU1whcjE0GlPi7Z51VcmXRsWrcYCmWMS1WTL-ySJt/pub?gid=2119161122&single=true&output=csv';
-
-    // ⚠️ Cambia esto si tu escala es diferente:
-    // - Si notas van de 0 a 5 → MAX_SCORE = 5
-    // - Si van de 0 a 10 → MAX_SCORE = 10
-    // - Si ya están en % (0-100) → MAX_SCORE = 100
-    const MAX_SCORE = 5;
 
     const COLUMNS = [
       { key: '1_COMUNICACIÓN', label: 'Comunicación' },
@@ -152,17 +146,18 @@
             row[header] = values[idx];
           });
 
-          // Convertir solo las columnas numéricas
+          // Limpiar y convertir columnas numéricas que ya están en %
           COLUMNS.forEach(col => {
-            const val = row[col.key];
-            if (val === '' || isNaN(val)) {
+            let val = row[col.key];
+            if (val === '' || val === null) {
               row[col.key] = null;
             } else {
-              const num = parseFloat(val);
-              if (num >= 0 && num <= MAX_SCORE) {
-                row[col.key] = num;
+              // Eliminar símbolo % y convertir a número
+              val = val.replace('%', '').trim();
+              if (!isNaN(val)) {
+                row[col.key] = parseFloat(val);
               } else {
-                row[col.key] = null; // fuera de rango
+                row[col.key] = null;
               }
             }
           });
@@ -170,64 +165,25 @@
           allData.push(row);
         }
 
-        // Mostrar promedios generales al cargar
-        showOverallAverages();
+        // Mostrar mensaje inicial
+        document.getElementById('resultContainer').innerHTML = `
+          <div class="info">✅ Datos cargados. Ingresa un DNI para buscar.</div>
+        `;
 
       } catch (error) {
         showError('❌ Error: ' + error.message);
       }
     }
 
-    function calculateColumnAverages(data) {
-      const result = {};
-      COLUMNS.forEach(col => {
-        let sum = 0;
-        let count = 0;
-        data.forEach(row => {
-          if (row[col.key] !== null) {
-            sum += row[col.key];
-            count++;
-          }
-        });
-        if (count > 0) {
-          const avg = sum / count;
-          const pct = ((avg / MAX_SCORE) * 100).toFixed(1);
-          result[col.key] = { percentage: pct, count };
-        } else {
-          result[col.key] = { percentage: 'N/A', count: 0 };
-        }
-      });
-      return result;
-    }
-
-    function showOverallAverages() {
-      const averages = calculateColumnAverages(allData);
-      let html = '';
-
-      COLUMNS.forEach(col => {
-        const avg = averages[col.key];
-        html += `
-          <div class="metric">
-            <span class="label">${col.label}:</span>
-            <span class="value">${avg.percentage}%</span>
-          </div>
-        `;
-      });
-
-      html += `<div class="info">Total de filas procesadas: ${allData.length}</div>`;
-
-      document.getElementById('resultContainer').innerHTML = html;
-    }
-
     function searchByDNI() {
-      const dniQuery = document.getElementById('dniInput').value.trim().toUpperCase();
+      const dniQuery = document.getElementById('dniInput').value.trim();
       if (!dniQuery) {
         alert('Por favor, ingresa un DNI.');
         return;
       }
 
       const filtered = allData.filter(row =>
-        row.DNI && row.DNI.toString().toUpperCase().includes(dniQuery)
+        row.DNI && row.DNI.toString().includes(dniQuery)
       );
 
       if (filtered.length === 0) {
@@ -237,15 +193,32 @@
         return;
       }
 
-      const averages = calculateColumnAverages(filtered);
+      // Si hay múltiples filas, calcular promedio por columna
+      const averages = {};
+      COLUMNS.forEach(col => {
+        let sum = 0;
+        let count = 0;
+        filtered.forEach(row => {
+          if (row[col.key] !== null) {
+            sum += row[col.key];
+            count++;
+          }
+        });
+        if (count > 0) {
+          averages[col.key] = (sum / count).toFixed(1);
+        } else {
+          averages[col.key] = 'N/A';
+        }
+      });
+
       let html = `<h2 class="section-title">Resultados para DNI: ${dniQuery}</h2>`;
 
       COLUMNS.forEach(col => {
-        const avg = averages[col.key];
+        const value = averages[col.key];
         html += `
           <div class="metric">
             <span class="label">${col.label}:</span>
-            <span class="value">${avg.percentage}%</span>
+            <span class="value">${value}%</span>
           </div>
         `;
       });
@@ -259,7 +232,7 @@
       document.getElementById('resultContainer').innerHTML = `<div class="error">${message}</div>`;
     }
 
-    // Iniciar
+    // Iniciar carga
     loadAndProcessData();
   </script>
 </body>
