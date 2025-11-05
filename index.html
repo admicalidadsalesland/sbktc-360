@@ -128,7 +128,6 @@
       font-size: 1.1em;
       margin-bottom: 10px;
     }
-
   </style>
 </head>
 <body>
@@ -157,6 +156,14 @@
       { key: 'NOTA', label: 'Nota General' }
     ];
 
+    const ERROR_COLUMNS = [
+      { key: 'ERROR_COMUNICACIÓN', label: 'Error Comunicación' },
+      { key: 'ERROR_INFORMACIÓN', label: 'Error Información' },
+      { key: 'ERROR_VENTA', label: 'Error Venta' },
+      { key: 'ERROR_REGULATORIO', label: 'Error Regulatorio' },
+      { key: 'TOTAL_ERRORES', label: 'Total Errores' }
+    ];
+
     let allData = [];
 
     async function loadAndProcessData() {
@@ -178,11 +185,14 @@
           val = val.replace('%', '').replace(',', '.');
           let num = parseFloat(val);
           if (num <= 1) num *= 100;
-          row[col.key] = Math.min(Math.max(num, 0), 130); // Escala hasta 130%
+          row[col.key] = Math.min(Math.max(num, 0), 130);
         });
 
-        // Contar errores (1 o 0)
-        row["ERRORES"] = row["ERRORES"] ? parseInt(row["ERRORES"]) : Math.floor(Math.random() * 5);
+        // Simulación de errores enteros por columna (solo ejemplo)
+        ERROR_COLUMNS.forEach((err, idx) => {
+          row[err.key] = Math.floor(Math.random() * 3); // Ejemplo: 0–2 errores
+        });
+        row['TOTAL_ERRORES'] = ERROR_COLUMNS.slice(0,4).reduce((a,b)=>a+(row[b.key]||0),0);
 
         allData.push(row);
       }
@@ -247,12 +257,21 @@
       document.getElementById('resultContainer').innerHTML = html;
       animateChart(notaGeneral);
 
-      // Tabla de errores
-      let errHtml = `<h2>Errores por Semana</h2><table><thead><tr><th>Semana</th><th>Total Errores</th></tr></thead><tbody>`;
-      weeks.forEach(week => {
-        const totalErr = byWeek[week].reduce((sum, r) => sum + (r["ERRORES"] || 0), 0);
-        errHtml += `<tr><td>${week}</td><td>${totalErr}</td></tr>`;
+      // Tabla de errores con formato por semana
+      let errHtml = `<h2>Errores por Indicador</h2><table><thead><tr><th>Indicador</th>`;
+      weeks.forEach(w => errHtml += `<th>${w}</th>`);
+      errHtml += `</tr></thead><tbody>`;
+
+      ERROR_COLUMNS.forEach(err => {
+        errHtml += `<tr><td class="metric-name">${err.label}</td>`;
+        weeks.forEach(w => {
+          const vals = byWeek[w].map(r => r[err.key] || 0);
+          const total = vals.length ? vals.reduce((a,b)=>a+b,0) : 0;
+          errHtml += `<td>${total}</td>`;
+        });
+        errHtml += `</tr>`;
       });
+
       errHtml += `</tbody></table>`;
       document.getElementById('errorContainer').innerHTML = errHtml;
     }
