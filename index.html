@@ -3,131 +3,142 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Dashboard Semanal - Evaluaciones</title>
-
-  <!-- Chart.js + Datalabels plugin -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
-
+  <title>Promedios por DNI - Evaluaciones</title>
   <style>
     body {
-      font-family: 'Inter', 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #f2f6fc, #e8eef7);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f5f7fa;
       margin: 0;
-      padding: 40px 20px;
-      color: #2c3e50;
+      padding: 20px;
+      color: #333;
     }
-
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
     h1 {
       text-align: center;
-      margin-bottom: 25px;
-      color: #1a2b4c;
-      letter-spacing: -0.5px;
+      color: #2c3e50;
+      margin-bottom: 20px;
     }
-
     .search-box {
       display: flex;
-      justify-content: center;
       gap: 10px;
-      margin-bottom: 35px;
+      margin-bottom: 25px;
+      align-items: center;
     }
-
     .search-box input {
-      padding: 12px 15px;
-      border: 1px solid #cbd5e1;
-      border-radius: 10px;
+      padding: 10px;
       font-size: 16px;
-      width: 280px;
-      box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
-      outline: none;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      flex: 1;
     }
-
-    .search-box input:focus {
-      border-color: #2563eb;
-      box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
-    }
-
     .search-box button {
-      background-color: #2563eb;
+      padding: 10px 20px;
+      background: #3498db;
       color: white;
       border: none;
-      border-radius: 10px;
-      padding: 12px 25px;
+      border-radius: 6px;
       cursor: pointer;
       font-size: 16px;
-      transition: all 0.2s ease;
     }
-
     .search-box button:hover {
-      background-color: #1e40af;
-      transform: translateY(-1px);
+      background: #2980b9;
     }
-
-    .cards-container {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 25px;
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 25px;
+    }
+    th, td {
+      border: 1px solid #eee;
       padding: 10px;
-    }
-
-    .card {
-      background: rgba(255,255,255,0.85);
-      backdrop-filter: blur(10px);
-      border-radius: 20px;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.1);
-      padding: 20px;
       text-align: center;
-      transition: transform 0.25s ease, box-shadow 0.25s ease;
     }
-
-    .card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 8px 22px rgba(0,0,0,0.12);
+    th {
+      background: #f0f4f8;
+      color: #2c3e50;
     }
-
+    td {
+      font-weight: 500;
+    }
     .metric-name {
       font-weight: 600;
-      color: #1e3a8a;
-      margin-bottom: 10px;
-      font-size: 1.05em;
+      color: #2980b9;
+      text-align: left;
     }
-
-    .average {
-      margin-top: 12px;
-      font-weight: 500;
-      color: #2563eb;
+    .total-general {
+      margin-top: 40px;
+      padding-top: 30px;
+      border-top: 3px solid #3498db;
+      text-align: center;
     }
-
-    canvas {
-      max-width: 100%;
-      height: 200px;
+    .chart-container {
+      position: relative;
+      width: 160px;
+      height: 160px;
+      margin: 0 auto;
     }
-
+    .circle-bg {
+      fill: none;
+      stroke: #e2e8f0;
+      stroke-width: 12;
+    }
+    .circle {
+      fill: none;
+      stroke-width: 12;
+      stroke-linecap: round;
+      stroke: #3498db;
+      transform: rotate(-90deg);
+      transform-origin: 50% 50%;
+      stroke-dasharray: 440;
+      stroke-dashoffset: 440;
+    }
+    .percentage {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 32px;
+      font-weight: 600;
+      color: #2c3e50;
+    }
+    .loading {
+      text-align: center;
+      font-size: 1.2em;
+      color: #7f8c8d;
+    }
+    .error {
+      color: #e74c3c;
+      text-align: center;
+      font-weight: bold;
+      margin: 20px 0;
+    }
     .info {
       text-align: center;
-      margin-top: 15px;
-      color: #64748b;
       font-style: italic;
-    }
-
-    .error {
-      text-align: center;
-      color: #e74c3c;
-      font-weight: 600;
-      margin-top: 20px;
+      color: #7f8c8d;
+      margin: 10px 0;
     }
   </style>
 </head>
 <body>
-  <h1>📈 Evolución Semanal por Indicador</h1>
+  <div class="container">
+    <h1>📊 Evaluaciones por DNI</h1>
 
-  <div class="search-box">
-    <input type="text" id="dniInput" placeholder="Buscar por DNI (ej: 40753375)" />
-    <button onclick="searchByDNI()">Buscar</button>
-  </div>
+    <div class="search-box">
+      <input type="text" id="dniInput" placeholder="Buscar por DNI (ej: 40753375)" />
+      <button onclick="searchByDNI()">Buscar</button>
+    </div>
 
-  <div id="cardsContainer" class="cards-container">
-    <div class="info">Cargando datos...</div>
+    <div id="resultContainer">
+      <div class="loading">Cargando datos...</div>
+    </div>
   </div>
 
   <script>
@@ -143,43 +154,76 @@
 
     let allData = [];
 
-    async function loadCSV() {
-      const response = await fetch(CSV_URL);
-      const text = await response.text();
-      const lines = text.trim().split('\n');
-      const headers = lines[0].split(',').map(h => h.trim());
-      allData = [];
+    async function loadAndProcessData() {
+      try {
+        const response = await fetch(CSV_URL);
+        if (!response.ok) throw new Error('No se pudo cargar el CSV');
+        const csvText = await response.text();
+        const lines = csvText.trim().split('\n');
 
-      for (let i = 1; i < lines.length; i++) {
-        const values = lines[i].split(',').map(v => v.trim().replace(/^"(.*)"$/, '$1'));
-        if (values.length !== headers.length) continue;
-        const row = {};
-        headers.forEach((header, idx) => row[header] = values[idx]);
-        COLUMNS.forEach(col => {
-          let val = row[col.key];
-          if (!val) { row[col.key] = null; return; }
-          val = val.replace('%','').replace(',','.');
-          let num = parseFloat(val);
-          if (num <= 1) num *= 100;
-          row[col.key] = isNaN(num) ? null : Math.min(Math.max(num,0),130);
-        });
-        allData.push(row);
+        if (lines.length < 2) {
+          showError('El archivo está vacío.');
+          return;
+        }
+
+        const headers = lines[0].split(',').map(h => h.trim());
+        allData = [];
+
+        for (let i = 1; i < lines.length; i++) {
+          const values = lines[i].split(',').map(v => v.trim().replace(/^"(.*)"$/, '$1'));
+          if (values.length !== headers.length) continue;
+
+          const row = {};
+          headers.forEach((header, idx) => {
+            row[header] = values[idx];
+          });
+
+          // Conversión de porcentaje 0–100
+          COLUMNS.forEach(col => {
+            let val = row[col.key];
+            if (val === '' || val === null) {
+              row[col.key] = null;
+              return;
+            }
+            val = val.replace('%', '').trim().replace(',', '.');
+            if (isNaN(val)) {
+              row[col.key] = null;
+              return;
+            }
+            let num = parseFloat(val);
+            if (num <= 1) num *= 100;
+            row[col.key] = Math.min(Math.max(num, 0), 100);
+          });
+
+          allData.push(row);
+        }
+
+        document.getElementById('resultContainer').innerHTML = `
+          <div class="info">✅ Datos cargados. Ingresa un DNI para buscar.</div>
+        `;
+      } catch (error) {
+        showError('❌ Error: ' + error.message);
       }
-
-      document.getElementById('cardsContainer').innerHTML =
-        '<div class="info">✅ Datos cargados. Ingresa un DNI para buscar.</div>';
     }
 
     function searchByDNI() {
-      const dni = document.getElementById('dniInput').value.trim();
-      if (!dni) return alert("Por favor, ingresa un DNI");
-
-      const filtered = allData.filter(r => r.DNI && r.DNI.includes(dni));
-      if (filtered.length === 0) {
-        document.getElementById('cardsContainer').innerHTML = `<div class="error">No se encontró el DNI ${dni}</div>`;
+      const dniQuery = document.getElementById('dniInput').value.trim();
+      if (!dniQuery) {
+        alert('Por favor, ingresa un DNI.');
         return;
       }
 
+      const filtered = allData.filter(row =>
+        row.DNI && row.DNI.toString().includes(dniQuery)
+      );
+
+      if (filtered.length === 0) {
+        document.getElementById('resultContainer').innerHTML =
+          `<div class="error">❌ No se encontró ningún registro con DNI: ${dniQuery}</div>`;
+        return;
+      }
+
+      // Agrupar por semana
       const byWeek = {};
       filtered.forEach(row => {
         const week = row.SEMANA || "Sin semana";
@@ -187,84 +231,121 @@
         byWeek[week].push(row);
       });
 
-      const weeks = Object.keys(byWeek).sort((a,b) => {
-        const na = parseInt(a.replace(/\D/g,'')) || 0;
-        const nb = parseInt(b.replace(/\D/g,'')) || 0;
-        return na - nb;
+      const weeks = Object.keys(byWeek).sort((a, b) => {
+        const numA = parseInt(a.replace(/\D/g, '')) || 0;
+        const numB = parseInt(b.replace(/\D/g, '')) || 0;
+        return numA - numB;
       });
 
-      const averages = {};
-      COLUMNS.forEach(col => {
-        averages[col.key] = weeks.map(week => {
-          const vals = byWeek[week].map(r => r[col.key]).filter(v => v !== null);
-          if (vals.length === 0) return null;
-          return vals.reduce((a,b)=>a+b,0)/vals.length;
+      // Calcular promedios por semana y columna
+      const averagesByWeek = {};
+      weeks.forEach(week => {
+        averagesByWeek[week] = {};
+        COLUMNS.forEach(col => {
+          const values = byWeek[week]
+            .map(r => r[col.key])
+            .filter(v => v !== null);
+          const avg =
+            values.length > 0
+              ? values.reduce((a, b) => a + b, 0) / values.length
+              : null;
+          averagesByWeek[week][col.key] = avg;
         });
       });
 
-      const container = document.getElementById('cardsContainer');
-      container.innerHTML = '';
+      // Calcular promedios globales
+      const totalSums = {};
+      const totalCounts = {};
       COLUMNS.forEach(col => {
-        const avgValues = averages[col.key];
-        const globalAvg = avgValues.filter(v=>v!==null).reduce((a,b)=>a+b,0)/avgValues.filter(v=>v!==null).length || 0;
-        const card = document.createElement('div');
-        card.className = 'card';
-        card.innerHTML = `
-          <div class="metric-name">${col.label}</div>
-          <canvas id="chart-${col.key.replace(/\W/g,'')}"></canvas>
-          <div class="average">Promedio: ${globalAvg.toFixed(1)}%</div>
-        `;
-        container.appendChild(card);
-
-        const ctx = card.querySelector('canvas').getContext('2d');
-        new Chart(ctx, {
-          type: 'line',
-          data: {
-            labels: weeks,
-            datasets: [{
-              label: col.label,
-              data: avgValues,
-              borderColor: 'rgba(37,99,235,1)',
-              backgroundColor: 'rgba(37,99,235,0.1)',
-              fill: true,
-              tension: 0.35,
-              pointRadius: 4,
-              pointHoverRadius: 6,
-              pointBackgroundColor: '#2563eb'
-            }]
-          },
-          options: {
-            responsive: true,
-            plugins: {
-              legend: { display: false },
-              datalabels: {
-                display: true,
-                align: 'top',
-                formatter: (v) => v ? v.toFixed(1)+'%' : '',
-                color: '#1e293b',
-                font: { weight: 'bold', size: 11 }
-              }
-            },
-            scales: {
-              y: {
-                min: 0,
-                max: 130,
-                ticks: { stepSize: 20, color:'#475569', font:{ size:11 } },
-                grid: { color:'rgba(0,0,0,0.05)' }
-              },
-              x: {
-                ticks: { color:'#475569', font:{ size:11 } },
-                grid: { color:'rgba(0,0,0,0.04)' }
-              }
-            },
-            animation: { duration: 1200, easing: 'easeOutQuart' }
-          },
-          plugins: [ChartDataLabels]
+        totalSums[col.key] = 0;
+        totalCounts[col.key] = 0;
+      });
+      Object.values(byWeek).flat().forEach(row => {
+        COLUMNS.forEach(col => {
+          if (row[col.key] !== null) {
+            totalSums[col.key] += row[col.key];
+            totalCounts[col.key]++;
+          }
         });
       });
+
+      const totalAverages = {};
+      COLUMNS.forEach(col => {
+        totalAverages[col.key] =
+          totalCounts[col.key] > 0
+            ? (totalSums[col.key] / totalCounts[col.key]).toFixed(1)
+            : 'N/A';
+      });
+
+      const notaGeneral = totalAverages['NOTA'];
+
+      // Generar tabla
+      let html = `<h2 style="text-align:center; color:#2c3e50;">Resultados para DNI: ${dniQuery}</h2>`;
+      html += `<table><thead><tr><th>Indicador</th>`;
+      weeks.forEach(week => {
+        html += `<th>${week}</th>`;
+      });
+      html += `</tr></thead><tbody>`;
+
+      COLUMNS.forEach(col => {
+        html += `<tr><td class="metric-name">${col.label}</td>`;
+        weeks.forEach(week => {
+          const val = averagesByWeek[week][col.key];
+          html += `<td>${val ? val.toFixed(1) + '%' : 'N/A'}</td>`;
+        });
+        html += `</tr>`;
+      });
+
+      html += `</tbody></table>`;
+
+      // Total general
+      html += `
+        <div class="total-general">
+          <div style="font-size:1.2em; color:#2c3e50; margin-bottom:15px;">Total General</div>
+          <div class="chart-container">
+            <svg viewBox="0 0 160 160">
+              <circle class="circle-bg" cx="80" cy="80" r="70"></circle>
+              <circle class="circle" cx="80" cy="80" r="70"></circle>
+            </svg>
+            <div class="percentage" id="percent-text">${notaGeneral}%</div>
+          </div>
+        </div>
+        <div class="info">Filas procesadas: ${filtered.length}</div>
+      `;
+
+      document.getElementById('resultContainer').innerHTML = html;
+      animateChart(notaGeneral);
     }
 
-    loadCSV();
+    function animateChart(porcentaje) {
+      const circle = document.querySelector('.circle');
+      const percentText = document.getElementById('percent-text');
+      const radius = 70;
+      const circumference = 2 * Math.PI * radius;
+      const offset = circumference - (porcentaje / 100) * circumference;
+
+      circle.style.strokeDasharray = circumference;
+      circle.style.strokeDashoffset = circumference;
+
+      circle.animate(
+        [{ strokeDashoffset: circumference }, { strokeDashoffset: offset }],
+        { duration: 1500, fill: "forwards", easing: "ease-out" }
+      );
+
+      let current = 0;
+      const target = Math.round(porcentaje);
+      const interval = setInterval(() => {
+        current++;
+        percentText.textContent = current + "%";
+        if (current >= target) clearInterval(interval);
+      }, 1500 / target);
+    }
+
+    function showError(message) {
+      document.getElementById('resultContainer').innerHTML = `<div class="error">${message}</div>`;
+    }
+
+    loadAndProcessData();
   </script>
 </body>
 </html>
