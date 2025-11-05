@@ -102,12 +102,12 @@
       color: #1e293b;
       text-align: center;
       font-weight: 600;
-      padding: 10px;
+      padding: 8px;
       border-bottom: 1px solid #e2e8f0;
     }
 
     td {
-      padding: 10px;
+      padding: 8px;
       border-bottom: 1px solid #f1f5f9;
       text-align: center;
     }
@@ -116,6 +116,15 @@
       text-align: left;
       font-weight: 500;
       color: #0f172a;
+    }
+
+    /* TABLA COMPACTA DERECHA */
+    .right-panel table {
+      font-size: 13px;
+    }
+
+    .right-panel th, .right-panel td {
+      padding: 5px 6px;
     }
 
     /* LINEA SEPARADORA */
@@ -259,7 +268,7 @@
 
       const weeks = [...new Set(filtered.map(r=>r.SEMANA))].sort();
 
-      // Tabla de porcentajes (0-100%)
+      // Tabla izquierda (0-100%)
       let table = `<h3>Resultados para DNI: ${dni}</h3>
       <table><thead><tr><th>Indicador</th>${weeks.map(w=>`<th>${w}</th>`).join('')}</tr></thead><tbody>`;
       let total=0, count=0;
@@ -267,7 +276,7 @@
         table += `<tr><td>${col.label}</td>`;
         weeks.forEach(w=>{
           const values = filtered.filter(r=>r.SEMANA===w).map(r=>parseFloat(r[col.key])||0);
-          const avg = values.length?values.reduce((a,b)=>a+b,0)/values.length:0;
+          const avg = values.length ? (values.reduce((a,b)=>a+b,0)/values.length)*100 : 0;
           table += `<td>${avg.toFixed(1)}%</td>`;
           if(col.key==="NOTA"){ total+=avg; count++; }
         });
@@ -288,7 +297,7 @@
       circle.style.strokeDashoffset = dashoffset;
       document.getElementById("percentageValue").textContent = `${percent.toFixed(1)}%`;
 
-      // Tabla de errores (solo enteros)
+      // Tabla derecha (más compacta, solo enteros)
       let detail = `<table><thead><tr><th>Indicador</th>${weeks.map(w=>`<th>${w}</th>`).join('')}</tr></thead><tbody>`;
       DETAIL_COLUMNS.forEach(col=>{
         detail += `<tr><td>${col.label}</td>`;
