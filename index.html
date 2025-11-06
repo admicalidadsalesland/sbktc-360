@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>SBK360 | Notas Interactivas</title>
+<title>SBK360 | Notas</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
@@ -16,72 +16,240 @@
   --text-muted: #64748b;
   --shadow-soft: 0 4px 12px rgba(0,0,0,0.06);
 }
+
+/* RESET */
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Inter', sans-serif; background: var(--bg-gradient); color: var(--text-main); }
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg-gradient);
+  color: var(--text-main);
+}
 
 /* HEADER */
-header { position: fixed; top:0; left:0; width:100%; height:70px; background: var(--card-bg); display:flex; align-items:center; justify-content:space-between; padding:0 40px; box-shadow: var(--shadow-soft); z-index:1000; }
-header .logo { font-weight:700; font-size:1.4rem; color: var(--primary); }
-header nav a { margin-left: 24px; text-decoration:none; color: var(--text-main); font-weight:500; position:relative; transition: color 0.2s, transform 0.2s; padding-bottom:4px; }
-header nav a::after { content:''; position:absolute; bottom:0; left:50%; width:0; height:2px; background-color: var(--primary); transition: all 0.3s; transform: translateX(-50%); }
-header nav a:hover { color: var(--primary); transform:translateY(-2px); }
-header nav a:hover::after { width:100%; }
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 70px;
+  background: var(--card-bg);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 40px;
+  box-shadow: var(--shadow-soft);
+  z-index: 1000;
+}
+header .logo {
+  font-weight: 700;
+  font-size: 1.4rem;
+  color: var(--primary);
+}
+header nav a {
+  margin-left: 24px;
+  text-decoration: none;
+  color: var(--text-main);
+  font-weight: 500;
+  position: relative;
+  transition: color 0.2s ease, transform 0.2s ease;
+  padding-bottom: 4px;
+}
+header nav a::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background-color: var(--primary);
+  transition: all 0.3s ease;
+  transform: translateX(-50%);
+}
+header nav a:hover {
+  color: var(--primary);
+  transform: translateY(-2px);
+}
+header nav a:hover::after { width: 100%; }
 
 /* MAIN */
-main { display:flex; gap:24px; padding:100px 40px 40px 40px; flex-wrap:wrap; }
+main {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 100px 40px 40px 40px;
+}
 
-/* PANELS */
-.left-panel, .right-panel { background: var(--card-bg); border-radius:20px; box-shadow: var(--shadow-soft); padding:20px; min-height:500px; flex:1; }
+/* PANELS - 50/50 */
+.left-panel, .right-panel {
+  background: var(--card-bg);
+  border-radius: 20px;
+  box-shadow: var(--shadow-soft);
+  padding: 20px;
+  min-height: 500px;
+  flex: 1;
+  max-width: 50%;
+}
 
 /* TITULOS */
-h1 { font-size:1.5rem; margin-bottom:16px; color:#334155; display:flex; align-items:center; gap:8px; }
-h1::before { content:"📊"; }
-h3 { font-size:1.05rem; color:#475569; margin-bottom:12px; }
+h1 { font-size: 1.5rem; margin-bottom: 16px; color: #334155; display: flex; align-items: center; gap: 8px; }
+h1::before { content: "📊"; }
+h3 { font-size: 1.05rem; color: #475569; margin-bottom: 12px; }
 
 /* BUSCADOR */
-.search-box { display:flex; gap:12px; margin-bottom:18px; }
-.search-box input { flex:1; padding:9px 12px; border-radius:12px; border:1px solid #cbd5e1; font-size:13px; transition: all 0.2s; }
-.search-box input:focus { border-color: var(--primary); outline:none; box-shadow:0 0 0 3px rgba(59,130,246,0.2); }
-.search-box button { display:flex; align-items:center; gap:4px; background: var(--primary); color:white; border:none; border-radius:12px; padding:9px 16px; font-size:13px; font-weight:500; cursor:pointer; transition:all 0.2s; }
-.search-box button:hover { background: var(--primary-hover); transform:translateY(-1px); box-shadow:0 4px 10px rgba(0,0,0,0.08); }
+.search-box { display: flex; gap: 12px; margin-bottom: 18px; }
+.search-box input {
+  flex: 1;
+  padding: 9px 12px;
+  border-radius: 12px;
+  border: 1px solid #cbd5e1;
+  font-size: 13px;
+  transition: all 0.2s ease;
+}
+.search-box input:focus {
+  border-color: var(--primary);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
+}
+.search-box button {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 9px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.search-box button:hover {
+  background: var(--primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
 
-/* TABLAS */
-table { width:100%; border-collapse:collapse; margin-top:8px; font-size:11px; }
-th { background:#f1f5f9; color:var(--text-main); font-weight:600; border-bottom:1px solid #e2e8f0; text-align:center; padding:4px 6px; }
-td { border-bottom:1px solid #f1f5f9; text-align:center; color:#0f172a; padding:3px 5px; position:relative; }
-td:first-child { text-align:left; font-weight:500; }
-tbody tr:nth-child(even) { background:#fafafa; }
-tbody tr:hover { background:#e2e8f0; }
-td[data-tooltip]:hover::after { content: attr(data-tooltip); position:absolute; bottom:120%; left:50%; transform:translateX(-50%); background:#1e293b; color:white; font-size:10px; padding:3px 6px; border-radius:6px; white-space:nowrap; z-index:10; }
-.divider { border-top:2px solid #e2e8f0; margin:20px 0; }
+/* TABLAS COMPACTAS */
+table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 11px; }
+th {
+  background: #f1f5f9;
+  color: var(--text-main);
+  font-weight: 600;
+  border-bottom: 1px solid #e2e8f0;
+  text-align: center;
+  padding: 4px 6px;
+}
+td {
+  border-bottom: 1px solid #f1f5f9;
+  text-align: center;
+  color: #0f172a;
+  padding: 3px 5px;
+  transition: color .15s ease, background-color .15s ease;
+  position: relative;
+}
+td:first-child { text-align: left; font-weight: 500; }
+tbody tr:nth-child(even) { background: #fafafa; }
+tbody tr:hover { background: #e2e8f0; }
 
-/* GRAFICOS */
+td[data-tooltip]:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 120%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1e293b;
+  color: white;
+  font-size: 10px;
+  padding: 3px 6px;
+  border-radius: 6px;
+  white-space: nowrap;
+  z-index: 10;
+}
+
+/* DIVIDER */
+.divider { border-top: 2px solid #e2e8f0; margin: 20px 0; }
+
+/* GRAFICO ANILLO */
 .chart-container { position: relative; width: 170px; height: 170px; margin: 14px auto; }
-svg { transform: rotate(-90deg); width:100%; height:100%; }
-.circle-bg { fill:none; stroke:#e5e7eb; stroke-width:12; }
-.circle-progress { fill:none; stroke-width:12; stroke-linecap:round; stroke-dasharray:565.48; stroke-dashoffset:565.48; filter:drop-shadow(0 4px 6px rgba(0,0,0,0.08)); }
-.percentage { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:1.8rem; font-weight:700; color:#111827; }
-.subtitle { text-align:center; color:#64748b; font-size:0.8rem; margin-top:6px; }
+svg { transform: rotate(-90deg); width: 100%; height: 100%; }
+.circle-bg { fill: none; stroke: #e5e7eb; stroke-width: 12; }
+.circle-progress {
+  fill: none;
+  stroke-width: 12;
+  stroke-linecap: round;
+  stroke-dasharray: 565.48;
+  stroke-dashoffset: 565.48;
+  transition: stroke .25s ease;
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.08));
+}
+.percentage {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #111827;
+}
+.subtitle { text-align: center; color: #64748b; font-size: 0.8rem; margin-top: 6px; }
 
 /* ESTADOS */
-.c-bad { color:#f43f5e !important; font-weight:600; }
-.c-warn { color:#facc15 !important; font-weight:600; }
-.c-good { color:#2AC793 !important; font-weight:600; }
-.cell-error { background:#fee2e2; color:#b91c1c; font-weight:600; border-radius:5px; }
-.cell-ok { background:#dcfce7; color:#16a34a; font-weight:600; border-radius:5px; }
+.c-bad { color: #f43f5e !important; font-weight: 600; }
+.c-warn { color: #facc15 !important; font-weight: 600; }
+.c-good { color: #2AC793 !important; font-weight: 600; }
+.cell-error { background: #fee2e2; color: #b91c1c; font-weight: 600; border-radius: 5px; }
+.cell-ok { background: #dcfce7; color: #16a34a; font-weight: 600; border-radius: 5px; }
 
-.info { text-align:center; color:#64748b; font-size:0.8rem; margin-top:16px; }
-.error { text-align:center; color:#b91c1c; font-weight:600; margin-top:16px; }
+.info { text-align: center; color: #64748b; font-size: 0.8rem; margin-top: 16px; }
+.error { text-align: center; color: #b91c1c; font-weight: 600; margin-top: 16px; }
 
-.status-message { position:fixed; bottom:20px; right:20px; background:white; border:1px solid #d1fae5; border-radius:12px; padding:12px 16px; box-shadow:0 4px 12px rgba(0,0,0,0.08); display:flex; align-items:center; gap:8px; font-size:0.85rem; color:#16a34a; opacity:0; transform:translateY(20px); transition:all 0.3s; z-index:9999; }
-.status-message.show { opacity:1; transform:translateY(0); }
-.status-message .check-icon { font-size:1.2rem; color:#16a34a; }
+/* MENSAJE DE CONFIRMACIÓN */
+.status-message {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: white;
+  border: 1px solid #d1fae5;
+  border-radius: 12px;
+  padding: 12px 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: #16a34a;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.3s ease;
+  z-index: 9999;
+}
+.status-message.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+.status-message .check-icon {
+  font-size: 1.2rem;
+  color: #16a34a;
+}
 
-.loader { border:4px solid #f3f3f3; border-top:4px solid var(--primary); border-radius:50%; width:28px; height:28px; animation:spin 1s linear infinite; margin:20px auto; }
-@keyframes spin { 100% { transform:rotate(360deg); } }
+/* LOADER */
+.loader {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid var(--primary);
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  animation: spin 1s linear infinite;
+  margin: 20px auto;
+}
+@keyframes spin { 100% { transform: rotate(360deg); } }
 
-@media(max-width:900px){ main{flex-direction:column;padding:80px 20px 20px 20px;} .left-panel,.right-panel{max-width:100%;} }
-
+/* RESPONSIVE */
+@media (max-width: 900px) {
+  main { flex-direction: column; padding: 80px 20px 20px 20px; }
+  .left-panel, .right-panel { max-width: 100%; }
+}
 </style>
 </head>
 
@@ -104,15 +272,11 @@ svg { transform: rotate(-90deg); width:100%; height:100%; }
       <button id="btnSearch">🔍 Buscar</button>
     </div>
     <div id="resultContainer"><div class="info">🔍 Ingresa un DNI para ver los resultados</div></div>
-    <div class="divider"></div>
-    <canvas id="lineChart" style="max-width:100%;height:250px;"></canvas>
   </div>
 
   <div class="right-panel">
     <h3>⚠️ Seguimiento por semana</h3>
     <div id="errorContainer"><div class="info">Esperando datos...</div></div>
-    <div class="divider"></div>
-    <canvas id="barChart" style="max-width:100%;height:250px;"></canvas>
   </div>
 </main>
 
@@ -121,7 +285,7 @@ svg { transform: rotate(-90deg); width:100%; height:100%; }
   <span>Notas de calidad cargadas</span>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 <script>
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRp7iRBUwVpHnmf7Q0mLyARIBl-inFlZbH43i3wU1whcjE0GlPi7Z51VcmXRsWrcYCmWMS1WTL-ySJt/pub?gid=2119161122&single=true&output=csv";
 
@@ -140,13 +304,13 @@ const DETAIL_COLUMNS = [
   { key: '1.4 NO UTILIZA TECNISISMOS', label: 'No usa tecnicismos' },
   { key: '1.5 NO UTILIZA MULETILLAS', label: 'No usa muletillas' },
   { key: '1.6 ESCUCHA ACTIVA', label: 'Escucha activa' },
-  { key: '1.7 NO REALIZA TUTEO (PERSONALIZACION)', label: 'No tuteo' },
-  { key: '2.1 BRINDA CARACTERISTICAS CORRECTAS DEL PRODUCTO', label: 'Características correctas' },
-  { key: '2.2 BRINDA CARACTERISTICAS COMPLETAS DEL PRODUCTO', label: 'Características completas' },
+  { key: '1.7 NO REALIZA TUTEO (PERSONALIZACION)', label: 'No tuteo (personalización)' },
+  { key: '2.1 BRINDA CARACTERISTICAS CORRECTAS DEL PRODUCTO', label: 'Características correctas del producto' },
+  { key: '2.2 BRINDA CARACTERISTICAS COMPLETAS DEL PRODUCTO', label: 'Características completas del producto' },
   { key: '2.3 PRESENTA BENEFICIOS DE MANERA CORRECTA', label: 'Beneficios correctos' },
   { key: '2.4 PRESENTA BENEFICIOS DE MANERA COMPLETA', label: 'Beneficios completos' },
-  { key: '2.5 ACLARA DUDAS DEL CLIENTE', label: 'Aclara dudas' },
-  { key: '3.1 SONDEA LA NECESIDAD DE CLIENTE', label: 'Sondea necesidad' },
+  { key: '2.5 ACLARA DUDAS DEL CLIENTE', label: 'Aclara dudas del cliente' },
+  { key: '3.1 SONDEA LA NECESIDAD DE CLIENTE', label: 'Sondea necesidad del cliente' },
   { key: '3.2 REBATE LA NEGATIVA DEL CLIENTE', label: 'Rebate la negativa' },
   { key: '3.3 REBATE DE ACUERDO A LA NEGATIVA DEL CLIENTE', label: 'Rebate según negativa' },
   { key: '3.4 APLICA CIERRE DE VENTA', label: 'Cierre de venta' },
@@ -156,71 +320,111 @@ const DETAIL_COLUMNS = [
 ];
 
 let allData = [];
-let lineChart, barChart;
 
-function parseToPercent(raw){
-  if(!raw) return null;
-  let s=String(raw).trim().replace('%','').replace(',','.');
-  if(!s) return null;
-  const n=parseFloat(s);
-  if(isNaN(n)) return null;
-  let v=n;
-  if(Math.abs(v)<=1) v=v*100;
-  if(v<0) v=0;
-  if(v>100) v=100;
+// UTILS
+function parseToPercent(raw) {
+  if (!raw) return null;
+  let s = String(raw).trim().replace('%','').replace(',','.');
+  if (!s) return null;
+  let n = parseFloat(s);
+  if (isNaN(n)) return null;
+  let v = n;
+  if (Math.abs(v) <= 1) v = v * 100;
+  if (v < 0) v = 0;
+  if (v > 100) v = 100;
   return v;
 }
-
-function getColorClass(value){
-  if(value<=65) return 'c-bad';
-  if(value>=85) return 'c-good';
+function getColorClass(value) {
+  if (value <= 65) return 'c-bad';
+  if (value >= 85) return 'c-good';
   return 'c-warn';
 }
+function showStatusMessage(msg = "Notas de calidad cargadas") {
+  const status = document.getElementById('statusMessage');
+  status.querySelector('span:nth-child(2)').textContent = msg;
+  status.classList.add('show');
+  setTimeout(()=> status.classList.remove('show'), 5000);
+}
 
-async function loadData(){
-  const res=await fetch(CSV_URL);
-  const text=await res.text();
-  const lines=text.split('\n').filter(Boolean);
-  const headers=lines[0].split(',').map(h=>h.trim());
-  allData=lines.slice(1).map(l=>{
-    const v=l.split(',').map(x=>x.trim().replace(/^"(.+)"$/,'$1'));
-    const o={};
-    headers.forEach((h,i)=>o[h]=v[i]||"");
-    return o;
+// CARGA CSV
+function loadData() {
+  return new Promise((resolve)=>{
+    const container = document.getElementById('resultContainer');
+    container.innerHTML = '<div class="loader"></div>';
+    Papa.parse(CSV_URL, {
+      download: true,
+      header: true,
+      complete: function(results) {
+        allData = results.data;
+        container.innerHTML = '<div class="info">🔍 Ingresa un DNI para ver los resultados</div>';
+        resolve();
+      }
+    });
   });
 }
 
-function calcAvg(arr){ return arr.length ? arr.reduce((a,b)=>a+b,0)/arr.length : 0; }
+// CALCULO PROMEDIO
+function calcAvg(values) {
+  const nums = values.filter(v=>v!==null && !isNaN(v));
+  if(!nums.length) return 0;
+  return nums.reduce((a,b)=>a+b,0)/nums.length;
+}
 
-async function searchByDNI(){
-  const dni=document.getElementById('dniInput').value.trim();
+// DONUT ANIMATION
+function animateDonut(targetPercent) {
+  const circle = document.querySelector('.circle-progress');
+  const text = document.getElementById('percentValue');
+  const radius = 90;
+  const circumference = 2 * Math.PI * radius;
+  circle.style.strokeDasharray = circumference;
+  let offset = circumference;
+  let current = 0;
+  const fps = 60;
+  function step() {
+    current += (targetPercent - current) * 0.1;
+    if(Math.abs(current - targetPercent) < 0.1) current = targetPercent;
+    offset = circumference - (current/100)*circumference;
+    circle.style.strokeDashoffset = offset;
+    let color = "#facc15";
+    if(current <= 65) color="#f43f5e";
+    else if(current>=85) color="#2AC793";
+    circle.style.stroke = color;
+    text.style.color = color;
+    text.textContent = current.toFixed(1)+'%';
+    if(current<targetPercent) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+// BUSCAR POR DNI
+async function searchByDNI() {
+  const dni = document.getElementById('dniInput').value.trim();
   if(!dni) return alert("Ingresa un DNI");
   if(!allData.length) await loadData();
-  const filtered=allData.filter(r=>r.DNI && r.DNI.toString().includes(dni));
+  const filtered = allData.filter(r=>r.DNI && r.DNI.toString().includes(dni));
   if(!filtered.length){
-    document.getElementById('resultContainer').innerHTML=`<div class="error">No se encontró el DNI ${dni}</div>`;
-    document.getElementById('errorContainer').innerHTML="";
-    hideStatusMessage();
+    document.getElementById('resultContainer').innerHTML = `<div class="error">No se encontró el DNI ${dni}</div>`;
+    document.getElementById('errorContainer').innerHTML = "";
     return;
   }
-  const nombre=filtered[0]?.AGENTE||"Sin nombre";
-  const weeks=[...new Set(filtered.map(r=>r.SEMANA||'Sin semana'))].sort();
+  const nombre = filtered[0]?.AGENTE || "Sin nombre";
+  const weeks = [...new Set(filtered.map(r=>r.SEMANA||'Sin semana'))].sort();
 
   // TABLA IZQUIERDA
-  let table=`<h3>Resultados para: ${nombre}</h3><table><thead><tr><th>Bloques</th>${weeks.map(w=>`<th>${w}</th>`).join('')}</tr></thead><tbody>`;
+  let table = `<h3>Resultados para: ${nombre}</h3>
+    <table><thead><tr><th>Bloques</th>${weeks.map(w=>`<th>${w}</th>`).join('')}</tr></thead><tbody>`;
   COLUMNS.forEach(col=>{
     table+=`<tr><td>${col.label}</td>`;
     weeks.forEach(w=>{
-      const vals=filtered.filter(r=>(r.SEMANA||'Sin semana')===w).map(r=>parseToPercent(r[col.key])).filter(x=>x!==null);
-      const avgWeek=calcAvg(vals);
-      const cls=getColorClass(avgWeek);
+      const vals = filtered.filter(r=>(r.SEMANA||'Sin semana')===w).map(r=>parseToPercent(r[col.key])).filter(x=>x!==null);
+      const avgWeek = calcAvg(vals);
+      const cls = getColorClass(avgWeek);
       table+=`<td class="${cls}" data-tooltip="${avgWeek.toFixed(1)}%">`+avgWeek.toFixed(1)+'%</td>';
     });
     table+='</tr>';
   });
   table+='</tbody></table><div class="divider"></div>';
-
-  const notaGlobal=calcAvg(filtered.map(r=>parseToPercent(r['NOTA'])));
+  const notaGlobal = calcAvg(filtered.map(r=>parseToPercent(r['NOTA'])));
   table+=`<div class="chart-container">
             <svg viewBox="0 0 200 200">
               <circle class="circle-bg" cx="100" cy="100" r="90"></circle>
@@ -229,121 +433,31 @@ async function searchByDNI(){
             <div class="percentage" id="percentValue">0%</div>
           </div>
           <div class="subtitle">(%) Nota General | (Evaluaciones: ${filtered.length})</div>`;
-  document.getElementById('resultContainer').innerHTML=table;
+  document.getElementById('resultContainer').innerHTML = table;
   animateDonut(notaGlobal);
 
   // TABLA DERECHA DETALLE
-  let detail=`<table><thead><tr><th>Atributos</th>${weeks.map(w=>`<th>${w}</th>`).join('')}</tr></thead><tbody>`;
+  let detail = `<table><thead><tr><th>Atributos</th>${weeks.map(w=>`<th>${w}</th>`).join('')}</tr></thead><tbody>`;
   DETAIL_COLUMNS.forEach(col=>{
     detail+=`<tr><td>${col.label}</td>`;
     weeks.forEach(w=>{
-      const sums=filtered.filter(r=>(r.SEMANA||'Sin semana')===w).map(r=>parseInt(String(r[col.key]||0).replace(/\D/g,''),10)).filter(v=>!isNaN(v));
-      const sum=sums.reduce((a,b)=>a+b,0);
+      const sums = filtered.filter(r=>(r.SEMANA||'Sin semana')===w)
+        .map(r=>parseInt(String(r[col.key]||0).replace(/\D/g,''),10))
+        .filter(v=>!isNaN(v));
+      const sum = sums.reduce((a,b)=>a+b,0);
       detail+=`<td class="${sum>=1?'cell-error':'cell-ok'}" data-tooltip="${sum}">${sum>=1?'❌':'✅'}</td>`;
     });
     detail+='</tr>';
   });
   detail+='</tbody></table>';
-  document.getElementById('errorContainer').innerHTML=detail;
-
-  // GRAFICOS
-  renderLineChart(weeks, filtered);
-  renderBarChart(weeks, filtered);
-
+  document.getElementById('errorContainer').innerHTML = detail;
   showStatusMessage();
 }
 
-function animateDonut(targetPercent){
-  const circle=document.querySelector('.circle-progress');
-  const text=document.getElementById('percentValue');
-  const radius=90;
-  const circumference=2*Math.PI*radius;
-  circle.style.strokeDasharray=circumference;
-  circle.style.strokeDashoffset=circumference;
-  targetPercent=Math.min(Math.max(targetPercent,0),100);
-
-  let current=0;
-  const duration=1500;
-  const fps=60;
-  const steps=Math.round(duration/(1000/fps));
-  const increment=targetPercent/steps;
-
-  const interval=setInterval(()=>{
-    current+=increment;
-    if(current>=targetPercent){ current=targetPercent; clearInterval(interval);}
-    const offset=circumference-(current/100)*circumference;
-    circle.style.strokeDashoffset=offset;
-
-    let color="#facc15";
-    if(current<=65) color="#f43f5e";
-    else if(current>=85) color="#2AC793";
-
-    circle.style.stroke=color;
-    text.style.color=color;
-    text.textContent=current.toFixed(1)+"%";
-  },1000/fps);
-}
-
-function showStatusMessage(){
-  const statusMsg=document.getElementById('statusMessage');
-  statusMsg.classList.add('show');
-  setTimeout(()=>{statusMsg.classList.remove('show');},5000);
-}
-
-function hideStatusMessage(){
-  document.getElementById('statusMessage').classList.remove('show');
-}
-
-function renderLineChart(weeks, data){
-  const datasets=COLUMNS.filter(c=>c.key!=='NOTA').map(c=>{
-    return {
-      label:c.label,
-      data:weeks.map(w=>{
-        const vals=data.filter(r=>(r.SEMANA||'Sin semana')===w).map(r=>parseToPercent(r[c.key])).filter(v=>v!==null);
-        return calcAvg(vals).toFixed(1);
-      }),
-      borderColor: 'rgba(59,130,246,0.8)',
-      backgroundColor: 'rgba(59,130,246,0.2)',
-      fill:false,
-      tension:0.3
-    };
-  });
-  if(lineChart) lineChart.destroy();
-  const ctx=document.getElementById('lineChart').getContext('2d');
-  lineChart=new Chart(ctx,{
-    type:'line',
-    data:{labels:weeks,datasets:datasets},
-    options:{
-      responsive:true,
-      plugins:{legend:{position:'bottom'}}
-    }
-  });
-}
-
-function renderBarChart(weeks, data){
-  const datasets=DETAIL_COLUMNS.map(c=>{
-    return {
-      label:c.label,
-      data:weeks.map(w=>{
-        const sums=data.filter(r=>(r.SEMANA||'Sin semana')===w).map(r=>parseInt(String(r[c.key]||0).replace(/\D/g,''),10)).filter(v=>!isNaN(v));
-        return sums.reduce((a,b)=>a+b,0);
-      }),
-      backgroundColor:'rgba(42,199,147,0.6)',
-      borderColor:'rgba(42,199,147,1)',
-      borderWidth:1
-    };
-  });
-  if(barChart) barChart.destroy();
-  const ctx=document.getElementById('barChart').getContext('2d');
-  barChart=new Chart(ctx,{
-    type:'bar',
-    data:{labels:weeks,datasets:datasets},
-    options:{responsive:true, plugins:{legend:{position:'bottom'}}}
-  });
-}
-
 document.getElementById('btnSearch').addEventListener('click', searchByDNI);
-document.getElementById('dniInput').addEventListener('keyup', e=>{ if(e.key==='Enter') searchByDNI(); });
+document.getElementById('dniInput').addEventListener('keyup', e=>{
+  if(e.key==='Enter') searchByDNI();
+});
 
 loadData();
 </script>
