@@ -70,7 +70,7 @@ main {
   background: var(--card-bg);
   border-radius: 20px;
   box-shadow: var(--shadow-soft);
-  padding: 24px;
+  padding: 20px;
   min-height: 600px;
 }
 
@@ -78,19 +78,19 @@ main {
 .right-panel { width: 40%; }
 
 /* TITULOS */
-h1 { font-size: 1.6rem; margin-bottom: 18px; color: #334155; display: flex; align-items: center; gap: 8px; }
+h1 { font-size: 1.5rem; margin-bottom: 16px; color: #334155; display: flex; align-items: center; gap: 8px; }
 h1::before { content: "📊"; }
 
-h3 { font-size: 1.1rem; color: #475569; margin-bottom: 14px; }
+h3 { font-size: 1.05rem; color: #475569; margin-bottom: 12px; }
 
 /* BUSCADOR */
-.search-box { display: flex; gap: 12px; margin-bottom: 20px; }
+.search-box { display: flex; gap: 12px; margin-bottom: 18px; }
 .search-box input {
   flex: 1;
-  padding: 10px 14px;
+  padding: 9px 12px;
   border-radius: 12px;
   border: 1px solid #cbd5e1;
-  font-size: 14px;
+  font-size: 13px;
   transition: all 0.2s ease;
 }
 .search-box input:focus {
@@ -103,8 +103,8 @@ h3 { font-size: 1.1rem; color: #475569; margin-bottom: 14px; }
   color: white;
   border: none;
   border-radius: 12px;
-  padding: 10px 18px;
-  font-size: 14px;
+  padding: 9px 16px;
+  font-size: 13px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -115,31 +115,29 @@ h3 { font-size: 1.1rem; color: #475569; margin-bottom: 14px; }
   box-shadow: 0 6px 12px rgba(0,0,0,0.1);
 }
 
-/* TABLAS */
-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+/* TABLAS COMPACTAS */
+table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 11px; }
 th {
   background: #f1f5f9;
   color: var(--text-main);
   font-weight: 600;
   border-bottom: 1px solid #e2e8f0;
   text-align: center;
-  font-size: 13px;
-  padding: 6px 8px;
+  padding: 4px 6px;
 }
 td {
   border-bottom: 1px solid #f1f5f9;
   text-align: center;
   color: #0f172a;
-  font-size: 12px;
-  padding: 4px 6px;
+  padding: 3px 5px;
   transition: color .15s ease, background-color .15s ease;
 }
 td:first-child { text-align: left; font-weight: 500; }
-tbody tr:nth-child(even) { background: #f9fafb; }
-.divider { border-top: 2px solid #e2e8f0; margin: 24px 0; }
+tbody tr:nth-child(even) { background: #fafafa; }
+.divider { border-top: 2px solid #e2e8f0; margin: 20px 0; }
 
 /* GRAFICO ANILLO */
-.chart-container { position: relative; width: 180px; height: 180px; margin: 16px auto; }
+.chart-container { position: relative; width: 170px; height: 170px; margin: 14px auto; }
 svg { transform: rotate(-90deg); width: 100%; height: 100%; }
 .circle-bg { fill: none; stroke: #e5e7eb; stroke-width: 12; }
 .circle-progress {
@@ -156,22 +154,22 @@ svg { transform: rotate(-90deg); width: 100%; height: 100%; }
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-size: 2rem;
+  font-size: 1.8rem;
   font-weight: 700;
   color: #111827;
   transition: color .25s ease;
 }
-.subtitle { text-align: center; color: #64748b; font-size: 0.85rem; margin-top: 8px; }
+.subtitle { text-align: center; color: #64748b; font-size: 0.8rem; margin-top: 6px; }
 
 /* ESTADOS */
 .c-bad { color: #f43f5e !important; font-weight: 600; }
 .c-warn { color: #facc15 !important; font-weight: 600; }
 .c-good { color: #2AC793 !important; font-weight: 600; }
-.cell-error { background: #fee2e2; color: #b91c1c; font-weight: 600; border-radius: 6px; }
-.cell-ok { background: #dcfce7; color: #16a34a; font-weight: 600; border-radius: 6px; }
+.cell-error { background: #fee2e2; color: #b91c1c; font-weight: 600; border-radius: 5px; }
+.cell-ok { background: #dcfce7; color: #16a34a; font-weight: 600; border-radius: 5px; }
 
-.info { text-align: center; color: #64748b; font-size: 0.85rem; margin-top: 20px; }
-.error { text-align: center; color: #b91c1c; font-weight: 600; margin-top: 20px; }
+.info { text-align: center; color: #64748b; font-size: 0.8rem; margin-top: 16px; }
+.error { text-align: center; color: #b91c1c; font-weight: 600; margin-top: 16px; }
 </style>
 </head>
 
