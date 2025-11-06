@@ -345,7 +345,7 @@ async function searchByDNI() {
 
   // TABLA IZQUIERDA
   let table = `<h3>Resultados para: ${nombre}</h3>
-    <table><thead><tr><th>Indicador</th>${weeks.map(w => `<th>${w}</th>`).join('')}</tr></thead><tbody>`;
+    <table><thead><tr><th>Bloques</th>${weeks.map(w => `<th>${w}</th>`).join('')}</tr></thead><tbody>`;
 
   COLUMNS.forEach(col => {
     table += `<tr><td>${col.label}</td>`;
@@ -382,7 +382,7 @@ async function searchByDNI() {
   animateDonut(notaGlobal);
 
   // TABLA DERECHA DETALLE
-  let detail = `<table><thead><tr><th>Indicador</th>${weeks.map(w => `<th>${w}</th>`).join('')}</tr></thead><tbody>`;
+  let detail = `<table><thead><tr><th>Atributos</th>${weeks.map(w => `<th>${w}</th>`).join('')}</tr></thead><tbody>`;
   DETAIL_COLUMNS.forEach(col => {
     detail += `<tr><td>${col.label}</td>`;
     weeks.forEach(w => {
