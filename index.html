@@ -14,7 +14,23 @@
   --card-bg: #ffffff;
   --text-main: #1e293b;
   --text-muted: #64748b;
-  --shadow-soft: 0 4px 12px rgba(0,0,0,0.06);
+  --text-light: #f8fafc;
+  --border-color: #cbd5e1;
+  --shadow-soft: 0 8px 24px rgba(0,0,0,0.08);
+  --shadow-card: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+  --shadow-focus: 0 0 0 3px rgba(59,130,246,0.2);
+  --success-bg: #dcfce7;
+  --success-border: #86efac;
+  --success-text: #16a34a;
+  --error-bg: #fee2e2;
+  --error-border: #fca5a5;
+  --error-text: #b91c1c;
+  --warn-bg: #fef3c7;
+  --warn-text: #d97706;
+  --good-bg: #dcfce7;
+  --good-text: #16a34a;
+  --bad-bg: #fee2e2;
+  --bad-text: #b91c1c;
 }
 
 /* RESET */
@@ -23,6 +39,8 @@ body {
   font-family: 'Inter', sans-serif;
   background: var(--bg-gradient);
   color: var(--text-main);
+  line-height: 1.5;
+  padding-top: 70px; /* Espacio para el header fijo */
 }
 
 /* HEADER */
@@ -39,12 +57,16 @@ header {
   padding: 0 40px;
   box-shadow: var(--shadow-soft);
   z-index: 1000;
+  border-bottom: 1px solid var(--border-color);
 }
+
 header .logo {
   font-weight: 700;
   font-size: 1.4rem;
   color: var(--primary);
 }
+
+/* MENÚ CON EFECTO UX */
 header nav a {
   margin-left: 24px;
   text-decoration: none;
@@ -54,6 +76,7 @@ header nav a {
   transition: color 0.2s ease, transform 0.2s ease;
   padding-bottom: 4px;
 }
+
 header nav a::after {
   content: '';
   position: absolute;
@@ -65,29 +88,47 @@ header nav a::after {
   transition: all 0.3s ease;
   transform: translateX(-50%);
 }
+
 header nav a:hover {
   color: var(--primary);
   transform: translateY(-2px);
 }
-header nav a:hover::after { width: 100%; }
+
+header nav a:hover::after {
+  width: 100%;
+}
 
 /* MAIN */
 main {
   display: flex;
   justify-content: space-between;
   gap: 24px;
-  padding: 100px 40px 40px 40px;
+  padding: 30px 40px; /* Ajustado para evitar superposición con header fijo */
 }
 
 /* PANELS - 50/50 */
 .left-panel, .right-panel {
   background: var(--card-bg);
   border-radius: 20px;
-  box-shadow: var(--shadow-soft);
+  box-shadow: var(--shadow-card);
   padding: 20px;
   min-height: 500px;
   flex: 1;
   max-width: 50%;
+  overflow-x: auto; /* Permitir desplazamiento horizontal si es necesario */
+}
+
+/* MEDIA QUERY: Cambiar a una columna en pantallas pequeñas */
+@media (max-width: 768px) {
+  main {
+    flex-direction: column;
+    padding: 20px;
+    gap: 16px;
+  }
+  .left-panel, .right-panel {
+    max-width: 100%;
+    min-height: 300px; /* Ajustar altura mínima en móviles */
+  }
 }
 
 /* TITULOS */
@@ -101,21 +142,19 @@ h3 { font-size: 1.05rem; color: #475569; margin-bottom: 12px; }
   flex: 1;
   padding: 9px 12px;
   border-radius: 12px;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--border-color);
   font-size: 13px;
   transition: all 0.2s ease;
+  background-color: var(--card-bg);
 }
 .search-box input:focus {
   border-color: var(--primary);
   outline: none;
-  box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
+  box-shadow: var(--shadow-focus);
 }
 .search-box button {
-  display: flex;
-  align-items: center;
-  gap: 4px;
   background: var(--primary);
-  color: white;
+  color: var(--text-light);
   border: none;
   border-radius: 12px;
   padding: 9px 16px;
@@ -126,8 +165,8 @@ h3 { font-size: 1.05rem; color: #475569; margin-bottom: 12px; }
 }
 .search-box button:hover {
   background: var(--primary-hover);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.1);
 }
 
 /* TABLAS COMPACTAS */
@@ -139,6 +178,9 @@ th {
   border-bottom: 1px solid #e2e8f0;
   text-align: center;
   padding: 4px 6px;
+  position: sticky; /* Fijar encabezados al desplazarse */
+  top: 0;
+  z-index: 10;
 }
 td {
   border-bottom: 1px solid #f1f5f9;
@@ -146,28 +188,9 @@ td {
   color: #0f172a;
   padding: 3px 5px;
   transition: color .15s ease, background-color .15s ease;
-  position: relative;
 }
 td:first-child { text-align: left; font-weight: 500; }
 tbody tr:nth-child(even) { background: #fafafa; }
-tbody tr:hover { background: #e2e8f0; }
-
-td[data-tooltip]:hover::after {
-  content: attr(data-tooltip);
-  position: absolute;
-  bottom: 120%;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #1e293b;
-  color: white;
-  font-size: 10px;
-  padding: 3px 6px;
-  border-radius: 6px;
-  white-space: nowrap;
-  z-index: 10;
-}
-
-/* DIVIDER */
 .divider { border-top: 2px solid #e2e8f0; margin: 20px 0; }
 
 /* GRAFICO ANILLO */
@@ -180,7 +203,7 @@ svg { transform: rotate(-90deg); width: 100%; height: 100%; }
   stroke-linecap: round;
   stroke-dasharray: 565.48;
   stroke-dashoffset: 565.48;
-  transition: stroke .25s ease;
+  transition: stroke-dashoffset .4s ease-out, stroke .25s ease;
   filter: drop-shadow(0 4px 6px rgba(0,0,0,0.08));
 }
 .percentage {
@@ -191,64 +214,80 @@ svg { transform: rotate(-90deg); width: 100%; height: 100%; }
   font-size: 1.8rem;
   font-weight: 700;
   color: #111827;
+  transition: color .25s ease;
 }
 .subtitle { text-align: center; color: #64748b; font-size: 0.8rem; margin-top: 6px; }
 
 /* ESTADOS */
-.c-bad { color: #f43f5e !important; font-weight: 600; }
-.c-warn { color: #facc15 !important; font-weight: 600; }
-.c-good { color: #2AC793 !important; font-weight: 600; }
-.cell-error { background: #fee2e2; color: #b91c1c; font-weight: 600; border-radius: 5px; }
-.cell-ok { background: #dcfce7; color: #16a34a; font-weight: 600; border-radius: 5px; }
+.c-bad { color: var(--bad-text) !important; font-weight: 600; }
+.c-warn { color: var(--warn-text) !important; font-weight: 600; }
+.c-good { color: var(--good-text) !important; font-weight: 600; }
+.cell-error { background: var(--error-bg); color: var(--error-text); font-weight: 600; border-radius: 5px; }
+.cell-ok { background: var(--success-bg); color: var(--success-text); font-weight: 600; border-radius: 5px; }
 
 .info { text-align: center; color: #64748b; font-size: 0.8rem; margin-top: 16px; }
-.error { text-align: center; color: #b91c1c; font-weight: 600; margin-top: 16px; }
+.error { text-align: center; color: var(--error-text); font-weight: 600; margin-top: 16px; }
 
-/* MENSAJE DE CONFIRMACIÓN */
+/* MENSAJE DE CONFIRMACIÓN (ESQUINA INFERIOR DERECHA) */
 .status-message {
   position: fixed;
   bottom: 20px;
   right: 20px;
   background: white;
-  border: 1px solid #d1fae5;
+  border: 1px solid var(--success-border);
   border-radius: 12px;
   padding: 12px 16px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  box-shadow: var(--shadow-card);
   display: flex;
   align-items: center;
   gap: 8px;
   font-size: 0.85rem;
-  color: #16a34a;
+  color: var(--success-text);
   opacity: 0;
   transform: translateY(20px);
   transition: all 0.3s ease;
   z-index: 9999;
 }
+
 .status-message.show {
   opacity: 1;
   transform: translateY(0);
 }
+
 .status-message .check-icon {
   font-size: 1.2rem;
-  color: #16a34a;
+  color: var(--success-text);
 }
 
-/* LOADER */
-.loader {
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid var(--primary);
+/* SPINNER DE CARGA */
+.spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(59,130,246,.3);
   border-radius: 50%;
-  width: 28px;
-  height: 28px;
-  animation: spin 1s linear infinite;
-  margin: 20px auto;
+  border-top-color: var(--primary);
+  animation: spin 1s ease-in-out infinite;
+  vertical-align: middle;
+  margin-right: 8px;
 }
+
 @keyframes spin { 100% { transform: rotate(360deg); } }
 
-/* RESPONSIVE */
-@media (max-width: 900px) {
-  main { flex-direction: column; padding: 80px 20px 20px 20px; }
-  .left-panel, .right-panel { max-width: 100%; }
+/* ACCESIBILIDAD: Focus Styles */
+button:focus, input:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Etiqueta para el input (mejora accesibilidad) */
+.search-box label {
+  position: absolute;
+  left: -10000px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
 }
 </style>
 </head>
@@ -268,8 +307,9 @@ svg { transform: rotate(-90deg); width: 100%; height: 100%; }
   <div class="left-panel">
     <h1>Consulta tus notas de calidad</h1>
     <div class="search-box">
+      <label for="dniInput">Buscar DNI</label> <!-- Etiqueta oculta para lectores de pantalla -->
       <input type="text" id="dniInput" placeholder="Buscar DNI (ej: 42882142)" />
-      <button id="btnSearch">🔍 Buscar</button>
+      <button onclick="searchByDNI()">Buscar</button>
     </div>
     <div id="resultContainer"><div class="info">🔍 Ingresa un DNI para ver los resultados</div></div>
   </div>
@@ -280,12 +320,12 @@ svg { transform: rotate(-90deg); width: 100%; height: 100%; }
   </div>
 </main>
 
+<!-- MENSAJE DE CONFIRMACIÓN -->
 <div id="statusMessage" class="status-message">
   <span class="check-icon">✅</span>
   <span>Notas de calidad cargadas</span>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 <script>
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRp7iRBUwVpHnmf7Q0mLyARIBl-inFlZbH43i3wU1whcjE0GlPi7Z51VcmXRsWrcYCmWMS1WTL-ySJt/pub?gid=2119161122&single=true&output=csv";
 
@@ -320,13 +360,13 @@ const DETAIL_COLUMNS = [
 ];
 
 let allData = [];
+let isDataLoading = false; // Bandera para evitar múltiples cargas
 
-// UTILS
 function parseToPercent(raw) {
   if (!raw) return null;
   let s = String(raw).trim().replace('%','').replace(',','.');
   if (!s) return null;
-  let n = parseFloat(s);
+  const n = parseFloat(s);
   if (isNaN(n)) return null;
   let v = n;
   if (Math.abs(v) <= 1) v = v * 100;
@@ -334,132 +374,191 @@ function parseToPercent(raw) {
   if (v > 100) v = 100;
   return v;
 }
+
 function getColorClass(value) {
   if (value <= 65) return 'c-bad';
   if (value >= 85) return 'c-good';
   return 'c-warn';
 }
-function showStatusMessage(msg = "Notas de calidad cargadas") {
-  const status = document.getElementById('statusMessage');
-  status.querySelector('span:nth-child(2)').textContent = msg;
-  status.classList.add('show');
-  setTimeout(()=> status.classList.remove('show'), 5000);
+
+function showLoading(elementId) {
+  const container = document.getElementById(elementId);
+  container.innerHTML = `<div class="info"><span class="spinner"></span> Cargando...</div>`;
 }
 
-// CARGA CSV
-function loadData() {
-  return new Promise((resolve)=>{
-    const container = document.getElementById('resultContainer');
-    container.innerHTML = '<div class="loader"></div>';
-    Papa.parse(CSV_URL, {
-      download: true,
-      header: true,
-      complete: function(results) {
-        allData = results.data;
-        container.innerHTML = '<div class="info">🔍 Ingresa un DNI para ver los resultados</div>';
-        resolve();
-      }
+async function loadData() {
+  if (isDataLoading) return; // Si ya se está cargando, no hacer nada
+  isDataLoading = true;
+  showLoading('resultContainer');
+  showLoading('errorContainer');
+
+  try {
+    const res = await fetch(CSV_URL);
+    if (!res.ok) {
+      throw new Error(`Error al cargar datos: ${res.status} ${res.statusText}`);
+    }
+    const text = await res.text();
+    const lines = text.split('\n').filter(Boolean);
+    if (lines.length < 2) {
+      throw new Error("No se encontraron datos en la hoja de cálculo.");
+    }
+    const headers = lines[0].split(',').map(h=>h.trim());
+    allData = lines.slice(1).map(l=>{
+      const v = l.split(',').map(x => x.trim().replace(/^"(.+)"$/,'$1'));
+      const o = {};
+      headers.forEach((h,i)=> o[h] = v[i] || "");
+      return o;
     });
+    console.log("Datos cargados exitosamente. Total filas:", allData.length);
+    // Restaurar mensajes de info iniciales
+    document.getElementById('resultContainer').innerHTML = '<div class="info">🔍 Ingresa un DNI para ver los resultados</div>';
+    document.getElementById('errorContainer').innerHTML = '<div class="info">Esperando datos...</div>';
+  } catch (error) {
+    console.error("Error detallado:", error);
+    document.getElementById('resultContainer').innerHTML = `<div class="error">Error al cargar datos: ${error.message || 'Desconocido'}</div>`;
+    document.getElementById('errorContainer').innerHTML = "";
+  } finally {
+    isDataLoading = false;
+  }
+}
+
+async function searchByDNI() {
+  const dni = document.getElementById("dniInput").value.trim();
+  if (!dni) {
+    alert("Por favor, ingresa un DNI.");
+    document.getElementById("dniInput").focus();
+    return;
+  }
+  if (!allData.length) {
+    await loadData();
+  }
+  if (isDataLoading) { // Si la carga está en progreso, esperar un poco
+     showLoading('resultContainer');
+     showLoading('errorContainer');
+     setTimeout(() => searchByDNI(), 500); // Reintentar en 500ms
+     return;
+  }
+
+  const filtered = allData.filter(r => r.DNI && r.DNI.toString().includes(dni));
+  if (!filtered.length) {
+    document.getElementById('resultContainer').innerHTML = `<div class="error">No se encontró el DNI ${dni}</div>`;
+    document.getElementById('errorContainer').innerHTML = "";
+    // Ocultar mensaje de éxito si no se encontró
+    document.getElementById('statusMessage').classList.remove('show');
+    return;
+  }
+
+  // Ahora usamos la columna "AGENTE"
+  const nombre = filtered[0]?.AGENTE || "Sin nombre";
+
+  const weeks = [...new Set(filtered.map(r => r.SEMANA || 'Sin semana'))].sort();
+
+  // TABLA IZQUIERDA
+  let table = `<h3>Resultados para: ${nombre}</h3>
+    <table><thead><tr><th>Bloques</th>${weeks.map(w => `<th>${w}</th>`).join('')}</tr></thead><tbody>`;
+
+  COLUMNS.forEach(col => {
+    table += `<tr><td>${col.label}</td>`;
+    weeks.forEach(w => {
+      const vals = filtered
+        .filter(r => (r.SEMANA || 'Sin semana') === w)
+        .map(r => parseToPercent(r[col.key]))
+        .filter(x => x !== null);
+      const avgWeek = vals.length ? (vals.reduce((a, b) => a + b, 0) / vals.length) : 0;
+      const cls = getColorClass(avgWeek);
+      table += `<td class="${cls}">${avgWeek.toFixed(1)}%</td>`;
+    });
+    table += `</tr>`;
   });
+  table += `</tbody></table><div class="divider"></div>`;
+
+  const totalAverages = {};
+  COLUMNS.forEach(col => {
+    const vals = filtered.map(r => parseToPercent(r[col.key])).filter(x => x !== null);
+    totalAverages[col.key] = vals.length ? (vals.reduce((a, b) => a + b, 0) / vals.length) : 0;
+  });
+  const notaGlobal = totalAverages['NOTA'] || 0;
+
+  table += `<div class="chart-container">
+              <svg viewBox="0 0 200 200">
+                <circle class="circle-bg" cx="100" cy="100" r="90"></circle>
+                <circle class="circle-progress" cx="100" cy="100" r="90"></circle>
+              </svg>
+              <div class="percentage" id="percentValue">0%</div>
+            </div>
+            <div class="subtitle">(%) Nota General | (Evaluaciones: ${filtered.length})</div>`;
+
+  document.getElementById("resultContainer").innerHTML = table;
+  animateDonut(notaGlobal);
+
+  // TABLA DERECHA DETALLE
+  let detail = `<table><thead><tr><th>Atributos</th>${weeks.map(w => `<th>${w}</th>`).join('')}</tr></thead><tbody>`;
+  DETAIL_COLUMNS.forEach(col => {
+    detail += `<tr><td>${col.label}</td>`;
+    weeks.forEach(w => {
+      const sums = filtered
+        .filter(r => (r.SEMANA || 'Sin semana') === w)
+        .map(r => {
+          const n = parseInt(String(r[col.key]).replace(/\D/g, ''), 10);
+          return isNaN(n) ? 0 : n;
+        });
+      const sum = sums.reduce((a, b) => a + b, 0);
+      detail += `<td class="${sum >= 1 ? 'cell-error' : 'cell-ok'}">${sum >= 1 ? '❌' : '✅'}</td>`;
+    });
+    detail += `</tr>`;
+  });
+  detail += `</tbody></table>`;
+  document.getElementById('errorContainer').innerHTML = detail;
+
+  // Mostrar mensaje de éxito
+  const statusMsg = document.getElementById('statusMessage');
+  statusMsg.classList.add('show');
+
+  // Ocultar el mensaje después de 5 segundos
+  setTimeout(() => {
+    statusMsg.classList.remove('show');
+  }, 5000);
 }
 
-// CALCULO PROMEDIO
-function calcAvg(values) {
-  const nums = values.filter(v=>v!==null && !isNaN(v));
-  if(!nums.length) return 0;
-  return nums.reduce((a,b)=>a+b,0)/nums.length;
-}
-
-// DONUT ANIMATION
 function animateDonut(targetPercent) {
   const circle = document.querySelector('.circle-progress');
   const text = document.getElementById('percentValue');
   const radius = 90;
   const circumference = 2 * Math.PI * radius;
   circle.style.strokeDasharray = circumference;
-  let offset = circumference;
+  circle.style.strokeDashoffset = circumference;
+
+  targetPercent = Math.min(Math.max(targetPercent, 0), 100);
+
   let current = 0;
+  const duration = 1500;
   const fps = 60;
-  function step() {
-    current += (targetPercent - current) * 0.1;
-    if(Math.abs(current - targetPercent) < 0.1) current = targetPercent;
-    offset = circumference - (current/100)*circumference;
+  const steps = Math.round(duration / (1000 / fps));
+  const increment = targetPercent / steps;
+
+  const interval = setInterval(() => {
+    current += increment;
+    if (current >= targetPercent) {
+      current = targetPercent;
+      clearInterval(interval);
+    }
+    const offset = circumference - (current / 100) * circumference;
     circle.style.strokeDashoffset = offset;
-    let color = "#facc15";
-    if(current <= 65) color="#f43f5e";
-    else if(current>=85) color="#2AC793";
+
+    let color = var('--warn-text'); // Usar color variable
+    if (current <= 65) color = var('--bad-text');
+    else if (current >= 85) color = var('--good-text');
+
+    // Actualizar color del círculo y texto
+    circle.style.setProperty('--current-color', color);
     circle.style.stroke = color;
     text.style.color = color;
-    text.textContent = current.toFixed(1)+'%';
-    if(current<targetPercent) requestAnimationFrame(step);
-  }
-  requestAnimationFrame(step);
+    text.textContent = current.toFixed(1) + "%";
+  }, 1000 / fps);
 }
 
-// BUSCAR POR DNI
-async function searchByDNI() {
-  const dni = document.getElementById('dniInput').value.trim();
-  if(!dni) return alert("Ingresa un DNI");
-  if(!allData.length) await loadData();
-  const filtered = allData.filter(r=>r.DNI && r.DNI.toString().includes(dni));
-  if(!filtered.length){
-    document.getElementById('resultContainer').innerHTML = `<div class="error">No se encontró el DNI ${dni}</div>`;
-    document.getElementById('errorContainer').innerHTML = "";
-    return;
-  }
-  const nombre = filtered[0]?.AGENTE || "Sin nombre";
-  const weeks = [...new Set(filtered.map(r=>r.SEMANA||'Sin semana'))].sort();
-
-  // TABLA IZQUIERDA
-  let table = `<h3>Resultados para: ${nombre}</h3>
-    <table><thead><tr><th>Bloques</th>${weeks.map(w=>`<th>${w}</th>`).join('')}</tr></thead><tbody>`;
-  COLUMNS.forEach(col=>{
-    table+=`<tr><td>${col.label}</td>`;
-    weeks.forEach(w=>{
-      const vals = filtered.filter(r=>(r.SEMANA||'Sin semana')===w).map(r=>parseToPercent(r[col.key])).filter(x=>x!==null);
-      const avgWeek = calcAvg(vals);
-      const cls = getColorClass(avgWeek);
-      table+=`<td class="${cls}" data-tooltip="${avgWeek.toFixed(1)}%">`+avgWeek.toFixed(1)+'%</td>';
-    });
-    table+='</tr>';
-  });
-  table+='</tbody></table><div class="divider"></div>';
-  const notaGlobal = calcAvg(filtered.map(r=>parseToPercent(r['NOTA'])));
-  table+=`<div class="chart-container">
-            <svg viewBox="0 0 200 200">
-              <circle class="circle-bg" cx="100" cy="100" r="90"></circle>
-              <circle class="circle-progress" cx="100" cy="100" r="90"></circle>
-            </svg>
-            <div class="percentage" id="percentValue">0%</div>
-          </div>
-          <div class="subtitle">(%) Nota General | (Evaluaciones: ${filtered.length})</div>`;
-  document.getElementById('resultContainer').innerHTML = table;
-  animateDonut(notaGlobal);
-
-  // TABLA DERECHA DETALLE
-  let detail = `<table><thead><tr><th>Atributos</th>${weeks.map(w=>`<th>${w}</th>`).join('')}</tr></thead><tbody>`;
-  DETAIL_COLUMNS.forEach(col=>{
-    detail+=`<tr><td>${col.label}</td>`;
-    weeks.forEach(w=>{
-      const sums = filtered.filter(r=>(r.SEMANA||'Sin semana')===w)
-        .map(r=>parseInt(String(r[col.key]||0).replace(/\D/g,''),10))
-        .filter(v=>!isNaN(v));
-      const sum = sums.reduce((a,b)=>a+b,0);
-      detail+=`<td class="${sum>=1?'cell-error':'cell-ok'}" data-tooltip="${sum}">${sum>=1?'❌':'✅'}</td>`;
-    });
-    detail+='</tr>';
-  });
-  detail+='</tbody></table>';
-  document.getElementById('errorContainer').innerHTML = detail;
-  showStatusMessage();
-}
-
-document.getElementById('btnSearch').addEventListener('click', searchByDNI);
-document.getElementById('dniInput').addEventListener('keyup', e=>{
-  if(e.key==='Enter') searchByDNI();
-});
-
-loadData();
+// Iniciar carga de datos al cargar la página
+document.addEventListener("DOMContentLoaded", loadData);
 </script>
 </body>
 </html>
