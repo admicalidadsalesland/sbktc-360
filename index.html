@@ -52,13 +52,7 @@ header {
   border-bottom: 2px solid #fff5f5;
   transition: all 0.3s ease;
 }
-
-/* Quitamos el hover que movía el menú */
-header:hover {
-  transform: none;
-  box-shadow: var(--shadow-menu);
-}
-
+header:hover { transform: none; box-shadow: var(--shadow-menu); }
 header .logo {
   font-weight: 700;
   font-size: 1.7rem;
@@ -66,7 +60,6 @@ header .logo {
   letter-spacing: 1px;
   text-shadow: 0 2px 4px rgba(0,0,0,0.25);
 }
-
 header nav a {
   margin-left: 28px;
   text-decoration: none;
@@ -88,9 +81,7 @@ header nav a::after {
   transition: all 0.3s ease;
   transform: translateX(-50%);
 }
-header nav a:hover {
-  transform: translateY(-3px) scale(1.08);
-}
+header nav a:hover { transform: translateY(-3px) scale(1.08); }
 header nav a:hover::after { width: 100%; }
 
 /* MAIN */
@@ -163,29 +154,46 @@ td {
   text-align: center;
   color: #0f172a;
   padding: 2px 4px;
+  position: relative; /* necesario para tooltip */
 }
 td:first-child { text-align: left; font-weight: 500; }
 tbody tr:nth-child(even) { background: #fff5f5; }
 tbody tr:hover { background: #fee2e2; }
 
-/* TOOLTIP */
+/* TOOLTIP CON MINI BARRA */
 td[data-tooltip]:hover::after {
-  content: attr(data-tooltip);
+  content: '';
   position: absolute;
   bottom: 120%;
   left: 50%;
-  transform: translateX(-50%) scale(1);
-  background: #1e293b;
-  color: white;
-  font-size: 9px;
-  padding: 3px 5px;
-  border-radius: 5px;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 8px;
+  background: linear-gradient(to right, #16a34a var(--bar-width,0%), #d1d5db var(--bar-width,0%));
+  border-radius: 4px;
   white-space: nowrap;
   z-index: 10;
   opacity: 0;
   transition: opacity 0.3s ease, transform 0.3s ease;
 }
-td[data-tooltip]:hover::after {
+td[data-tooltip]:hover::before {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 140%;
+  left: 50%;
+  transform: translateX(-50%) scale(1);
+  background: #1e293b;
+  color: white;
+  font-size: 9px;
+  padding: 2px 5px;
+  border-radius: 4px;
+  white-space: nowrap;
+  z-index: 11;
+  opacity: 0;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+td[data-tooltip]:hover::after,
+td[data-tooltip]:hover::before {
   opacity: 1;
   transform: translateX(-50%) scale(1.05);
 }
@@ -263,7 +271,6 @@ svg { transform: rotate(-90deg); width: 100%; height: 100%; }
   main { flex-direction: column; padding: calc(var(--menu-height) + 20px) 16px 16px 16px; }
   .left-panel, .right-panel { max-width: 100%; }
 }
-
 </style>
 </head>
 
@@ -433,7 +440,7 @@ async function searchByDNI() {
       const vals = filtered.filter(r=>(r.SEMANA||'Sin semana')===w).map(r=>parseToPercent(r[col.key])).filter(x=>x!==null);
       const avgWeek = calcAvg(vals);
       const cls = getColorClass(avgWeek);
-      table+=`<td class="${cls}" data-tooltip="${avgWeek.toFixed(1)}%">`+avgWeek.toFixed(1)+'%</td>';
+      table+=`<td class="${cls}" data-tooltip="${avgWeek.toFixed(1)}%" style="--bar-width:${avgWeek}%">`+avgWeek.toFixed(1)+'%</td>';
     });
     table+='</tr>';
   });
@@ -459,7 +466,7 @@ async function searchByDNI() {
         .map(r=>parseInt(String(r[col.key]||0).replace(/\D/g,''),10))
         .filter(v=>!isNaN(v));
       const sum = sums.reduce((a,b)=>a+b,0);
-      detail+=`<td class="${sum>=1?'cell-error':'cell-ok'}" data-tooltip="${sum}">${sum>=1?'❌':'✅'}</td>`;
+      detail+=`<td class="${sum>=1?'cell-error':'cell-ok'}" data-tooltip="${sum}" style="--bar-width:${sum*10}%">${sum>=1?'❌':'✅'}</td>`;
     });
     detail+='</tr>';
   });
