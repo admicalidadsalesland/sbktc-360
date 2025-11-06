@@ -569,7 +569,7 @@ function animateDonut(targetPercent) {
         launchConfetti();
         showCelebrationMessage(targetPercent);
       }
-      // Aplicar efecto glow si es muy buena nota
+      // Aplicar efecto glow si es muy buena nota (≥90%)
       if (targetPercent >= 90) {
         circle.style.boxShadow = '0 0 20px rgba(22, 163, 74, 0.6)';
       } else {
@@ -596,8 +596,9 @@ async function searchByDNI() {
 
   // TABLA IZQUIERDA
   let table = `<h3>Resultados para: ${nombre}`;
-  // Idea 3: Badge si es buena nota
-  if (calcAvg(filtered.map(r=>parseToPercent(r['NOTA']))) >= 85) {
+  // Idea 3: Badge si es buena nota (≥85%)
+  const notaGlobal = calcAvg(filtered.map(r=>parseToPercent(r['NOTA'])));
+  if (notaGlobal >= 85) {
     table += `<span style="display: inline-block; background: #fbbf24; color: #1e293b; font-size: 0.7rem; padding: 2px 8px; border-radius: 12px; margin-left: 8px; font-weight: 600;">🌟 Excelente</span>`;
   }
   table += `</h3><table><thead><tr><th>Bloques</th>${weeks.map(w=>`<th>${w}</th>`).join('')}</tr></thead><tbody>`;
@@ -612,7 +613,6 @@ async function searchByDNI() {
     table+='</tr>';
   });
   table+='</tbody></table><div class="divider"></div>';
-  const notaGlobal = calcAvg(filtered.map(r=>parseToPercent(r['NOTA'])));
   table+=`<div class="chart-container">
             <svg viewBox="0 0 200 200">
               <circle class="circle-bg" cx="100" cy="100" r="90"></circle>
@@ -622,56 +622,25 @@ async function searchByDNI() {
           </div>
           <div class="subtitle">(%) Nota General | (Evaluaciones: ${filtered.length})</div>`;
 
-  // Idea 5: Sugerencia si la nota es baja
+  // Idea 5: Sugerencia si la nota es baja (<85%)
   if (notaGlobal < 85) {
     const worstBlock = COLUMNS.slice(0, -1).reduce((worst, col) => {
       const avg = calcAvg(filtered.map(r => parseToPercent(r[col.key])));
       return avg < worst.avg ? { key: col.label, avg } : worst;
     }, { key: '', avg: 100 });
 
-    const suggestion = `
+    table += `
       <div class="suggestion-box">
         💡 <strong>Sugerencia:</strong> Tu peor desempeño fue en <strong>${worstBlock.key}</strong> (${worstBlock.avg.toFixed(1)}%). 
         Recuerda: mejorar aquí puede elevar tu nota general en hasta 15%.
       </div>
     `;
-    table += suggestion;
   }
 
   document.getElementById('resultContainer').innerHTML = table;
   animateDonut(notaGlobal);
 
-  // Idea 2: Gráfico de evolución semanal
-  const weeklyNotes = weeks.map(w => {
-    const vals = filtered.filter(r => (r.SEMANA || 'Sin semana') === w)
-      .map(r => parseToPercent(r['NOTA']))
-      .filter(x => x !== null);
-    return calcAvg(vals);
-  });
-
-  let lineChart = '';
-  if (weeklyNotes.length > 1) {
-    lineChart = `
-      <div style="margin-top: 16px; height: 80px; position: relative;">
-        <svg width="100%" height="80" viewBox="0 0 200 80" style="background: #fdfdfd; border-radius: 8px;">
-          <polyline 
-            fill="none" 
-            stroke="#16a34a" 
-            stroke-width="2" 
-            points="${weeklyNotes.map((v, i) => `${(i * 50) + 10},${80 - (v * 0.8)}`).join(' ')}"
-          />
-          ${weeklyNotes.map((v, i) => `
-            <circle cx="${(i * 50) + 10}" cy="${80 - (v * 0.8)}" r="3" fill="#16a34a" />
-          `).join('')}
-        </svg>
-        <div style="text-align: center; font-size: 0.75rem; color: #64748b; margin-top: 4px;">
-          Evolución de tu nota en las últimas ${weeks.length} semanas
-        </div>
-      </div>
-    `;
-  }
-
-  // TABLA DERECHA DETALLE
+  // TABLA DERECHA DETALLE (sin gráfico de evolución)
   let detail = `<table><thead><tr><th>Atributos</th>${weeks.map(w=>`<th>${w}</th>`).join('')}</tr></thead><tbody>`;
   DETAIL_COLUMNS.forEach(col=>{
     detail+=`<tr><td>${col.label}</td>`;
@@ -686,7 +655,7 @@ async function searchByDNI() {
   });
   detail+='</tbody></table>';
 
-  document.getElementById('errorContainer').innerHTML = detail + lineChart;
+  document.getElementById('errorContainer').innerHTML = detail;
   showStatusMessage();
 }
 
