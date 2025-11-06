@@ -280,6 +280,17 @@ svg { transform: rotate(-90deg); width: 100%; height: 100%; }
   text-shadow: 0 0 20px rgba(22, 163, 74, 0.5);
 }
 
+/* SUGERENCIA DE MEJORA */
+.suggestion-box {
+  margin-top: 16px;
+  padding: 12px;
+  background: #fef3c7;
+  border-left: 4px solid #f59e0b;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: #78350f;
+}
+
 /* LOADER */
 .loader {
   border: 3px solid #f3f3f3;
@@ -471,13 +482,12 @@ function showCelebrationMessage(nota) {
     } else if (nota >= 85) {
         text = "¡Felicidades! ¡Lograste una nota sobresaliente!";
     } else {
-        return; // No mostrar si no alcanza 85%
+        return;
     }
 
     messageEl.textContent = text;
     messageEl.classList.add('show');
 
-    // Desvanecer después de 5 segundos
     setTimeout(() => {
         messageEl.classList.remove('show');
     }, 5000);
@@ -554,10 +564,16 @@ function animateDonut(targetPercent) {
     text.textContent = current.toFixed(1)+'%';
     if(current<targetPercent) requestAnimationFrame(step);
     else {
-      // Animación terminada → Activar celebración
+      // Activar celebración si es buena nota
       if (targetPercent >= 85) {
         launchConfetti();
         showCelebrationMessage(targetPercent);
+      }
+      // Aplicar efecto glow si es muy buena nota
+      if (targetPercent >= 90) {
+        circle.style.boxShadow = '0 0 20px rgba(22, 163, 74, 0.6)';
+      } else {
+        circle.style.boxShadow = 'none';
       }
     }
   }
@@ -579,8 +595,12 @@ async function searchByDNI() {
   const weeks = [...new Set(filtered.map(r=>r.SEMANA||'Sin semana'))].sort();
 
   // TABLA IZQUIERDA
-  let table = `<h3>Resultados para: ${nombre}</h3>
-    <table><thead><tr><th>Bloques</th>${weeks.map(w=>`<th>${w}</th>`).join('')}</tr></thead><tbody>`;
+  let table = `<h3>Resultados para: ${nombre}`;
+  // Idea 3: Badge si es buena nota
+  if (calcAvg(filtered.map(r=>parseToPercent(r['NOTA']))) >= 85) {
+    table += `<span style="display: inline-block; background: #fbbf24; color: #1e293b; font-size: 0.7rem; padding: 2px 8px; border-radius: 12px; margin-left: 8px; font-weight: 600;">🌟 Excelente</span>`;
+  }
+  table += `</h3><table><thead><tr><th>Bloques</th>${weeks.map(w=>`<th>${w}</th>`).join('')}</tr></thead><tbody>`;
   COLUMNS.forEach(col=>{
     table+=`<tr><td>${col.label}</td>`;
     weeks.forEach(w=>{
@@ -601,8 +621,55 @@ async function searchByDNI() {
             <div class="percentage" id="percentValue">0%</div>
           </div>
           <div class="subtitle">(%) Nota General | (Evaluaciones: ${filtered.length})</div>`;
+
+  // Idea 5: Sugerencia si la nota es baja
+  if (notaGlobal < 85) {
+    const worstBlock = COLUMNS.slice(0, -1).reduce((worst, col) => {
+      const avg = calcAvg(filtered.map(r => parseToPercent(r[col.key])));
+      return avg < worst.avg ? { key: col.label, avg } : worst;
+    }, { key: '', avg: 100 });
+
+    const suggestion = `
+      <div class="suggestion-box">
+        💡 <strong>Sugerencia:</strong> Tu peor desempeño fue en <strong>${worstBlock.key}</strong> (${worstBlock.avg.toFixed(1)}%). 
+        Recuerda: mejorar aquí puede elevar tu nota general en hasta 15%.
+      </div>
+    `;
+    table += suggestion;
+  }
+
   document.getElementById('resultContainer').innerHTML = table;
   animateDonut(notaGlobal);
+
+  // Idea 2: Gráfico de evolución semanal
+  const weeklyNotes = weeks.map(w => {
+    const vals = filtered.filter(r => (r.SEMANA || 'Sin semana') === w)
+      .map(r => parseToPercent(r['NOTA']))
+      .filter(x => x !== null);
+    return calcAvg(vals);
+  });
+
+  let lineChart = '';
+  if (weeklyNotes.length > 1) {
+    lineChart = `
+      <div style="margin-top: 16px; height: 80px; position: relative;">
+        <svg width="100%" height="80" viewBox="0 0 200 80" style="background: #fdfdfd; border-radius: 8px;">
+          <polyline 
+            fill="none" 
+            stroke="#16a34a" 
+            stroke-width="2" 
+            points="${weeklyNotes.map((v, i) => `${(i * 50) + 10},${80 - (v * 0.8)}`).join(' ')}"
+          />
+          ${weeklyNotes.map((v, i) => `
+            <circle cx="${(i * 50) + 10}" cy="${80 - (v * 0.8)}" r="3" fill="#16a34a" />
+          `).join('')}
+        </svg>
+        <div style="text-align: center; font-size: 0.75rem; color: #64748b; margin-top: 4px;">
+          Evolución de tu nota en las últimas ${weeks.length} semanas
+        </div>
+      </div>
+    `;
+  }
 
   // TABLA DERECHA DETALLE
   let detail = `<table><thead><tr><th>Atributos</th>${weeks.map(w=>`<th>${w}</th>`).join('')}</tr></thead><tbody>`;
@@ -618,7 +685,8 @@ async function searchByDNI() {
     detail+='</tr>';
   });
   detail+='</tbody></table>';
-  document.getElementById('errorContainer').innerHTML = detail;
+
+  document.getElementById('errorContainer').innerHTML = detail + lineChart;
   showStatusMessage();
 }
 
