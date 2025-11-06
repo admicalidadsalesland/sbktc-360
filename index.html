@@ -25,6 +25,7 @@ body {
   font-family: 'Inter', sans-serif;
   background: var(--bg-gradient);
   color: var(--text-main);
+  overflow-x: hidden; /* Evita scroll horizontal causado por el confeti */
 }
 
 /* MENU CON GRADIENTE ANIMADO */
@@ -271,6 +272,17 @@ svg { transform: rotate(-90deg); width: 100%; height: 100%; }
   main { flex-direction: column; padding: calc(var(--menu-height) + 20px) 16px 16px 16px; }
   .left-panel, .right-panel { max-width: 100%; }
 }
+
+/* ESTILO CONFETI */
+#confetti-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none; /* Permite interactuar con los elementos debajo */
+  z-index: 9998; /* Debajo del status message */
+}
 </style>
 </head>
 
@@ -305,6 +317,9 @@ svg { transform: rotate(-90deg); width: 100%; height: 100%; }
   <span class="check-icon">✅</span>
   <span>Notas de calidad cargadas</span>
 </div>
+
+<!-- CANVAS PARA CONFETI -->
+<canvas id="confetti-canvas"></canvas>
 
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 <script>
@@ -341,6 +356,81 @@ const DETAIL_COLUMNS = [
 ];
 
 let allData = [];
+let confettiCanvas, confettiCtx;
+let confettiPieces = [];
+const confettiColors = ['#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5', '#2196f3', '#03a9f4', '#00bcd4', '#009688', '#4caf50', '#8bc34a', '#cddc39', '#ffeb3b', '#ffc107', '#ff9800', '#ff5722'];
+
+// Inicializar canvas para confeti
+function initConfetti() {
+    confettiCanvas = document.getElementById('confetti-canvas');
+    confettiCtx = confettiCanvas.getContext('2d');
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+}
+
+function resizeCanvas() {
+    confettiCanvas.width = window.innerWidth;
+    confettiCanvas.height = window.innerHeight;
+}
+
+// Clase para cada trozo de confeti
+class ConfettiPiece {
+    constructor() {
+        this.x = Math.random() * confettiCanvas.width;
+        this.y = -20;
+        this.width = Math.random() * 10 + 5;
+        this.height = Math.random() * 8 + 3;
+        this.speed = Math.random() * 3 + 2;
+        this.color = confettiColors[Math.floor(Math.random() * confettiColors.length)];
+        this.rotation = Math.random() * 360;
+        this.rotationSpeed = Math.random() * 5 - 2.5;
+    }
+
+    update() {
+        this.y += this.speed;
+        this.rotation += this.rotationSpeed;
+    }
+
+    draw() {
+        confettiCtx.save();
+        confettiCtx.translate(this.x, this.y);
+        confettiCtx.rotate(this.rotation * Math.PI / 180);
+        confettiCtx.fillStyle = this.color;
+        confettiCtx.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
+        confettiCtx.restore();
+    }
+}
+
+// Lanzar confeti
+function launchConfetti() {
+    confettiPieces = [];
+    const pieceCount = 150;
+    for (let i = 0; i < pieceCount; i++) {
+        confettiPieces.push(new ConfettiPiece());
+    }
+    animateConfetti();
+}
+
+// Animar confeti
+function animateConfetti() {
+    confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+    let activePieces = 0;
+
+    confettiPieces.forEach(piece => {
+        piece.update();
+        piece.draw();
+        if (piece.y < confettiCanvas.height) {
+            activePieces++;
+        }
+    });
+
+    if (activePieces > 0) {
+        requestAnimationFrame(animateConfetti);
+    } else {
+        confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height); // Limpiar al final
+    }
+}
+
 
 // UTILS
 function parseToPercent(raw) {
@@ -413,6 +503,12 @@ function animateDonut(targetPercent) {
     text.style.color = color;
     text.textContent = current.toFixed(1)+'%';
     if(current<targetPercent) requestAnimationFrame(step);
+    else {
+      // Animación terminada, verificar si se debe lanzar confeti
+      if (targetPercent >= 85) {
+        launchConfetti();
+      }
+    }
   }
   requestAnimationFrame(step);
 }
@@ -480,7 +576,11 @@ document.getElementById('dniInput').addEventListener('keyup', e=>{
   if(e.key==='Enter') searchByDNI();
 });
 
-loadData();
+// Inicializar confeti y cargar datos
+window.onload = () => {
+    initConfetti();
+    loadData();
+};
 </script>
 </body>
 </html>
