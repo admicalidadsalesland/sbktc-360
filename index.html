@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>SBK360 | Notas </title>
+<title>SBK360 | Notas</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
@@ -87,15 +87,15 @@ main {
   padding: 100px 40px 40px 40px;
 }
 
-/* PANELS */
+/* PANELS - 50/50 */
 .left-panel, .right-panel {
   background: var(--card-bg);
   border-radius: 20px;
   box-shadow: var(--shadow-soft);
-  padding: 10px;
+  padding: 20px;
   min-height: 500px;
-  flex: 1; /* Ocupa espacio proporcional */
-  max-width: 50%; /* Asegura que no supere el 50% */
+  flex: 1;
+  max-width: 50%;
 }
 
 /* TITULOS */
@@ -299,19 +299,23 @@ async function searchByDNI() {
     return;
   }
 
-  const weeks = [...new Set(filtered.map(r=>r.SEMANA || 'Sin semana'))].sort();
+  // Obtener el nombre del primer registro coincidente
+  const nombre = filtered[0]?.NOMBRE || "Sin nombre";
+
+  const weeks = [...new Set(filtered.map(r => r.SEMANA || 'Sin semana'))].sort();
 
   // TABLA IZQUIERDA
-  let table = `<h3>Resultados para DNI: ${dni}</h3>
-    <table><thead><tr><th>Indicador</th>${weeks.map(w=>`<th>${w}</th>`).join('')}</tr></thead><tbody>`;
+  let table = `<h3>Resultados para: ${nombre}</h3>
+    <table><thead><tr><th>Indicador</th>${weeks.map(w => `<th>${w}</th>`).join('')}</tr></thead><tbody>`;
 
   COLUMNS.forEach(col => {
     table += `<tr><td>${col.label}</td>`;
     weeks.forEach(w => {
-      const vals = filtered.filter(r => (r.SEMANA||'Sin semana') === w)
-                           .map(r => parseToPercent(r[col.key]))
-                           .filter(x => x !== null);
-      const avgWeek = vals.length ? (vals.reduce((a,b)=>a+b,0)/vals.length) : 0;
+      const vals = filtered
+        .filter(r => (r.SEMANA || 'Sin semana') === w)
+        .map(r => parseToPercent(r[col.key]))
+        .filter(x => x !== null);
+      const avgWeek = vals.length ? (vals.reduce((a, b) => a + b, 0) / vals.length) : 0;
       const cls = getColorClass(avgWeek);
       table += `<td class="${cls}">${avgWeek.toFixed(1)}%</td>`;
     });
@@ -322,7 +326,7 @@ async function searchByDNI() {
   const totalAverages = {};
   COLUMNS.forEach(col => {
     const vals = filtered.map(r => parseToPercent(r[col.key])).filter(x => x !== null);
-    totalAverages[col.key] = vals.length ? (vals.reduce((a,b)=>a+b,0)/vals.length) : 0;
+    totalAverages[col.key] = vals.length ? (vals.reduce((a, b) => a + b, 0) / vals.length) : 0;
   });
   const notaGlobal = totalAverages['NOTA'] || 0;
 
@@ -339,14 +343,18 @@ async function searchByDNI() {
   animateDonut(notaGlobal);
 
   // TABLA DERECHA DETALLE
-  let detail = `<table><thead><tr><th>Indicador</th>${weeks.map(w=>`<th>${w}</th>`).join('')}</tr></thead><tbody>`;
-  DETAIL_COLUMNS.forEach(col=>{
+  let detail = `<table><thead><tr><th>Indicador</th>${weeks.map(w => `<th>${w}</th>`).join('')}</tr></thead><tbody>`;
+  DETAIL_COLUMNS.forEach(col => {
     detail += `<tr><td>${col.label}</td>`;
-    weeks.forEach(w=>{
-      const sums = filtered.filter(r => (r.SEMANA||'Sin semana') === w)
-                           .map(r => { const n = parseInt(String(r[col.key]).replace(/\D/g,''),10); return isNaN(n)?0:n; });
-      const sum = sums.reduce((a,b)=>a+b,0);
-      detail += `<td class="${sum>=1 ? 'cell-error':'cell-ok'}">${sum>=1?'❌':'✅'}</td>`;
+    weeks.forEach(w => {
+      const sums = filtered
+        .filter(r => (r.SEMANA || 'Sin semana') === w)
+        .map(r => {
+          const n = parseInt(String(r[col.key]).replace(/\D/g, ''), 10);
+          return isNaN(n) ? 0 : n;
+        });
+      const sum = sums.reduce((a, b) => a + b, 0);
+      detail += `<td class="${sum >= 1 ? 'cell-error' : 'cell-ok'}">${sum >= 1 ? '❌' : '✅'}</td>`;
     });
     detail += `</tr>`;
   });
