@@ -168,6 +168,12 @@ h3 { font-size: 1.05rem; color: #475569; margin-bottom: 12px; }
   transform: translateY(-2px);
   box-shadow: 0 6px 12px rgba(0,0,0,0.1);
 }
+.search-box button:disabled {
+  background: #94a3b8;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
 
 /* TABLAS COMPACTAS */
 table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 11px; }
@@ -309,7 +315,7 @@ button:focus, input:focus {
     <div class="search-box">
       <label for="dniInput">Buscar DNI</label> <!-- Etiqueta oculta para lectores de pantalla -->
       <input type="text" id="dniInput" placeholder="Buscar DNI (ej: 42882142)" />
-      <button onclick="searchByDNI()">Buscar</button>
+      <button id="searchButton" onclick="searchByDNI()">Buscar</button>
     </div>
     <div id="resultContainer"><div class="info">🔍 Ingresa un DNI para ver los resultados</div></div>
   </div>
@@ -360,7 +366,7 @@ const DETAIL_COLUMNS = [
 ];
 
 let allData = [];
-let isDataLoading = false; // Bandera para evitar múltiples cargas
+let isDataLoaded = false; // Bandera para saber si los datos han sido cargados
 
 function parseToPercent(raw) {
   if (!raw) return null;
@@ -386,9 +392,15 @@ function showLoading(elementId) {
   container.innerHTML = `<div class="info"><span class="spinner"></span> Cargando...</div>`;
 }
 
+function enableSearchButton(enabled) {
+  const button = document.getElementById("searchButton");
+  button.disabled = !enabled;
+  button.textContent = enabled ? "Buscar" : "Cargando...";
+}
+
 async function loadData() {
-  if (isDataLoading) return; // Si ya se está cargando, no hacer nada
-  isDataLoading = true;
+  if (isDataLoaded) return; // Si ya se cargaron, no hacer nada
+  enableSearchButton(false); // Deshabilitar botón mientras carga
   showLoading('resultContainer');
   showLoading('errorContainer');
 
@@ -410,6 +422,7 @@ async function loadData() {
       return o;
     });
     console.log("Datos cargados exitosamente. Total filas:", allData.length);
+    isDataLoaded = true; // Marcar como cargado
     // Restaurar mensajes de info iniciales
     document.getElementById('resultContainer').innerHTML = '<div class="info">🔍 Ingresa un DNI para ver los resultados</div>';
     document.getElementById('errorContainer').innerHTML = '<div class="info">Esperando datos...</div>';
@@ -418,28 +431,26 @@ async function loadData() {
     document.getElementById('resultContainer').innerHTML = `<div class="error">Error al cargar datos: ${error.message || 'Desconocido'}</div>`;
     document.getElementById('errorContainer').innerHTML = "";
   } finally {
-    isDataLoading = false;
+    enableSearchButton(true); // Habilitar botón al finalizar
   }
 }
 
 async function searchByDNI() {
+  if (!isDataLoaded) {
+      alert("Los datos aún no han sido cargados. Por favor, espera un momento.");
+      return;
+  }
+
   const dni = document.getElementById("dniInput").value.trim();
   if (!dni) {
     alert("Por favor, ingresa un DNI.");
     document.getElementById("dniInput").focus();
     return;
   }
-  if (!allData.length) {
-    await loadData();
-  }
-  if (isDataLoading) { // Si la carga está en progreso, esperar un poco
-     showLoading('resultContainer');
-     showLoading('errorContainer');
-     setTimeout(() => searchByDNI(), 500); // Reintentar en 500ms
-     return;
-  }
 
-  const filtered = allData.filter(r => r.DNI && r.DNI.toString().includes(dni));
+  // Filtrar por DNI exacto (convertir ambos a string para comparar)
+  const filtered = allData.filter(r => r.DNI && r.DNI.toString() === dni);
+
   if (!filtered.length) {
     document.getElementById('resultContainer').innerHTML = `<div class="error">No se encontró el DNI ${dni}</div>`;
     document.getElementById('errorContainer').innerHTML = "";
@@ -545,12 +556,11 @@ function animateDonut(targetPercent) {
     const offset = circumference - (current / 100) * circumference;
     circle.style.strokeDashoffset = offset;
 
-    let color = var('--warn-text'); // Usar color variable
-    if (current <= 65) color = var('--bad-text');
-    else if (current >= 85) color = var('--good-text');
+    let color = '#facc15'; // Amarillo por defecto
+    if (current <= 65) color = '#f43f5e'; // Rojo
+    else if (current >= 85) color = '#2AC793'; // Verde
 
     // Actualizar color del círculo y texto
-    circle.style.setProperty('--current-color', color);
     circle.style.stroke = color;
     text.style.color = color;
     text.textContent = current.toFixed(1) + "%";
