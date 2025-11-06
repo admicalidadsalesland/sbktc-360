@@ -47,15 +47,37 @@ header .logo {
   color: var(--primary);
 }
 
+/* MENÚ CON EFECTO UX */
 header nav a {
   margin-left: 24px;
   text-decoration: none;
   color: var(--text-main);
   font-weight: 500;
-  transition: color 0.2s ease;
+  position: relative;
+  transition: color 0.2s ease, transform 0.2s ease;
+  padding-bottom: 4px;
 }
 
-header nav a:hover { color: var(--primary); }
+header nav a::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background-color: var(--primary);
+  transition: all 0.3s ease;
+  transform: translateX(-50%);
+}
+
+header nav a:hover {
+  color: var(--primary);
+  transform: translateY(-2px);
+}
+
+header nav a:hover::after {
+  width: 100%;
+}
 
 /* MAIN */
 main {
