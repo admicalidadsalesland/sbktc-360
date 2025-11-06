@@ -300,7 +300,7 @@ async function searchByDNI() {
   }
 
   // Obtener el nombre del primer registro coincidente
-  const nombre = filtered[0]?.NOMBRE || "Sin nombre";
+  const nombre = filtered[0]?.AGENTE || "Sin nombre";
 
   const weeks = [...new Set(filtered.map(r => r.SEMANA || 'Sin semana'))].sort();
 
