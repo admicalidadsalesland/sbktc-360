@@ -26,50 +26,36 @@ body {
 }
 
 /* HEADER */
-header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 70px;
-  background: var(--card-bg);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 40px;
-  box-shadow: var(--shadow-soft);
-  z-index: 1000;
+:root {
+  --primary: #ef4444; /* rojo */
+  --primary-hover: #b91c1c; /* rojo más oscuro */
+  --bg-gradient: linear-gradient(135deg, #fee2e2 0%, #fef2f2 100%);
+  --card-bg: #ffffff;
+  --text-main: #1e293b;
+  --text-muted: #64748b;
+  --shadow-soft: 0 4px 12px rgba(0,0,0,0.06);
 }
 header .logo {
   font-weight: 700;
   font-size: 1.4rem;
   color: var(--primary);
 }
-header nav a {
-  margin-left: 24px;
-  text-decoration: none;
-  color: var(--text-main);
-  font-weight: 500;
-  position: relative;
-  transition: color 0.2s ease, transform 0.2s ease;
-  padding-bottom: 4px;
-}
-header nav a::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  width: 0;
-  height: 2px;
-  background-color: var(--primary);
-  transition: all 0.3s ease;
-  transform: translateX(-50%);
-}
 header nav a:hover {
   color: var(--primary);
-  transform: translateY(-2px);
 }
-header nav a:hover::after { width: 100%; }
+header nav a:hover::after {
+  background-color: var(--primary);
+}
+.search-box button {
+  background: var(--primary);
+}
+.search-box button:hover {
+  background: var(--primary-hover);
+}
+.loader {
+  border-top: 4px solid var(--primary);
+}
+
 
 /* MAIN */
 main {
