@@ -25,7 +25,7 @@ body {
   font-family: 'Inter', sans-serif;
   background: var(--bg-gradient);
   color: var(--text-main);
-  overflow-x: hidden; /* Evita scroll horizontal causado por el confeti */
+  overflow-x: hidden;
 }
 
 /* MENU CON GRADIENTE ANIMADO */
@@ -155,7 +155,7 @@ td {
   text-align: center;
   color: #0f172a;
   padding: 2px 4px;
-  position: relative; /* necesario para tooltip */
+  position: relative;
 }
 td:first-child { text-align: left; font-weight: 500; }
 tbody tr:nth-child(even) { background: #fff5f5; }
@@ -205,7 +205,7 @@ td[data-tooltip]:hover::before {
 /* GRAFICO ANILLO */
 .chart-container { position: relative; width: 160px; height: 160px; margin: 16px auto; }
 svg { transform: rotate(-90deg); width: 100%; height: 100%; }
-.circle-bg { fill: none; stroke: #d1d5db; stroke-width: 12; } /* fondo gris */
+.circle-bg { fill: none; stroke: #d1d5db; stroke-width: 12; }
 .circle-progress {
   fill: none;
   stroke-width: 12;
@@ -232,7 +232,7 @@ svg { transform: rotate(-90deg); width: 100%; height: 100%; }
 .cell-error { background: #fee2e2; color: #b91c1c; font-weight: 600; border-radius: 4px; }
 .cell-ok { background: #dcfce7; color: #16a34a; font-weight: 600; border-radius: 4px; }
 
-/* MENSAJE */
+/* MENSAJE DE ESTADO */
 .status-message {
   position: fixed;
   bottom: 20px;
@@ -254,6 +254,31 @@ svg { transform: rotate(-90deg); width: 100%; height: 100%; }
 }
 .status-message.show { opacity: 1; transform: translateY(0); }
 .status-message .check-icon { font-size: 1.2rem; color: #16a34a; }
+
+/* MENSAJE DINÁMICO CENTRAL (CELEBRACIÓN) */
+#celebration-message {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.8);
+  font-size: 2rem;
+  font-weight: 700;
+  color: #f43f5e;
+  text-align: center;
+  text-shadow: 0 2px 10px rgba(244, 63, 94, 0.3);
+  z-index: 9997;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.6s ease;
+  font-family: 'Inter', sans-serif;
+  white-space: nowrap;
+}
+#celebration-message.show {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+  color: #16a34a;
+  text-shadow: 0 0 20px rgba(22, 163, 74, 0.5);
+}
 
 /* LOADER */
 .loader {
@@ -280,8 +305,8 @@ svg { transform: rotate(-90deg); width: 100%; height: 100%; }
   left: 0;
   width: 100%;
   height: 100%;
-  pointer-events: none; /* Permite interactuar con los elementos debajo */
-  z-index: 9998; /* Debajo del status message */
+  pointer-events: none;
+  z-index: 9996;
 }
 </style>
 </head>
@@ -320,6 +345,9 @@ svg { transform: rotate(-90deg); width: 100%; height: 100%; }
 
 <!-- CANVAS PARA CONFETI -->
 <canvas id="confetti-canvas"></canvas>
+
+<!-- MENSAJE DINÁMICO CENTRAL -->
+<div id="celebration-message">¡Felicidades!</div>
 
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 <script>
@@ -427,10 +455,33 @@ function animateConfetti() {
     if (activePieces > 0) {
         requestAnimationFrame(animateConfetti);
     } else {
-        confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height); // Limpiar al final
+        confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
     }
 }
 
+// Mostrar mensaje dinámico de celebración
+function showCelebrationMessage(nota) {
+    const messageEl = document.getElementById('celebration-message');
+    let text = '';
+
+    if (nota >= 95) {
+        text = "¡Excelente! ¡Eres un referente en calidad!";
+    } else if (nota >= 90) {
+        text = "¡Impresionante! ¡Tu desempeño es excepcional!";
+    } else if (nota >= 85) {
+        text = "¡Felicidades! ¡Lograste una nota sobresaliente!";
+    } else {
+        return; // No mostrar si no alcanza 85%
+    }
+
+    messageEl.textContent = text;
+    messageEl.classList.add('show');
+
+    // Desvanecer después de 5 segundos
+    setTimeout(() => {
+        messageEl.classList.remove('show');
+    }, 5000);
+}
 
 // UTILS
 function parseToPercent(raw) {
@@ -490,11 +541,10 @@ function animateDonut(targetPercent) {
   circle.style.strokeDasharray = circumference;
   let offset = circumference;
   let current = 0;
-  const fps = 60;
   function step() {
     current += (targetPercent - current) * 0.1;
     if(Math.abs(current - targetPercent) < 0.1) current = targetPercent;
-    offset = circumference - (current/100)*circumference;
+    const offset = circumference - (current/100)*circumference;
     circle.style.strokeDashoffset = offset;
     let color = "#facc15";
     if(current <= 65) color="#f43f5e";
@@ -504,9 +554,10 @@ function animateDonut(targetPercent) {
     text.textContent = current.toFixed(1)+'%';
     if(current<targetPercent) requestAnimationFrame(step);
     else {
-      // Animación terminada, verificar si se debe lanzar confeti
+      // Animación terminada → Activar celebración
       if (targetPercent >= 85) {
         launchConfetti();
+        showCelebrationMessage(targetPercent);
       }
     }
   }
