@@ -19,7 +19,6 @@
   --menu-height: 70px;
 }
 
-/* RESET */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body {
   font-family: 'Inter', sans-serif;
@@ -28,7 +27,6 @@ body {
   overflow-x: hidden;
 }
 
-/* MENU CON GRADIENTE ANIMADO */
 @keyframes gradientMove {
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
@@ -53,14 +51,7 @@ header {
   border-bottom: 2px solid #fff5f5;
   transition: all 0.3s ease;
 }
-header:hover { transform: none; box-shadow: var(--shadow-menu); }
-header .logo {
-  font-weight: 700;
-  font-size: 1.7rem;
-  color: #fff;
-  letter-spacing: 1px;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.25);
-}
+header .logo { font-weight: 700; font-size: 1.7rem; color: #fff; letter-spacing: 1px; text-shadow: 0 2px 4px rgba(0,0,0,0.25); }
 header nav a {
   margin-left: 28px;
   text-decoration: none;
@@ -85,7 +76,6 @@ header nav a::after {
 header nav a:hover { transform: translateY(-3px) scale(1.08); }
 header nav a:hover::after { width: 100%; }
 
-/* MAIN */
 main {
   display: flex;
   justify-content: space-between;
@@ -94,7 +84,6 @@ main {
   transition: all 0.3s ease;
 }
 
-/* PANELS */
 .left-panel, .right-panel {
   background: var(--card-bg);
   border-radius: 20px;
@@ -105,12 +94,10 @@ main {
   max-width: 50%;
 }
 
-/* TITULOS */
 h1 { font-size: 1.6rem; margin-bottom: 14px; color: #334155; display: flex; align-items: center; gap: 6px; }
 h1::before { content: "📊"; }
 h3 { font-size: 1rem; color: #475569; margin-bottom: 10px; }
 
-/* BUSCADOR */
 .search-box { display: flex; gap: 10px; margin-bottom: 14px; }
 .search-box input {
   flex: 1;
@@ -140,7 +127,6 @@ h3 { font-size: 1rem; color: #475569; margin-bottom: 10px; }
   cursor: pointer;
 }
 
-/* TABLAS COMPACTAS */
 table { width: 100%; border-collapse: collapse; margin-top: 6px; font-size: 10px; }
 th {
   background: #fee2e2;
@@ -161,7 +147,6 @@ td:first-child { text-align: left; font-weight: 500; }
 tbody tr:nth-child(even) { background: #fff5f5; }
 tbody tr:hover { background: #fee2e2; }
 
-/* TOOLTIP CON MINI BARRA */
 td[data-tooltip]:hover::after {
   content: '';
   position: absolute;
@@ -199,10 +184,8 @@ td[data-tooltip]:hover::before {
   transform: translateX(-50%) scale(1.05);
 }
 
-/* DIVIDER */
 .divider { border-top: 2px solid #fca5a5; margin: 16px 0; }
 
-/* GRAFICO ANILLO */
 .chart-container { position: relative; width: 160px; height: 160px; margin: 16px auto; }
 svg { transform: rotate(-90deg); width: 100%; height: 100%; }
 .circle-bg { fill: none; stroke: #d1d5db; stroke-width: 12; }
@@ -225,14 +208,12 @@ svg { transform: rotate(-90deg); width: 100%; height: 100%; }
 }
 .subtitle { text-align: center; color: #64748b; font-size: 0.8rem; margin-top: 4px; }
 
-/* ESTADOS */
 .c-bad { color: #b91c1c !important; font-weight: 600; }
 .c-warn { color: #f97316 !important; font-weight: 600; }
 .c-good { color: #16a34a !important; font-weight: 600; }
 .cell-error { background: #fee2e2; color: #b91c1c; font-weight: 600; border-radius: 4px; }
 .cell-ok { background: #dcfce7; color: #16a34a; font-weight: 600; border-radius: 4px; }
 
-/* MENSAJE DE ESTADO */
 .status-message {
   position: fixed;
   bottom: 20px;
@@ -255,7 +236,6 @@ svg { transform: rotate(-90deg); width: 100%; height: 100%; }
 .status-message.show { opacity: 1; transform: translateY(0); }
 .status-message .check-icon { font-size: 1.2rem; color: #16a34a; }
 
-/* MENSAJE DINÁMICO CENTRAL (CELEBRACIÓN) */
 #celebration-message {
   position: fixed;
   top: 50%;
@@ -280,7 +260,6 @@ svg { transform: rotate(-90deg); width: 100%; height: 100%; }
   text-shadow: 0 0 20px rgba(22, 163, 74, 0.5);
 }
 
-/* SUGERENCIA DE MEJORA */
 .suggestion-box {
   margin-top: 16px;
   padding: 12px;
@@ -291,7 +270,6 @@ svg { transform: rotate(-90deg); width: 100%; height: 100%; }
   color: #78350f;
 }
 
-/* TENDENCIA */
 .trend-indicator {
   display: inline-block;
   font-size: 0.85rem;
@@ -304,7 +282,6 @@ svg { transform: rotate(-90deg); width: 100%; height: 100%; }
 .trend-down { color: #b91c1c; background: #fee2e2; }
 .trend-flat { color: #64748b; background: #f1f5f9; }
 
-/* LOADER */
 .loader {
   border: 3px solid #f3f3f3;
   border-top: 3px solid #ef4444;
@@ -316,13 +293,11 @@ svg { transform: rotate(-90deg); width: 100%; height: 100%; }
 }
 @keyframes spin { 100% { transform: rotate(360deg); } }
 
-/* RESPONSIVE */
 @media (max-width: 900px) {
   main { flex-direction: column; padding: calc(var(--menu-height) + 20px) 16px 16px 16px; }
   .left-panel, .right-panel { max-width: 100%; }
 }
 
-/* ESTILO CONFETI */
 #confetti-canvas {
   position: fixed;
   top: 0;
@@ -367,16 +342,14 @@ svg { transform: rotate(-90deg); width: 100%; height: 100%; }
   <span>Notas de calidad cargadas</span>
 </div>
 
-<!-- CANVAS PARA CONFETI -->
 <canvas id="confetti-canvas"></canvas>
-
-<!-- MENSAJE DINÁMICO CENTRAL -->
 <div id="celebration-message">¡Felicidades!</div>
 
-<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 <script>
-const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRp7iRBUwVpHnmf7Q0mLyARIBl-inFlZbH43i3wU1whcjE0GlPi7Z51VcmXRsWrcYCmWMS1WTL-ySJt/pub?gid=2119161122&single=true&output=csv";
+// 🔥 CONFIGURACIÓN: reemplaza con tu URL de Web App de Apps Script
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/REEMPLAZA_CON_TU_WEB_APP_URL/exec";
 
+// Definiciones de columnas (solo para etiquetas)
 const COLUMNS = [
   { key: '1_COMUNICACIÓN', label: 'Comunicación' },
   { key: '2_INFORMACIÓN', label: 'Información' },
@@ -407,308 +380,242 @@ const DETAIL_COLUMNS = [
   { key: '4.1 LPDP (FLAG 0 & 2)', label: 'LPDP (Flag 0 & 2)' }
 ];
 
-let allData = [];
+// Mapeo de nombre a índice para el detalle
+const headersToIndex = {
+  'DNI': 0, 'AGENTE': 1, 'SEMANA': 2,
+  '1_COMUNICACIÓN': 3, '2_INFORMACIÓN': 4, '3_GESTION DE VENTA (PRE VENTA)': 5,
+  '4_REGULATORIO': 6, 'NOTA': 7, 'FECHA': 8,
+  '1.1 PROTOCOLO DE BIENVENIDA Y DESPEDIDA': 9,
+  '1.2 CAPACIDAD DE FLUIDEZ Y VOCALIZACIÓN': 10,
+  '1.3 PRESENTA SONRISA TELEFONICA': 11,
+  '1.4 NO UTILIZA TECNISISMOS': 12,
+  '1.5 NO UTILIZA MULETILLAS': 13,
+  '1.6 ESCUCHA ACTIVA': 14,
+  '1.7 NO REALIZA TUTEO (PERSONALIZACION)': 15,
+  '2.1 BRINDA CARACTERISTICAS CORRECTAS DEL PRODUCTO': 16,
+  '2.2 BRINDA CARACTERISTICAS COMPLETAS DEL PRODUCTO': 17,
+  '2.3 PRESENTA BENEFICIOS DE MANERA CORRECTA': 18,
+  '2.4 PRESENTA BENEFICIOS DE MANERA COMPLETA': 19,
+  '2.5 ACLARA DUDAS DEL CLIENTE': 20,
+  '3.1 SONDEA LA NECESIDAD DE CLIENTE': 21,
+  '3.2 REBATE LA NEGATIVA DEL CLIENTE': 22,
+  '3.3 REBATE DE ACUERDO A LA NEGATIVA DEL CLIENTE': 23,
+  '3.4 APLICA CIERRE DE VENTA': 24,
+  '3.5 OFRECE CORRECTAMENTE CUENTA DIGITAL': 25,
+  '3.6 TIPIFICACIÓN': 26,
+  '4.1 LPDP (FLAG 0 & 2)': 27
+};
+
 let confettiCanvas, confettiCtx;
-let confettiPieces = [];
 const confettiColors = ['#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5', '#2196f3', '#03a9f4', '#00bcd4', '#009688', '#4caf50', '#8bc34a', '#cddc39', '#ffeb3b', '#ffc107', '#ff9800', '#ff5722'];
 
-// Inicializar canvas para confeti
+class ConfettiPiece {
+  constructor(w, h) {
+    this.x = Math.random() * w;
+    this.y = -20;
+    this.width = Math.random() * 10 + 5;
+    this.height = Math.random() * 8 + 3;
+    this.speed = Math.random() * 3 + 2;
+    this.color = confettiColors[Math.floor(Math.random() * confettiColors.length)];
+    this.rotation = Math.random() * 360;
+    this.rotationSpeed = Math.random() * 5 - 2.5;
+  }
+
+  update() {
+    this.y += this.speed;
+    this.rotation += this.rotationSpeed;
+  }
+
+  draw(ctx) {
+    ctx.save();
+    ctx.translate(this.x, this.y);
+    ctx.rotate(this.rotation * Math.PI / 180);
+    ctx.fillStyle = this.color;
+    ctx.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
+    ctx.restore();
+  }
+}
+
 function initConfetti() {
-    confettiCanvas = document.getElementById('confetti-canvas');
-    confettiCtx = confettiCanvas.getContext('2d');
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
+  confettiCanvas = document.getElementById('confetti-canvas');
+  confettiCtx = confettiCanvas.getContext('2d');
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
 }
 
 function resizeCanvas() {
-    confettiCanvas.width = window.innerWidth;
-    confettiCanvas.height = window.innerHeight;
+  confettiCanvas.width = window.innerWidth;
+  confettiCanvas.height = window.innerHeight;
 }
 
-// Clase para cada trozo de confeti
-class ConfettiPiece {
-    constructor() {
-        this.x = Math.random() * confettiCanvas.width;
-        this.y = -20;
-        this.width = Math.random() * 10 + 5;
-        this.height = Math.random() * 8 + 3;
-        this.speed = Math.random() * 3 + 2;
-        this.color = confettiColors[Math.floor(Math.random() * confettiColors.length)];
-        this.rotation = Math.random() * 360;
-        this.rotationSpeed = Math.random() * 5 - 2.5;
-    }
-
-    update() {
-        this.y += this.speed;
-        this.rotation += this.rotationSpeed;
-    }
-
-    draw() {
-        confettiCtx.save();
-        confettiCtx.translate(this.x, this.y);
-        confettiCtx.rotate(this.rotation * Math.PI / 180);
-        confettiCtx.fillStyle = this.color;
-        confettiCtx.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
-        confettiCtx.restore();
-    }
-}
-
-// Lanzar confeti
 function launchConfetti() {
-    confettiPieces = [];
-    const pieceCount = 150;
-    for (let i = 0; i < pieceCount; i++) {
-        confettiPieces.push(new ConfettiPiece());
-    }
-    animateConfetti();
-}
+  const pieces = [];
+  const count = 150;
+  for (let i = 0; i < count; i++) {
+    pieces.push(new ConfettiPiece(confettiCanvas.width, confettiCanvas.height));
+  }
 
-// Animar confeti
-function animateConfetti() {
+  function animate() {
     confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
-    let activePieces = 0;
-
-    confettiPieces.forEach(piece => {
-        piece.update();
-        piece.draw();
-        if (piece.y < confettiCanvas.height) {
-            activePieces++;
-        }
+    let active = 0;
+    pieces.forEach(p => {
+      p.update();
+      p.draw(confettiCtx);
+      if (p.y < confettiCanvas.height) active++;
     });
-
-    if (activePieces > 0) {
-        requestAnimationFrame(animateConfetti);
-    } else {
-        confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
-    }
+    if (active > 0) requestAnimationFrame(animate);
+  }
+  animate();
 }
 
-// Mostrar mensaje dinámico de celebración
 function showCelebrationMessage(nota) {
-    const messageEl = document.getElementById('celebration-message');
-    let text = '';
+  const msg = document.getElementById('celebration-message');
+  let text = '';
+  if (nota >= 95) text = "¡Excelente! ¡Eres un referente en calidad!";
+  else if (nota >= 90) text = "¡Impresionante! ¡Tu desempeño es excepcional!";
+  else if (nota >= 85) text = "¡Felicidades! ¡Lograste una nota sobresaliente!";
+  else return;
 
-    if (nota >= 95) {
-        text = "¡Excelente! ¡Eres un referente en calidad!";
-    } else if (nota >= 90) {
-        text = "¡Impresionante! ¡Tu desempeño es excepcional!";
-    } else if (nota >= 85) {
-        text = "¡Felicidades! ¡Lograste una nota sobresaliente!";
-    } else {
-        return;
-    }
-
-    messageEl.textContent = text;
-    messageEl.classList.add('show');
-
-    setTimeout(() => {
-        messageEl.classList.remove('show');
-    }, 5000);
+  msg.textContent = text;
+  msg.classList.add('show');
+  setTimeout(() => msg.classList.remove('show'), 5000);
 }
 
-// UTILS
-function parseToPercent(raw) {
-  if (!raw) return null;
-  let s = String(raw).trim().replace('%','').replace(',','.');
-  if (!s) return null;
-  let n = parseFloat(s);
-  if (isNaN(n)) return null;
-  let v = n;
-  if (Math.abs(v) <= 1) v = v * 100;
-  if (v < 0) v = 0;
-  if (v > 100) v = 100;
-  return v;
-}
 function getColorClass(value) {
   if (value <= 65) return 'c-bad';
   if (value >= 85) return 'c-good';
   return 'c-warn';
 }
-function showStatusMessage(msg = "Notas de calidad cargadas") {
-  const status = document.getElementById('statusMessage');
-  status.querySelector('span:nth-child(2)').textContent = msg;
-  status.classList.add('show');
-  setTimeout(()=> status.classList.remove('show'), 5000);
+
+function showStatusMessage(text = "Notas de calidad cargadas") {
+  const el = document.getElementById('statusMessage');
+  el.querySelector('span:nth-child(2)').textContent = text;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 5000);
 }
 
-// CARGA CSV
-function loadData() {
-  return new Promise((resolve)=>{
-    const container = document.getElementById('resultContainer');
-    container.innerHTML = '<div class="loader"></div>';
-    Papa.parse(CSV_URL, {
-      download: true,
-      header: true,
-      complete: function(results) {
-        allData = results.data;
-        container.innerHTML = '<div class="info">🔍 Ingresa un DNI para ver los resultados</div>';
-        resolve();
-      }
-    });
-  });
-}
-
-// CALCULO PROMEDIO
-function calcAvg(values) {
-  const nums = values.filter(v=>v!==null && !isNaN(v));
-  if(!nums.length) return 0;
-  return nums.reduce((a,b)=>a+b,0)/nums.length;
-}
-
-// DONUT ANIMATION
 function animateDonut(targetPercent) {
   const circle = document.querySelector('.circle-progress');
-  const text = document.getElementById('percentValue');
+  const textEl = document.getElementById('percentValue');
   const radius = 90;
   const circumference = 2 * Math.PI * radius;
   circle.style.strokeDasharray = circumference;
-  let offset = circumference;
   let current = 0;
+
   function step() {
     current += (targetPercent - current) * 0.1;
-    if(Math.abs(current - targetPercent) < 0.1) current = targetPercent;
-    const offset = circumference - (current/100)*circumference;
+    if (Math.abs(current - targetPercent) < 0.1) current = targetPercent;
+    const offset = circumference - (current / 100) * circumference;
     circle.style.strokeDashoffset = offset;
+    
     let color = "#facc15";
-    if(current <= 65) color="#f43f5e";
-    else if(current>=85) color="#2AC793";
+    if (current <= 65) color = "#f43f5e";
+    else if (current >= 85) color = "#2AC793";
+    
     circle.style.stroke = color;
-    text.style.color = color;
-    text.textContent = current.toFixed(1)+'%';
-    if(current<targetPercent) requestAnimationFrame(step);
-    else {
-      // Activar celebración si es buena nota
+    textEl.style.color = color;
+    textEl.textContent = current.toFixed(1) + '%';
+
+    if (current < targetPercent) {
+      requestAnimationFrame(step);
+    } else {
       if (targetPercent >= 85) {
         launchConfetti();
         showCelebrationMessage(targetPercent);
       }
-      // Aplicar efecto glow si es muy buena nota (≥90%)
-      if (targetPercent >= 90) {
-        circle.style.boxShadow = '0 0 20px rgba(22, 163, 74, 0.6)';
-      } else {
-        circle.style.boxShadow = 'none';
-      }
+      circle.style.boxShadow = targetPercent >= 90 ? '0 0 20px rgba(22, 163, 74, 0.6)' : 'none';
     }
   }
   requestAnimationFrame(step);
 }
 
-// BUSCAR POR DNI
+// 🔥 NUEVA FUNCIÓN PRINCIPAL: usa la API
 async function searchByDNI() {
   const dni = document.getElementById('dniInput').value.trim();
-  if(!dni) return alert("Ingresa un DNI");
-  if(!allData.length) await loadData();
-  const filtered = allData.filter(r=>r.DNI && r.DNI.toString().includes(dni));
-  if(!filtered.length){
-    document.getElementById('resultContainer').innerHTML = `<div class="error">No se encontró el DNI ${dni}</div>`;
-    document.getElementById('errorContainer').innerHTML = "";
-    return;
-  }
-  const nombre = filtered[0]?.AGENTE || "Sin nombre";
-  const weeks = [...new Set(filtered.map(r=>r.SEMANA||'Sin semana'))].sort();
+  if (!dni) return alert("Ingresa un DNI");
 
-  // TABLA IZQUIERDA
-  let table = `<h3>Resultados para: ${nombre}`;
-  // Idea 3: Badge si es buena nota (≥85%)
-  const notaGlobal = calcAvg(filtered.map(r=>parseToPercent(r['NOTA'])));
-  if (notaGlobal >= 85) {
-    table += `<span style="display: inline-block; background: #fbbf24; color: #1e293b; font-size: 0.7rem; padding: 2px 8px; border-radius: 12px; margin-left: 8px; font-weight: 600;">🌟 Excelente</span>`;
-  }
-  table += `</h3><table><thead><tr><th>Bloques</th>${weeks.map(w=>`<th>${w}</th>`).join('')}</tr></thead><tbody>`;
-  COLUMNS.forEach(col=>{
-    table+=`<tr><td>${col.label}</td>`;
-    weeks.forEach(w=>{
-      const vals = filtered.filter(r=>(r.SEMANA||'Sin semana')===w).map(r=>parseToPercent(r[col.key])).filter(x=>x!==null);
-      const avgWeek = calcAvg(vals);
-      const cls = getColorClass(avgWeek);
-      table+=`<td class="${cls}" data-tooltip="${avgWeek.toFixed(1)}%" style="--bar-width:${avgWeek}%">`+avgWeek.toFixed(1)+'%</td>';
-    });
-    table+='</tr>';
-  });
-  table+='</tbody></table><div class="divider"></div>';
-  table+=`<div class="chart-container">
-            <svg viewBox="0 0 200 200">
-              <circle class="circle-bg" cx="100" cy="100" r="90"></circle>
-              <circle class="circle-progress" cx="100" cy="100" r="90"></circle>
-            </svg>
-            <div class="percentage" id="percentValue">0%</div>
-          </div>
-          <div class="subtitle">(%) Nota General | (Evaluaciones: ${filtered.length})</div>`;
+  const left = document.getElementById('resultContainer');
+  const right = document.getElementById('errorContainer');
+  left.innerHTML = '<div class="loader"></div>';
+  right.innerHTML = '<div class="loader"></div>';
 
-  // Idea 5: Sugerencia si la nota es baja (<85%)
-  if (notaGlobal < 85) {
-    const worstBlock = COLUMNS.slice(0, -1).reduce((worst, col) => {
-      const avg = calcAvg(filtered.map(r => parseToPercent(r[col.key])));
-      return avg < worst.avg ? { key: col.label, avg } : worst;
-    }, { key: '', avg: 100 });
+  try {
+    const res = await fetch(`${APPS_SCRIPT_URL}?dni=${encodeURIComponent(dni)}`);
+    const data = await res.json();
 
-    table += `
-      <div class="suggestion-box">
-        💡 <strong>Sugerencia:</strong> Tu bloque a mejorar es <strong>${worstBlock.key}</strong> (${worstBlock.avg.toFixed(1)}%). 
-        Recuerda: mejorar aquí puede elevar tu nota general en hasta 15%.
-      </div>
-    `;
-  }
+    if (data.error) throw new Error(data.error);
+    if (data.total === 0) throw new Error(`No se encontraron registros para el DNI ${dni}`);
 
-  // Idea 2 (mejorado): Mini indicador de tendencia
-  if (weeks.length > 1) {
-    const lastTwoWeeks = weeks.slice(-2); // Últimas dos semanas
-    const lastWeekNote = calcAvg(filtered.filter(r => r.SEMANA === lastTwoWeeks[1]).map(r => parseToPercent(r['NOTA'])));
-    const prevWeekNote = calcAvg(filtered.filter(r => r.SEMANA === lastTwoWeeks[0]).map(r => parseToPercent(r['NOTA'])));
-    
-    if (lastWeekNote !== null && prevWeekNote !== null) {
-      const diff = lastWeekNote - prevWeekNote;
-      let trendClass = 'trend-flat';
-      let trendIcon = '↔️';
-      let trendText = `${diff.toFixed(1)}%`;
-      
-      if (diff > 0) {
-        trendClass = 'trend-up';
-        trendIcon = '📈';
-        trendText = `+${diff.toFixed(1)}%`;
-      } else if (diff < 0) {
-        trendClass = 'trend-down';
-        trendIcon = '📉';
-        trendText = `${diff.toFixed(1)}%`;
-      }
-      
-      table += `<div style="margin-top: 8px; text-align: center;">
-                  <span class="trend-indicator ${trendClass}">${trendIcon} ${trendText} vs semana anterior</span>
-                </div>`;
+    const nombre = data.registros[0][1] || "Sin nombre"; // AGENTE = índice 1
+    const promedios = data.promedios;
+    const notaGlobal = promedios?.NOTA ?? 0;
+
+    // Panel izquierdo: promedios generales
+    let table = `<h3>Resultados para: ${nombre}`;
+    if (notaGlobal >= 85) {
+      table += `<span style="display: inline-block; background: #fbbf24; color: #1e293b; font-size: 0.7rem; padding: 2px 8px; border-radius: 12px; margin-left: 8px; font-weight: 600;">🌟 Excelente</span>`;
     }
-  }
+    table += `</h3>`;
 
-  document.getElementById('resultContainer').innerHTML = table;
-  animateDonut(notaGlobal);
-
-  // TABLA DERECHA DETALLE (sin gráfico de evolución)
-  let detail = `<table><thead><tr><th>Atributos</th>${weeks.map(w=>`<th>${w}</th>`).join('')}</tr></thead><tbody>`;
-  DETAIL_COLUMNS.forEach(col=>{
-    detail+=`<tr><td>${col.label}</td>`;
-    weeks.forEach(w=>{
-      const sums = filtered.filter(r=>(r.SEMANA||'Sin semana')===w)
-        .map(r=>parseInt(String(r[col.key]||0).replace(/\D/g,''),10))
-        .filter(v=>!isNaN(v));
-      const sum = sums.reduce((a,b)=>a+b,0);
-      detail+=`<td class="${sum>=1?'cell-error':'cell-ok'}" data-tooltip="${sum}" style="--bar-width:${sum*10}%">${sum>=1?'❌':'✅'}</td>`;
+    table += `<table><thead><tr><th>Bloques</th><th>Promedio</th></tr></thead><tbody>`;
+    COLUMNS.forEach(col => {
+      const valor = promedios[col.key] || 0;
+      const cls = getColorClass(valor);
+      table += `<tr><td>${col.label}</td><td class="${cls}" data-tooltip="${valor.toFixed(1)}%" style="--bar-width:${valor}%">${valor.toFixed(1)}%</td></tr>`;
     });
-    detail+='</tr>';
-  });
-  detail+='</tbody></table>';
+    table += `</tbody></table>`;
 
-  document.getElementById('errorContainer').innerHTML = detail;
-  showStatusMessage();
+    table += `<div class="divider"></div>
+              <div class="chart-container">
+                <svg viewBox="0 0 200 200">
+                  <circle class="circle-bg" cx="100" cy="100" r="90"></circle>
+                  <circle class="circle-progress" cx="100" cy="100" r="90"></circle>
+                </svg>
+                <div class="percentage" id="percentValue">0%</div>
+              </div>
+              <div class="subtitle">(%) Nota General | (Evaluaciones: ${data.total})</div>`;
+
+    if (notaGlobal < 85) {
+      const worst = COLUMNS.slice(0, -1).reduce((w, col) => {
+        const avg = promedios[col.key] || 100;
+        return avg < w.avg ? { key: col.label, avg } : w;
+      }, { key: '', avg: 100 });
+
+      table += `<div class="suggestion-box">💡 <strong>Sugerencia:</strong> Tu bloque a mejorar es <strong>${worst.key}</strong> (${worst.avg.toFixed(1)}%). Recuerda: mejorar aquí puede elevar tu nota general en hasta 15%.</div>`;
+    }
+
+    left.innerHTML = table;
+    animateDonut(notaGlobal);
+
+    // Panel derecho: último registro detallado
+    const last = data.registros[data.registros.length - 1];
+    let detail = `<table><thead><tr><th>Atributos</th><th>Resultado</th></tr></thead><tbody>`;
+    DETAIL_COLUMNS.forEach(col => {
+      const idx = headersToIndex[col.key];
+      const val = last?.[idx] ?? 0;
+      const clean = typeof val === 'string' ? parseInt(val.replace(/\D/g, ''), 10) : Number(val);
+      const isValid = clean === 0;
+      detail += `<tr><td>${col.label}</td><td class="${isValid ? 'cell-ok' : 'cell-error'}" data-tooltip="${clean}">${isValid ? '✅' : '❌'}</td></tr>`;
+    });
+    detail += `</tbody></table>`;
+    right.innerHTML = detail;
+
+    showStatusMessage();
+  } catch (err) {
+    console.error(err);
+    const msg = err.message || 'Error desconocido';
+    document.getElementById('resultContainer').innerHTML = `<div class="error">${msg}</div>`;
+    document.getElementById('errorContainer').innerHTML = "";
+  }
 }
 
 document.getElementById('btnSearch').addEventListener('click', searchByDNI);
-document.getElementById('dniInput').addEventListener('keyup', e=>{
-  if(e.key==='Enter') searchByDNI();
+document.getElementById('dniInput').addEventListener('keyup', e => {
+  if (e.key === 'Enter') searchByDNI();
 });
 
-// Inicializar confeti y cargar datos
 window.onload = () => {
-    initConfetti();
-    loadData();
+  initConfetti();
 };
 </script>
 </body>
